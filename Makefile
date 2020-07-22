@@ -7,7 +7,7 @@ help:
 	@echo "install - Install required tools"
 	@echo "lint    - Lint code using golangci-lint"
 
-# Build status
+# Build katana
 build:
 	@./scripts/build/build.sh
 
