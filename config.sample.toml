@@ -1,0 +1,23 @@
+[vmdeployer]
+
+#related to job
+jobname = "e17"
+region = "global"
+priority = 50
+datacentre = "dc1"
+groupName = "test"
+
+#related to restart policy
+restartAttempts = 0
+restartMode = "fail"
+
+#related to the task
+taskname = "task01"
+driver   = "firecracker-task-driver"
+
+#Name of network set up using cni
+networkName = "fcnet"
+
+#related to logs
+fileNum  = 10
+fileSize  = 10
