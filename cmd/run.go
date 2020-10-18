@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/sdslabs/katana/api"
+	"github.com/sdslabs/katana/vmdeployerservice"
 	"github.com/spf13/cobra"
 )
 
@@ -10,7 +11,27 @@ var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run the katana API server",
 	Long:  `Runs the katana API server on port 3000`,
-	Run: func(cmd *cobra.Command, args []string) {
-		api.RunKatanaAPIServer()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// var g errgroup.Group
+
+		// vmDeployerListener, err := net.Listen("tcp", ":8001")
+		// if err != nil {
+		// 	panic(err)
+		// }
+
+		// vmDeployerServer := vmdeployerservice.Server()
+
+		// if e := vmDeployerServer.Serve(vmDeployerListener); e != nil {
+		// 	panic(e)
+		// }
+
+		go vmdeployerservice.Server()
+
+		// apiServer := api.Server()
+		return api.Server()
+
+		// if err := g.Wait(); err != nil {
+		// 	os.Exit(1)
+		// }
 	},
 }
