@@ -1,0 +1,7 @@
+[api]
+host = "localhost"
+port = "3000"
+
+[vmdeployer]
+host = "localhost"
+port = "8001"
