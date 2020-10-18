@@ -4,6 +4,10 @@ set -e
 
 CWD=${PWD}
 
+PROJECTROOT=$(pwd)
+PROJECTNAME=$(basename "$(PWD)")
+GOBIN=${PROJECTROOT}/bin
+
 GO_FLAGS=${GO_FLAGS:-"-tags netgo"}
 GO_CMD=${GO_CMD:-"build"}
 BUILD_USER=${BUILD_USER:-"${USER}@${HOSTNAME}"}
@@ -41,7 +45,7 @@ if [ -n "$VERBOSE" ]; then
   echo "Building with -ldflags $ldflags"
 fi
 
-GOBIN=$PWD go "${GO_CMD}" -o "$(go env GOPATH)/bin/katana" ${GO_FLAGS} -ldflags "${ldflags}" "${repo_path}/cmd"
+GOBIN=$PWD go "${GO_CMD}" -o "${GOBIN}/${PROJECTNAME}" ${GO_FLAGS} -ldflags "${ldflags}" "${repo_path}/cmd"
 
 echo "[*] Build Complete."
 exit 0
