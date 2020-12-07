@@ -6,10 +6,11 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/apex/log v1.5.0 // indirect
 	github.com/gin-contrib/cors v1.3.1 // indirect
-	github.com/gin-gonic/gin v1.6.3 // indirect
+	github.com/gin-gonic/gin v1.6.3
 	github.com/gofiber/fiber v1.14.6 // indirect
 	github.com/gofiber/fiber/v2 v2.1.0
 	github.com/golang/protobuf v1.4.3
+	github.com/hashicorp/nomad/api v0.0.0-20201204170458-d76340f0f7e7
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.0.0

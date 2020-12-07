@@ -36,6 +36,9 @@ func Server() error {
 	admin.Get("/:name", c.HelloAdmin)
 	admin.Get("/cluster/:id", c.ClusterInfo)
 
+	main := api.Group("/main")
+	main.Get("/:name", c.HelloMain)
+
 	fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port)
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port))
 }
