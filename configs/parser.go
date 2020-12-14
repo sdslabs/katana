@@ -2,7 +2,7 @@ package configs
 
 import (
 	"flag"
-	"os"
+	"log"
 
 	"github.com/BurntSushi/toml"
 )
@@ -11,7 +11,7 @@ func getConfiguration() *KatanaCfg {
 	flag.Parse()
 	config := &KatanaCfg{}
 	if _, err := toml.DecodeFile(*configFile, config); err != nil {
-		os.Exit(1)
+		log.Fatal(err)
 	}
 	return config
 }
@@ -26,4 +26,6 @@ var (
 	APIConfig = ServicesConfig.API
 
 	VMDeployerServiceConfig = ServicesConfig.VMDeployer
+
+	ChallengeDeployerServiceConfig = ServicesConfig.ChallengeDeployer
 )

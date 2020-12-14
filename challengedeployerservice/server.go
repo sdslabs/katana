@@ -6,12 +6,13 @@ import (
 	"net"
 	"os"
 
+	"github.com/sdslabs/katana/configs"
 	pb "github.com/sdslabs/katana/lib/foundry/protos/vmmanager"
 	"google.golang.org/grpc"
 	"k8s.io/client-go/kubernetes"
 )
 
-var config *ChallengeDeployerConfig
+var config configs.ChallengeDeployerConfig
 var kubeclient *kubernetes.Clientset
 
 type server struct {
@@ -59,6 +60,8 @@ func test() {
 }
 
 func NewService() error {
-	fmt.Println("In progress")
+	fmt.Println("Starting challenge deployer")
+	config = configs.ChallengeDeployerServiceConfig
+	fmt.Println(configs.KatanaConfig)
 	return nil
 }
