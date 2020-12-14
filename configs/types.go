@@ -11,13 +11,14 @@ type VMDeployerService struct {
 }
 
 type ChallengeDeployerConfig struct {
-	Host          string `toml:"host"`
-	Port          int    `toml:"port"`
-	TeamLabel     string `toml:"teamlabel"`
-	BroadcastPort int    `toml:"broadcastport"`
-	KubeHost      string `toml:"kubehost"`
-	KubeNameSpace string `toml:"kubenamesapce"`
-	KubeConfig    string `toml:"kubeconfig"`
+	Host           string `toml:"host"`
+	Port           int    `toml:"port"`
+	TeamLabel      string `toml:"teamlabel"`
+	BroadcastPort  int    `toml:"broadcastport"`
+	TeamClientPort int    `toml:"teamclientport"`
+	KubeHost       string `toml:"kubehost"`
+	KubeNameSpace  string `toml:"kubenamesapce"`
+	KubeConfig     string `toml:"kubeconfig"`
 }
 
 type Services struct {

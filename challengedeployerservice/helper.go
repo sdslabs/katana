@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -72,7 +73,6 @@ func compressAndMove(src string, dst string) error {
 	w := zip.NewWriter(outfile)
 	defer w.Close()
 
-	// TODO: Make less hacky
 	n := len(src)
 	if src[n-1] == '/' {
 		src = src[:n-1]
@@ -92,7 +92,7 @@ func compressAndMove(src string, dst string) error {
 		}
 		defer file.Close()
 
-		// TODO: Check for absolute paths to prevent arbitrary file overwrite
+		// TODO: Check for arbitrary read/ write
 
 		f, err := w.Create(path[n:])
 		if err != nil {
@@ -111,15 +111,6 @@ func compressAndMove(src string, dst string) error {
 		return err
 	}
 	return os.RemoveAll(src)
-}
-
-func broadcast(file string) error {
-	chal, err := os.Open(filepath.Join("challenges", file))
-	if err != nil {
-		return err
-	}
-	fmt.Println(chal)
-	return nil
 }
 
 func sendFile(file *os.File, params map[string]string, filename, uri string) error {
@@ -149,4 +140,34 @@ func sendFile(file *os.File, params map[string]string, filename, uri string) err
 
 	client.Do(req)
 	return nil
+}
+
+func broadcast(file string) error {
+	chal, err := os.Open(filepath.Join("challenges", file))
+	if err != nil {
+		return err
+	}
+	defer chal.Close()
+
+	lbl := make(map[string]string)
+	lbl["app"] = config.TeamLabel
+	teamPods, err := getPods(lbl)
+	if err != nil {
+		return err
+	}
+
+	addresses := []string{}
+	for _, pod := range teamPods {
+		addresses = append(addresses, fmt.Sprintf("%s:%d", pod.Status.PodIP, config.TeamClientPort))
+	}
+
+	addressesEncoded, err := json.Marshal(addresses)
+	if err != nil {
+		return err
+	}
+
+	params := make(map[string]string)
+	params["targets"] = string(addressesEncoded)
+
+	return sendFile(chal, params, file, fmt.Sprintf("%s:%d", config.KubeHost, config.BroadcastPort))
 }

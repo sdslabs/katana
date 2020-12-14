@@ -13,4 +13,5 @@ kubeconfig = ""
 kubehost = "localhost"
 kubenamespace = ""
 broadcastport = 3003
+teamclientport = 2002
 teamlabel = "ctfteam"
