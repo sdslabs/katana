@@ -16,9 +16,6 @@ type ChallengeDeployerConfig struct {
 	TeamLabel      string `toml:"teamlabel"`
 	BroadcastPort  int    `toml:"broadcastport"`
 	TeamClientPort int    `toml:"teamclientport"`
-	KubeHost       string `toml:"kubehost"`
-	KubeNameSpace  string `toml:"kubenamesapce"`
-	KubeConfig     string `toml:"kubeconfig"`
 }
 
 type Services struct {
@@ -28,5 +25,8 @@ type Services struct {
 }
 
 type KatanaCfg struct {
-	Services Services `toml:"services"`
+	KubeHost      string   `toml:"kubehost"`
+	KubeNameSpace string   `toml:"kubenamesapce"`
+	KubeConfig    string   `toml:"kubeconfig"`
+	Services      Services `toml:"services"`
 }

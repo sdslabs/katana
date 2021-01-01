@@ -22,7 +22,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func getClient(pathToCfg string) (*kubernetes.Clientset, error) {
+// Get kubernetes client
+func getClient(pathToCfg string) error {
 	if pathToCfg == "" {
 		pathToCfg = filepath.Join(
 			os.Getenv("HOME"), ".kube", "config",
@@ -30,18 +31,35 @@ func getClient(pathToCfg string) (*kubernetes.Clientset, error) {
 	}
 	config, err := clientcmd.BuildConfigFromFlags("", pathToCfg)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return kubernetes.NewForConfig(config)
+
+	client, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return err
+	}
+
+	kubeclient = client
+	return nil
 }
 
 func getPods(lbls map[string]string) ([]v1.Pod, error) {
 	set := labels.Set(lbls)
-	pods, err := kubeclient.CoreV1().Pods(config.KubeNameSpace).List(context.Background(), metav1.ListOptions{LabelSelector: set.AsSelector().String()})
+	pods, err := kubeclient.CoreV1().Pods(katanaConfig.KubeNameSpace).List(context.Background(), metav1.ListOptions{LabelSelector: set.AsSelector().String()})
 	if err != nil {
 		return nil, err
 	}
 	return pods.Items, nil
+}
+
+// Check if path already exists or not
+func exists(path string) bool {
+	if _, err := os.Stat(path); err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+	}
+	return true
 }
 
 // Clone the provided remote repository into repos/<local>
@@ -51,11 +69,12 @@ func clone(remote string, local string, auth *githttp.BasicAuth) error {
 		Progress: os.Stdout,
 		Auth:     auth,
 	}
+
 	tmpdir, err := ioutil.TempDir("tmp", local)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Temporary directory created: %s", tmpdir)
+
 	if _, err := git.PlainClone(fmt.Sprintf(tmpdir), false, cloneConfig); err != nil {
 		return err
 	}
@@ -64,6 +83,10 @@ func clone(remote string, local string, auth *githttp.BasicAuth) error {
 
 // Compress the src directory into <dst>.zip
 func compressAndMove(src string, dst string) error {
+	if exists(dst) {
+		return fmt.Errorf("File %s: already exists or cannot be accessed", dst)
+	}
+
 	outfile, err := os.Create(dst)
 	if err != nil {
 		return err
@@ -113,12 +136,12 @@ func compressAndMove(src string, dst string) error {
 	return os.RemoveAll(src)
 }
 
+// Send file to given URI and include provided parameters in the request
 func sendFile(file *os.File, params map[string]string, filename, uri string) error {
 	client := &http.Client{}
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile(filename, filename)
-
 	if err != nil {
 		return err
 	}
@@ -142,6 +165,7 @@ func sendFile(file *os.File, params map[string]string, filename, uri string) err
 	return nil
 }
 
+// Send given file to the broadcast service, to be forwarded to all pods marked with app=cofig.Teamlabel
 func broadcast(file string) error {
 	chal, err := os.Open(filepath.Join("challenges", file))
 	if err != nil {
@@ -169,5 +193,5 @@ func broadcast(file string) error {
 	params := make(map[string]string)
 	params["targets"] = string(addressesEncoded)
 
-	return sendFile(chal, params, file, fmt.Sprintf("%s:%d", config.KubeHost, config.BroadcastPort))
+	return sendFile(chal, params, file, fmt.Sprintf("%s:%d", katanaConfig.KubeHost, config.BroadcastPort))
 }

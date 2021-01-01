@@ -13,6 +13,7 @@ import (
 )
 
 var config g.ChallengeDeployerConfig
+var katanaConfig *g.KatanaCfg
 var kubeclient *kubernetes.Clientset
 
 type server struct{}
@@ -55,5 +56,10 @@ func Server() error {
 func NewService() error {
 	fmt.Println("Initiating Challenge Deployer service")
 	config = g.ChallengeDeployerServiceConfig
+	katanaConfig = g.KatanaConfig
+
+	if err := getClient(katanaConfig.KubeConfig); err != nil {
+		return err
+	}
 	return Server()
 }
