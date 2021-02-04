@@ -1,7 +1,18 @@
-[api]
-host = "localhost"
-port = "3000"
+kubeconfig = ""
+kubehost = "http://localhost"
+kubenamespace = ""
 
-[vmdeployer]
+[services.api]
 host = "localhost"
-port = "8001"
+port = 3000
+
+[services.vmdeployer]
+host = "localhost"
+port = 8001
+
+[services.challengedeployer]
+host = "localhost"
+port = 8002
+broadcastport = 3003
+teamclientport = 2002
+teamlabel = "ctfteam"
