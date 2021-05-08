@@ -12,9 +12,11 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-var config g.ChallengeDeployerConfig
-var katanaConfig *g.KatanaCfg
-var kubeclient *kubernetes.Clientset
+var (
+	config       g.ChallengeDeployerConfig
+	katanaConfig *g.KatanaCfg
+	kubeclient   *kubernetes.Clientset
+)
 
 type server struct{}
 
