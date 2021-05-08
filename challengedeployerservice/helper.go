@@ -137,11 +137,11 @@ func compressAndMove(src string, dst string) error {
 }
 
 // Send file to given URI and include provided parameters in the request
-func sendFile(file *os.File, params map[string]string, filename, uri string) error {
+func SendFile(file *os.File, params map[string]string, filename, uri string) error {
 	client := &http.Client{}
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile(filename, filename)
+	part, err := writer.CreateFormFile("challfile", filename)
 	if err != nil {
 		return err
 	}
@@ -193,5 +193,5 @@ func broadcast(file string) error {
 	params := make(map[string]string)
 	params["targets"] = string(addressesEncoded)
 
-	return sendFile(chal, params, file, fmt.Sprintf("%s:%d", katanaConfig.KubeHost, config.BroadcastPort))
+	return SendFile(chal, params, file, fmt.Sprintf("%s:%d", katanaConfig.KubeHost, config.BroadcastPort))
 }
