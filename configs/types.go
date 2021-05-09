@@ -5,22 +5,22 @@ type API struct {
 	Host string `toml:"host"`
 }
 
-type VMDeployerService struct {
-	Port int    `toml:"port"`
-	Host string `toml:"host"`
+type Cluster struct {
+	BroadcastCount uint   `toml:"broadcastcount"`
+	BroadcastLabel string `toml:"broadcastlabel"`
+	TeamCount      uint   `toml:"teamcount"`
+	TeamLabel      string `toml:"teamlabel"`
 }
 
 type ChallengeDeployerConfig struct {
 	Host           string `toml:"host"`
-	Port           int    `toml:"port"`
-	TeamLabel      string `toml:"teamlabel"`
-	BroadcastPort  int    `toml:"broadcastport"`
-	TeamClientPort int    `toml:"teamclientport"`
+	Port           uint   `toml:"port"`
+	BroadcastPort  uint   `toml:"broadcastport"`
+	TeamClientPort uint   `toml:"teamclientport"`
 }
 
 type Services struct {
 	API               API                     `toml:"api"`
-	VMDeployer        VMDeployerService       `toml:"vmdeployer"`
 	ChallengeDeployer ChallengeDeployerConfig `toml:"challengedeployer"`
 }
 
@@ -29,4 +29,5 @@ type KatanaCfg struct {
 	KubeNameSpace string   `toml:"kubenamesapce"`
 	KubeConfig    string   `toml:"kubeconfig"`
 	Services      Services `toml:"services"`
+	Cluster       Cluster  `toml:"cluster"`
 }

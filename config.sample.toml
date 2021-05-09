@@ -2,17 +2,18 @@ kubeconfig = ""
 kubehost = "http://localhost"
 kubenamespace = ""
 
+[cluster]
+broadcastcount = 2
+broadcastlabel = "broadcast"
+teamcount = 3
+teamlabel = "ctfteam"
+
 [services.api]
 host = "localhost"
 port = 3000
-
-[services.vmdeployer]
-host = "localhost"
-port = 8001
 
 [services.challengedeployer]
 host = "localhost"
 port = 8002
 broadcastport = 3003
-teamclientport = 2002
-teamlabel = "ctfteam"
+teamclientport = 3004

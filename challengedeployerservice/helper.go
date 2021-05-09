@@ -174,7 +174,7 @@ func broadcast(file string) error {
 	defer chal.Close()
 
 	lbl := make(map[string]string)
-	lbl["app"] = config.TeamLabel
+	lbl["app"] = katanaConfig.Cluster.TeamLabel
 	teamPods, err := getPods(lbl)
 	if err != nil {
 		return err

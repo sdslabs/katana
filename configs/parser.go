@@ -25,7 +25,7 @@ var (
 
 	APIConfig = ServicesConfig.API
 
-	VMDeployerServiceConfig = ServicesConfig.VMDeployer
+	ClusterConfig = KatanaConfig.Cluster
 
 	ChallengeDeployerServiceConfig = ServicesConfig.ChallengeDeployer
 )

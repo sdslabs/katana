@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: katana-teams
+spec:
+  selector:
+    matchLabels:
+      app: {{.TeamLabel}}
+  replicas: {{.TeamCount}}
+  template:
+    metadata:
+      labels:
+        app: {{.TeamLabel}}
+    spec:
+      containers:
+      - name: teamvm
+        image: scar26/sdskatanad:latest
