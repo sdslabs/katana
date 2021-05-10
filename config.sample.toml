@@ -7,6 +7,12 @@ broadcastcount = 2
 broadcastlabel = "broadcast"
 teamcount = 3
 teamlabel = "ctfteam"
+manifest_dir = "templates/manifests"
+manifests = [
+    "teams.yml",
+    "broadcast.yml",
+    "broadcast-service.yml"
+]
 
 [services.api]
 host = "localhost"
@@ -17,3 +23,4 @@ host = "localhost"
 port = 8002
 broadcastport = 3003
 teamclientport = 3004
+challenge_artifact_label = "challfile"

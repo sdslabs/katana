@@ -6,10 +6,12 @@ type API struct {
 }
 
 type Cluster struct {
-	BroadcastCount uint   `toml:"broadcastcount"`
-	BroadcastLabel string `toml:"broadcastlabel"`
-	TeamCount      uint   `toml:"teamcount"`
-	TeamLabel      string `toml:"teamlabel"`
+	BroadcastCount uint     `toml:"broadcastcount"`
+	BroadcastLabel string   `toml:"broadcastlabel"`
+	TeamCount      uint     `toml:"teamcount"`
+	TeamLabel      string   `toml:"teamlabel"`
+	ManifestDir    string   `toml:"manifest_dir"`
+	Manifests      []string `toml:"manifests"`
 }
 
 type ChallengeDeployerConfig struct {
@@ -17,6 +19,7 @@ type ChallengeDeployerConfig struct {
 	Port           uint   `toml:"port"`
 	BroadcastPort  uint   `toml:"broadcastport"`
 	TeamClientPort uint   `toml:"teamclientport"`
+	ArtifactLabel  string `toml:"challenge_artifact_label"`
 }
 
 type Services struct {

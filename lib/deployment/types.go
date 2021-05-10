@@ -1,17 +1,10 @@
 package deployment
 
-type TeamConfig struct {
-	TeamCount uint
-	TeamLabel string
-}
-
-type BroadcastConfig struct {
+// DeploymentConfig contains the total data to be injected in manifest templates
+type DeploymentConfig struct {
+	TeamCount      uint
+	TeamLabel      string
 	BroadcastCount uint
-	BroadcastLabel string
-	BroadcastPort  uint
-}
-
-type BroadcastServiceConfig struct {
 	BroadcastLabel string
 	BroadcastPort  uint
 }

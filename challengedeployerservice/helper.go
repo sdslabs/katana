@@ -141,7 +141,7 @@ func SendFile(file *os.File, params map[string]string, filename, uri string) err
 	client := &http.Client{}
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("challfile", filename)
+	part, err := writer.CreateFormFile(config.ArtifactLabel, filename)
 	if err != nil {
 		return err
 	}

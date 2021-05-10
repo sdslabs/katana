@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"path/filepath"
 	"text/template"
 
 	g "github.com/sdslabs/katana/configs"
@@ -19,6 +20,7 @@ import (
 	"k8s.io/client-go/restmapper"
 )
 
+// ApplyManifest applies a given manifest to the cluster
 func ApplyManifest(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset, manifest []byte) error {
 	dd, err := dynamic.NewForConfig(kubeconfig)
 	if err != nil {
@@ -54,7 +56,7 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset, ma
 		var dri dynamic.ResourceInterface
 		if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
 			if unstructuredObj.GetNamespace() == "" {
-				unstructuredObj.SetNamespace("default")
+				unstructuredObj.SetNamespace(g.KatanaConfig.KubeNameSpace)
 			}
 			dri = dd.Resource(mapping.Resource).Namespace(unstructuredObj.GetNamespace())
 		} else {
@@ -73,63 +75,35 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset, ma
 	}
 }
 
+// DeployCluster retrieves and applies all the manifest templates specified in config
+// after injecting the necessary values
 func DeployCluster(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset) error {
 	clusterConfig := g.ClusterConfig
 
-	teamConfig := TeamConfig{
-		TeamCount: clusterConfig.TeamCount,
-		TeamLabel: clusterConfig.TeamLabel,
-	}
-
-	broadcastConfig := BroadcastConfig{
+	deploymentConfig := DeploymentConfig{
+		TeamCount:      clusterConfig.TeamCount,
+		TeamLabel:      clusterConfig.TeamLabel,
 		BroadcastCount: clusterConfig.BroadcastCount,
 		BroadcastLabel: clusterConfig.BroadcastLabel,
 		BroadcastPort:  g.ServicesConfig.ChallengeDeployer.BroadcastPort,
 	}
 
-	broadcastServiceConfig := &BroadcastServiceConfig{
-		BroadcastLabel: clusterConfig.BroadcastLabel,
-		BroadcastPort:  g.ServicesConfig.ChallengeDeployer.BroadcastPort,
+	for _, m := range clusterConfig.Manifests {
+		manifest := &bytes.Buffer{}
+
+		tmpl, err := template.ParseFiles(filepath.Join(clusterConfig.ManifestDir), m)
+		if err != nil {
+			return err
+		}
+
+		if err = tmpl.Execute(manifest, deploymentConfig); err != nil {
+			return err
+		}
+
+		if err = ApplyManifest(kubeconfig, kubeclient, manifest.Bytes()); err != nil {
+			return err
+		}
 	}
 
-	teamtmpl, err := template.ParseFiles("templates/manifests/teams.yml")
-	if err != nil {
-		return err
-	}
-
-	broadcasttmpl, err := template.ParseFiles("templates/manifests/broadcast.yml")
-	if err != nil {
-		return err
-	}
-
-	broadcastsvctmpl, err := template.ParseFiles("templates/manifests/broadcast-service.yml")
-	if err != nil {
-		return err
-	}
-
-	teamManifest := &bytes.Buffer{}
-	broadcastManifest := &bytes.Buffer{}
-	broadcastServiceManifest := &bytes.Buffer{}
-
-	if err = teamtmpl.Execute(teamManifest, teamConfig); err != nil {
-		return err
-	}
-
-	if err = broadcasttmpl.Execute(broadcastManifest, broadcastConfig); err != nil {
-		return err
-	}
-
-	if err = broadcastsvctmpl.Execute(broadcastServiceManifest, broadcastServiceConfig); err != nil {
-		return err
-	}
-
-	if err = ApplyManifest(kubeconfig, kubeclient, teamManifest.Bytes()); err != nil {
-		return err
-	}
-
-	if err = ApplyManifest(kubeconfig, kubeclient, broadcastManifest.Bytes()); err != nil {
-		return err
-	}
-
-	return ApplyManifest(kubeconfig, kubeclient, broadcastServiceManifest.Bytes())
+	return nil
 }
