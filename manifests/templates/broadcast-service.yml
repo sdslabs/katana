@@ -5,6 +5,7 @@ metadata:
 spec:
   type: ClusterIP
   selector:
+    deployment: {{.DeploymentLabel}}
     app: {{.BroadcastLabel}}
   ports:
     - protocol: TCP

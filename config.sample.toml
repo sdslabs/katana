@@ -3,6 +3,7 @@ kubehost = "http://localhost"
 kubenamespace = "default"
 
 [cluster]
+deploymentlabel = "katana"
 broadcastcount = 2
 broadcastlabel = "broadcast"
 teamcount = 3

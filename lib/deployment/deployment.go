@@ -9,9 +9,11 @@ import (
 	"text/template"
 
 	g "github.com/sdslabs/katana/configs"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 	yamlutil "k8s.io/apimachinery/pkg/util/yaml"
@@ -22,7 +24,7 @@ import (
 )
 
 // ApplyManifest applies a given manifest to the cluster
-func ApplyManifest(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset, manifest []byte) error {
+func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset, manifest []byte) error {
 	dd, err := dynamic.NewForConfig(kubeconfig)
 	if err != nil {
 		return err
@@ -43,7 +45,7 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset, ma
 
 		unstructuredObj := &unstructured.Unstructured{Object: unstructuredMap}
 
-		gr, err := restmapper.GetAPIGroupResources(kubeclient.Discovery())
+		gr, err := restmapper.GetAPIGroupResources(kubeclientset.Discovery())
 		if err != nil {
 			return err
 		}
@@ -78,7 +80,7 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset, ma
 
 // DeployCluster retrieves and applies all the manifest templates specified in config
 // after injecting the necessary values
-func DeployCluster(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset) error {
+func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset) error {
 	clusterConfig := g.ClusterConfig
 
 	deploymentConfig := DeploymentConfig{
@@ -109,10 +111,37 @@ func DeployCluster(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset) er
 			return err
 		}
 
-		if err = ApplyManifest(kubeconfig, kubeclient, manifest.Bytes()); err != nil {
+		if err = ApplyManifest(kubeconfig, kubeclientset, manifest.Bytes()); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func PollPods(kubeclientset *kubernetes.Clientset, activePods chan<- string) (string, error) {
+	client := kubeclientset.CoreV1()
+	selector := make(map[string]string)
+	selector["deployment"] = g.ClusterConfig.DeploymentLabel
+	opts := metav1.ListOptions{LabelSelector: labels.Set(selector).AsSelector().String()}
+
+	statusCount := make(map[corev1.PodPhase]uint)
+	for {
+		pods, err := client.Pods(g.KatanaConfig.KubeNameSpace).List(context.Background(), opts)
+		if err != nil {
+			return "", err
+		}
+
+		statusCount[corev1.PodFailed] = 0
+		statusCount[corev1.PodPending] = 0
+		statusCount[corev1.PodRunning] = 0
+		statusCount[corev1.PodUnknown] = 0
+
+		for _, pod := range pods.Items {
+			statusCount[pod.Status.Phase] += 1
+		}
+
+		fmt.Print("\r \r")
+		fmt.Printf("Running: %d\tPending: %d\tFailed: %d\tUnknown: %d", statusCount[corev1.PodRunning], statusCount[corev1.PodPending], statusCount[corev1.PodFailed], statusCount[corev1.PodFailed])
+	}
 }
