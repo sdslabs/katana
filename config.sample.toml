@@ -1,6 +1,6 @@
 kubeconfig = ""
 kubehost = "http://localhost"
-kubenamespace = ""
+kubenamespace = "default"
 
 [cluster]
 broadcastcount = 2

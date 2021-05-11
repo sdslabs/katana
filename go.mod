@@ -7,6 +7,7 @@ require (
 	github.com/apex/log v1.5.0 // indirect
 	github.com/gin-contrib/cors v1.3.1 // indirect
 	github.com/gin-gonic/gin v1.6.3 // indirect
+	github.com/gliderlabs/ssh v0.2.2
 	github.com/go-git/go-git/v5 v5.2.0
 	github.com/gofiber/fiber v1.14.6 // indirect
 	github.com/gofiber/fiber/v2 v2.1.0

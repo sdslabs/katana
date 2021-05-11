@@ -29,7 +29,7 @@ type Services struct {
 
 type KatanaCfg struct {
 	KubeHost      string   `toml:"kubehost"`
-	KubeNameSpace string   `toml:"kubenamesapce"`
+	KubeNameSpace string   `toml:"kubenamespace"`
 	KubeConfig    string   `toml:"kubeconfig"`
 	Services      Services `toml:"services"`
 	Cluster       Cluster  `toml:"cluster"`
