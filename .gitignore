@@ -6,3 +6,5 @@ challenges/*
 !challenges/.gitkeep
 tmp/*
 !tmp/.gitkeep
+katana
+test.go
