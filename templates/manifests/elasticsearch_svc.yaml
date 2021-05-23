@@ -2,7 +2,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: elasticsearch
-  namespace: katana-logging
+  namespace: {{.KubeNameSpace}}
   labels:
     app: elasticsearch
 spec:

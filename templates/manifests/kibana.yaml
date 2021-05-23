@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kibana
-  namespace: katana-logging
+  namespace: {{.KubeNameSpace}}
   labels:
     app: kibana
 spec:
@@ -15,7 +15,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kibana
-  namespace: katana-logging
+  namespace: {{.KubeNameSpace}}
   labels:
     app: kibana
 spec:

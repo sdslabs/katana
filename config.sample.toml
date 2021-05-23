@@ -12,7 +12,6 @@ manifests = [
     "teams.yml",
     "broadcast.yml",
     "broadcast-service.yml",
-    "log-namespace.yaml",
     "elasticsearch_svc.yaml",
     "elasticsearch_statefulset.yaml",
     "kibana.yaml",
