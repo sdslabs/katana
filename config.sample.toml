@@ -11,7 +11,12 @@ manifest_dir = "templates/manifests"
 manifests = [
     "teams.yml",
     "broadcast.yml",
-    "broadcast-service.yml"
+    "broadcast-service.yml",
+    "log-namespace.yaml",
+    "elasticsearch_svc.yaml",
+    "elasticsearch_statefulset.yaml",
+    "kibana.yaml",
+    "fluentd-daemonset.yaml"
 ]
 
 [services.api]
