@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/sdslabs/katana/api"
-	"github.com/sdslabs/katana/vmdeployerservice"
 	"github.com/spf13/cobra"
 )
 
@@ -24,8 +23,6 @@ var runCmd = &cobra.Command{
 		// if e := vmDeployerServer.Serve(vmDeployerListener); e != nil {
 		// 	panic(e)
 		// }
-
-		go vmdeployerservice.Server()
 
 		// apiServer := api.Server()
 		return api.Server()
