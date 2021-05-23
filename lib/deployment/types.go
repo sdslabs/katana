@@ -7,4 +7,6 @@ type DeploymentConfig struct {
 	BroadcastCount uint
 	BroadcastLabel string
 	BroadcastPort  uint
+	KubeNameSpace  string
+	FluentHost     string
 }
