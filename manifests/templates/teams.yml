@@ -15,3 +15,13 @@ spec:
       containers:
       - name: teamvm
         image: scar26/sdskatanad:latest
+        volumeMounts:
+        - name: vol1
+          mountPath: /opt/katana
+      volumes:
+      - name: vol1   
+        configMap:
+          name: teamvm-config
+          items: 
+          - key: "teamvm.configs"
+            path: "config.py"

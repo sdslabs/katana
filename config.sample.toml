@@ -10,6 +10,7 @@ teamlabel = "ctfteam"
 manifest_dir = "manifests/templates"
 manifests = [
     "teams.yml",
+    "teamvm_configmap.yaml"
     "broadcast.yml",
     "broadcast-service.yml",
     "elasticsearch_svc.yaml",
