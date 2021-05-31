@@ -93,7 +93,7 @@ func DeployCluster(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset) er
 
 	for _, m := range clusterConfig.Manifests {
 		manifest := &bytes.Buffer{}
-
+		fmt.Printf("Applying: %s\n", m)
 		tmpl, err := template.ParseFiles(filepath.Join(clusterConfig.ManifestDir, m))
 		if err != nil {
 			return err

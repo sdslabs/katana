@@ -7,7 +7,7 @@ broadcastcount = 2
 broadcastlabel = "broadcast"
 teamcount = 3
 teamlabel = "ctfteam"
-manifest_dir = "templates/manifests"
+manifest_dir = "manifests/templates"
 manifests = [
     "teams.yml",
     "broadcast.yml",
