@@ -1,9 +1,0 @@
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: teamvm-config
-data:
-  teamvm.configs: |
-    challenge_dir = "/opt/challenges/"
-    tmp_dir = "/tmp/"
-    init_file = "run.sh"
