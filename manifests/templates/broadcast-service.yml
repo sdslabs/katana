@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: broadcast-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: {{.BroadcastLabel}}
   ports:

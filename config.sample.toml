@@ -7,7 +7,7 @@ broadcastcount = 2
 broadcastlabel = "broadcast"
 teamcount = 3
 teamlabel = "ctfteam"
-manifest_dir = "templates/manifests"
+manifest_dir = "manifests/templates"
 manifests = [
     "teams.yml",
     "broadcast.yml",
@@ -15,7 +15,8 @@ manifests = [
     "elasticsearch_svc.yaml",
     "elasticsearch_statefulset.yaml",
     "kibana.yaml",
-    "fluentd-daemonset.yaml"
+    "fluentd-daemonset.yaml",
+    "ingress.yml"
 ]
 
 [services.api]
@@ -23,7 +24,7 @@ host = "localhost"
 port = 3000
 
 [services.challengedeployer]
-host = "localhost"
+host = "challengedeployer.katana.local"
 port = 8002
 broadcastport = 3003
 teamclientport = 3004

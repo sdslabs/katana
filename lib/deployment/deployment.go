@@ -82,18 +82,19 @@ func DeployCluster(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset) er
 	clusterConfig := g.ClusterConfig
 
 	deploymentConfig := DeploymentConfig{
-		FluentHost:     fmt.Sprintf("\"elasticsearch.%s.svc.cluster.local\"", g.KatanaConfig.KubeNameSpace),
-		KubeNameSpace:  g.KatanaConfig.KubeNameSpace,
-		TeamCount:      clusterConfig.TeamCount,
-		TeamLabel:      clusterConfig.TeamLabel,
-		BroadcastCount: clusterConfig.BroadcastCount,
-		BroadcastLabel: clusterConfig.BroadcastLabel,
-		BroadcastPort:  g.ServicesConfig.ChallengeDeployer.BroadcastPort,
+		FluentHost:            fmt.Sprintf("\"elasticsearch.%s.svc.cluster.local\"", g.KatanaConfig.KubeNameSpace),
+		KubeNameSpace:         g.KatanaConfig.KubeNameSpace,
+		TeamCount:             clusterConfig.TeamCount,
+		TeamLabel:             clusterConfig.TeamLabel,
+		BroadcastCount:        clusterConfig.BroadcastCount,
+		BroadcastLabel:        clusterConfig.BroadcastLabel,
+		BroadcastPort:         g.ServicesConfig.ChallengeDeployer.BroadcastPort,
+		ChallengeDeployerHost: g.ServicesConfig.ChallengeDeployer.Host,
 	}
 
 	for _, m := range clusterConfig.Manifests {
 		manifest := &bytes.Buffer{}
-
+		fmt.Printf("Applying: %s\n", m)
 		tmpl, err := template.ParseFiles(filepath.Join(clusterConfig.ManifestDir, m))
 		if err != nil {
 			return err
