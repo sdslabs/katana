@@ -45,4 +45,5 @@ spec:
             valueFrom:
               configMapKeyRef:
                 name: teamvm-config
-                key: daemon_port                
+                key: daemon_port       
+
