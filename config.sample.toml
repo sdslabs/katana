@@ -29,3 +29,9 @@ port = 8002
 broadcastport = 3003
 teamclientport = 3004
 challenge_artifact_label = "challfile"
+
+[teamvm]
+challengedir = "/opt/challenges/"
+tmpdir = "/tmp/"
+initfile = "run.sh"
+daemonport = 3004

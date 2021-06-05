@@ -28,9 +28,17 @@ type Services struct {
 }
 
 type KatanaCfg struct {
-	KubeHost      string   `toml:"kubehost"`
-	KubeNameSpace string   `toml:"kubenamespace"`
-	KubeConfig    string   `toml:"kubeconfig"`
-	Services      Services `toml:"services"`
-	Cluster       Cluster  `toml:"cluster"`
+	KubeHost      string              `toml:"kubehost"`
+	KubeNameSpace string              `toml:"kubenamespace"`
+	KubeConfig    string              `toml:"kubeconfig"`
+	Services      Services            `toml:"services"`
+	Cluster       Cluster             `toml:"cluster"`
+	TeamVmConfig  TeamChallengeConfig `toml:"teamvm"`
+}
+
+type TeamChallengeConfig struct {
+	ChallengeDir string `toml:"challengedir"`
+	TempDir      string `toml:"tmpdir"`
+	InitFile     string `toml:"initfile"`
+	DaemonPort   uint   `toml:"daemonport"`
 }

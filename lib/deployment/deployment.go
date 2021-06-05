@@ -82,14 +82,17 @@ func DeployCluster(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset) er
 	clusterConfig := g.ClusterConfig
 
 	deploymentConfig := DeploymentConfig{
-		FluentHost:            fmt.Sprintf("\"elasticsearch.%s.svc.cluster.local\"", g.KatanaConfig.KubeNameSpace),
-		KubeNameSpace:         g.KatanaConfig.KubeNameSpace,
-		TeamCount:             clusterConfig.TeamCount,
-		TeamLabel:             clusterConfig.TeamLabel,
-		BroadcastCount:        clusterConfig.BroadcastCount,
-		BroadcastLabel:        clusterConfig.BroadcastLabel,
-		BroadcastPort:         g.ServicesConfig.ChallengeDeployer.BroadcastPort,
-		ChallengeDeployerHost: g.ServicesConfig.ChallengeDeployer.Host,
+		FluentHost:     fmt.Sprintf("\"elasticsearch.%s.svc.cluster.local\"", g.KatanaConfig.KubeNameSpace),
+		KubeNameSpace:  g.KatanaConfig.KubeNameSpace,
+		TeamCount:      clusterConfig.TeamCount,
+		TeamLabel:      clusterConfig.TeamLabel,
+		BroadcastCount: clusterConfig.BroadcastCount,
+		BroadcastLabel: clusterConfig.BroadcastLabel,
+		BroadcastPort:  g.ServicesConfig.ChallengeDeployer.BroadcastPort,
+		ChallengDir:    g.TeamVmConfig.ChallengeDir,
+		TempDir:        g.TeamVmConfig.TempDir,
+		InitFile:       g.TeamVmConfig.InitFile,
+		DaemonPort:     g.TeamVmConfig.DaemonPort,
 	}
 
 	for _, m := range clusterConfig.Manifests {
