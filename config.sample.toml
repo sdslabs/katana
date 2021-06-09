@@ -28,7 +28,7 @@ host = "challengedeployer.katana.local"
 port = 8002
 broadcastport = 3003
 teamclientport = 3004
-challenge_artifact_label = "challfile"
+challengeartifactlabel = "challfile"
 
 [teamvm]
 challengedir = "/opt/challenges/"

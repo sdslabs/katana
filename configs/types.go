@@ -19,7 +19,7 @@ type ChallengeDeployerConfig struct {
 	Port           uint   `toml:"port"`
 	BroadcastPort  uint   `toml:"broadcastport"`
 	TeamClientPort uint   `toml:"teamclientport"`
-	ArtifactLabel  string `toml:"challenge_artifact_label"`
+	ArtifactLabel  string `toml:"challengeartifactlabel"`
 }
 
 type Services struct {
