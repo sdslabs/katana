@@ -57,7 +57,7 @@ func Server() error {
 
 func NewService() error {
 	fmt.Println("Initiating Challenge Deployer service")
-	config = g.ChallengeDeployerServiceConfig
+	config = g.ServicesConfig.ChallengeDeployer
 	katanaConfig = g.KatanaConfig
 
 	if err := getClient(katanaConfig.KubeConfig); err != nil {
