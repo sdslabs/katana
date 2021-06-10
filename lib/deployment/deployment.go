@@ -94,6 +94,7 @@ func DeployCluster(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset) er
 		InitFile:              g.TeamVmConfig.InitFile,
 		DaemonPort:            g.TeamVmConfig.DaemonPort,
 		ChallengeDeployerHost: g.ServicesConfig.ChallengeDeployer.Host,
+		ChallengeArtifact:     g.ServicesConfig.ChallengeDeployer.ArtifactLabel,
 	}
 
 	for _, m := range clusterConfig.Manifests {
