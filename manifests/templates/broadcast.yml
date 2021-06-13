@@ -17,3 +17,6 @@ spec:
         image: scar26/sdskatanabroadcast:latest
         ports:
         - containerPort:  {{.BroadcastPort}}
+        env: 
+        - name: "CHALLENGE_ARTIFACT"
+          value: {{.ChallengeArtifact}}

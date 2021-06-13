@@ -14,4 +14,5 @@ type DeploymentConfig struct {
 	InitFile              string
 	DaemonPort            uint
 	ChallengeDeployerHost string
+	ChallengeArtifact     string
 }
