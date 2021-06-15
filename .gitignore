@@ -9,3 +9,4 @@ tmp/*
 katana
 test.go
 vendor/*
+*.log

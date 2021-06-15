@@ -119,7 +119,7 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 	return nil
 }
 
-func PollPods(kubeclientset *kubernetes.Clientset, activePods chan<- string) (string, error) {
+func PollDeployments(kubeclientset *kubernetes.Clientset, activePods chan<- string) (string, error) {
 	client := kubeclientset.CoreV1()
 	selector := make(map[string]string)
 	selector["deployment"] = g.ClusterConfig.DeploymentLabel

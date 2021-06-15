@@ -35,6 +35,7 @@ type KatanaCfg struct {
 	Services      Services            `toml:"services"`
 	Cluster       Cluster             `toml:"cluster"`
 	TeamVmConfig  TeamChallengeConfig `toml:"teamvm"`
+	Mongo         MongoCfg            `toml:"mongo"`
 }
 
 type TeamChallengeConfig struct {

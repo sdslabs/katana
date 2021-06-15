@@ -1,6 +1,7 @@
 kubeconfig = ""
 kubehost = "http://localhost"
 kubenamespace = "default"
+logfile = "katana.log"
 
 [cluster]
 deploymentlabel = "katana"
@@ -36,3 +37,6 @@ challengedir = "/opt/challenges/"
 tmpdir = "/tmp/"
 initfile = "run.sh"
 daemonport = 3004
+
+[mongo]
+url = "mongodb://scar:scar@localhost:27017/?authSource=admin"
