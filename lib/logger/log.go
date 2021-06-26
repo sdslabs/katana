@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/op/go-logging"
 	"github.com/sdslabs/katana/configs"
 )
 
@@ -20,6 +21,10 @@ var tagToString = map[int]string{
 	DebugTAG: "[DEBUG]",
 }
 
+var format = logging.MustStringFormatter(
+	`%{color}%{time:15:04:05.000} %{shortfunc} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}`,
+)
+
 var logFile *os.File
 var fileLogging bool
 
@@ -31,7 +36,9 @@ func Log(tag int, messages ...string) {
 	fmt.Fprintf(logFile, "abc")
 }
 
-func LogError(tag int, messages ...string)
+func LogError(message string) {
+	fmt.Println()
+}
 
 func init() {
 	var err error

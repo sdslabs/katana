@@ -15,7 +15,7 @@ type Cluster struct {
 	Manifests       []string `toml:"manifests"`
 }
 
-type ChallengeDeployerConfig struct {
+type ChallengeDeployerCfg struct {
 	Host           string `toml:"host"`
 	Port           uint   `toml:"port"`
 	BroadcastPort  uint   `toml:"broadcastport"`
@@ -23,19 +23,14 @@ type ChallengeDeployerConfig struct {
 	ArtifactLabel  string `toml:"challengeartifactlabel"`
 }
 
-type Services struct {
-	API               API                     `toml:"api"`
-	ChallengeDeployer ChallengeDeployerConfig `toml:"challengedeployer"`
+type AdminCfg struct {
+	Username string `toml:"username"`
+	Password string `toml:"password"`
 }
 
-type KatanaCfg struct {
-	KubeHost      string              `toml:"kubehost"`
-	KubeNameSpace string              `toml:"kubenamespace"`
-	KubeConfig    string              `toml:"kubeconfig"`
-	Services      Services            `toml:"services"`
-	Cluster       Cluster             `toml:"cluster"`
-	TeamVmConfig  TeamChallengeConfig `toml:"teamvm"`
-	Mongo         MongoCfg            `toml:"mongo"`
+type ServicesCfg struct {
+	API               API                  `toml:"api"`
+	ChallengeDeployer ChallengeDeployerCfg `toml:"challengedeployer"`
 }
 
 type TeamChallengeConfig struct {
@@ -43,4 +38,16 @@ type TeamChallengeConfig struct {
 	TempDir      string `toml:"tmpdir"`
 	InitFile     string `toml:"initfile"`
 	DaemonPort   uint   `toml:"daemonport"`
+}
+
+type KatanaCfg struct {
+	KubeHost      string              `toml:"kubehost"`
+	KubeNameSpace string              `toml:"kubenamespace"`
+	KubeConfig    string              `toml:"kubeconfig"`
+	LogFile       string              `toml:"logfile"`
+	Services      ServicesCfg         `toml:"services"`
+	Cluster       ClusterCfg          `toml:"cluster"`
+	Mongo         MongoCfg            `toml:"mongo"`
+	TeamVmConfig  TeamChallengeConfig `toml:"teamvm"`
+	AdminConfig   AdminCfg            `toml:"admin"`
 }
