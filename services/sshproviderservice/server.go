@@ -1,7 +1,6 @@
 package sshproviderservice
 
 import (
-	"context"
 	"log"
 	"os"
 	"path/filepath"
@@ -9,46 +8,28 @@ import (
 	"github.com/gliderlabs/ssh"
 	g "github.com/sdslabs/katana/configs"
 	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/remotecommand"
 )
 
 var (
-	config       g.ChallengeDeployerConfig
-	katanaConfig *g.KatanaCfg
-	kubeclient   *kubernetes.Clientset
+	kubeClientset *kubernetes.Clientset
+	kubeConfig    *rest.Config
+	execCmd       = []string{"/bin/bash"}
 )
 
-func ExecCmdExample(s ssh.Session) {
+func sessionHandler(s ssh.Session) {
+	kubeclient := kubeClientset.CoreV1().RESTClient()
 
-	pathToCfg := filepath.Join(
-		os.Getenv("HOME"), ".kube", "config",
-	)
+	podName := s.User()
 
-	config, err := clientcmd.BuildConfigFromFlags("", pathToCfg)
-	if err != nil {
-		log.Fatal(err)
-	}
+	req := kubeclient.Post().Resource("pods").Name(podName).Namespace(g.KatanaConfig.KubeNameSpace).SubResource("exec")
 
-	client, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	cmd := []string{
-		"/bin/bash",
-	}
-
-	pods, err := client.CoreV1().Pods("").List(context.Background(), metav1.ListOptions{})
-	podName := pods.Items[0].Name
-
-	req := client.CoreV1().RESTClient().Post().Resource("pods").Name(podName).
-		Namespace("default").SubResource("exec")
 	option := &v1.PodExecOptions{
-		Command: cmd,
+		Command: execCmd,
 		Stdin:   true,
 		Stdout:  true,
 		Stderr:  true,
@@ -59,7 +40,7 @@ func ExecCmdExample(s ssh.Session) {
 		option,
 		scheme.ParameterCodec,
 	)
-	exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
+	exec, err := remotecommand.NewSPDYExecutor(kubeConfig, "POST", req.URL())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -76,7 +57,29 @@ func ExecCmdExample(s ssh.Session) {
 }
 
 func Server() {
-	ssh.Handle(ExecCmdExample)
+	ssh.Handle(sessionHandler)
 	log.Println("starting ssh server on port 2222")
 	log.Fatal(ssh.ListenAndServe(":2222", nil))
+}
+
+func init() {
+	var pathToCfg string
+	if g.KatanaConfig.KubeConfig == "" {
+		pathToCfg = filepath.Join(
+			os.Getenv("HOME"), ".kube", "config",
+		)
+	} else {
+		pathToCfg = g.KatanaConfig.KubeConfig
+	}
+
+	config, err := clientcmd.BuildConfigFromFlags("", pathToCfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	kubeConfig = config
+
+	kubeClientset, err = kubernetes.NewForConfig(config)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

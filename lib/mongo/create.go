@@ -21,3 +21,7 @@ func InsertMany(ctx context.Context, collectionName string, data []interface{}) 
 	}
 	return res.InsertedIDs, nil
 }
+
+func CreateTeams(teams []interface{}) (interface{}, error) {
+	return InsertMany(context.Background(), TeamsCollection, teams)
+}
