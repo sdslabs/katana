@@ -3,16 +3,14 @@ package sshproviderservice
 import (
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 
 	"github.com/gliderlabs/ssh"
 	g "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/lib/utils"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/remotecommand"
 )
 
@@ -65,22 +63,13 @@ func Server() {
 }
 
 func init() {
-	var pathToCfg string
-	if g.KatanaConfig.KubeConfig == "" {
-		pathToCfg = filepath.Join(
-			os.Getenv("HOME"), ".kube", "config",
-		)
-	} else {
-		pathToCfg = g.KatanaConfig.KubeConfig
-	}
-
-	config, err := clientcmd.BuildConfigFromFlags("", pathToCfg)
+	var err error
+	kubeConfig, err = utils.GetKubeConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
-	kubeConfig = config
 
-	kubeClientset, err = kubernetes.NewForConfig(config)
+	kubeClientset, err = utils.GetKubeClient()
 	if err != nil {
 		log.Fatal(err)
 	}

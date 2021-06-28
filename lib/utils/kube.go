@@ -15,7 +15,7 @@ import (
 )
 
 // Get kubernetes REST config
-func getKubeConfig() (*rest.Config, error) {
+func GetKubeConfig() (*rest.Config, error) {
 	var pathToCfg string
 	if g.KatanaConfig.KubeConfig == "" {
 		pathToCfg = filepath.Join(
@@ -30,7 +30,7 @@ func getKubeConfig() (*rest.Config, error) {
 
 // Get kubernetes clientset
 func GetKubeClient() (*kubernetes.Clientset, error) {
-	config, err := getKubeConfig()
+	config, err := GetKubeConfig()
 	if err != nil {
 		return nil, err
 	}
