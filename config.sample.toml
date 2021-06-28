@@ -41,7 +41,7 @@ daemonport = 3004
 [services.sshprovider]
 host = "localhost"
 port = 2222
-creds_file = "teamcreds.json"
+creds_file = "teamcreds.txt"
 password_length = 10
 
 [mongo]
