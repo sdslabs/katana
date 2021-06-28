@@ -6,46 +6,36 @@ import (
 	"time"
 
 	"github.com/op/go-logging"
-	"github.com/sdslabs/katana/configs"
 )
 
 const (
-	ErrorTAG = 1
-	InfoTAG  = 2
-	DebugTAG = 3
+	ErrorTAG = "[ERROR]"
+	InfoTAG  = "[INFO]"
 )
 
-var tagToString = map[int]string{
-	ErrorTAG: "[ERROR]",
-	InfoTAG:  "[INFO]",
-	DebugTAG: "[DEBUG]",
-}
-
-var format = logging.MustStringFormatter(
-	`%{color}%{time:15:04:05.000} %{shortfunc} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}`,
+var (
+	log      = logging.MustGetLogger("katana")
+	format   = logging.MustStringFormatter(`%{color}%{time:15:04:05.000} %{shortfunc} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}`)
+	LogInfo  = log.Info
+	LogError = log.Error
 )
-
-var logFile *os.File
-var fileLogging bool
 
 func getTimeStamp() string {
 	return fmt.Sprintf("%v", time.Now().Unix())
 }
 
-func Log(tag int, messages ...string) {
-	fmt.Fprintf(logFile, "abc")
-}
-
-func LogError(message string) {
-	fmt.Println()
-}
-
 func init() {
-	var err error
-	logFile, err = os.Open(configs.KatanaConfig.LogFile)
-	if err != nil {
-		LogError("Log file could not be accessed")
-	} else {
-		fileLogging = true
-	}
+	var infoBackend logging.Backend
+	var errBackend logging.Backend
+
+	infoBackend = logging.NewLogBackend(os.Stdout, InfoTAG, 0)
+	errBackend = logging.NewLogBackend(os.Stderr, ErrorTAG, 0)
+
+	infoBackend = logging.NewBackendFormatter(infoBackend, format)
+	errBackend = logging.NewBackendFormatter(errBackend, format)
+
+	errBackendLeveled := logging.AddModuleLevel(errBackend)
+	errBackendLeveled.SetLevel(logging.ERROR, "")
+
+	logging.SetBackend(infoBackend, errBackendLeveled)
 }
