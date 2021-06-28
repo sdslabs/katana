@@ -31,6 +31,7 @@ type AdminCfg struct {
 type ServicesCfg struct {
 	API               API                  `toml:"api"`
 	ChallengeDeployer ChallengeDeployerCfg `toml:"challengedeployer"`
+	SSHProvider       SSHProviderCfg       `toml:"sshprovider"`
 }
 
 type TeamChallengeConfig struct {
@@ -38,6 +39,13 @@ type TeamChallengeConfig struct {
 	TempDir      string `toml:"tmpdir"`
 	InitFile     string `toml:"initfile"`
 	DaemonPort   uint   `toml:"daemonport"`
+}
+
+type SSHProviderCfg struct {
+	Host        string `toml:"host"`
+	Port        uint   `toml:"port"`
+	CredsFile   string `toml:"creds_file"`
+	PasswordLen uint   `toml:"password_length"`
 }
 
 type KatanaCfg struct {

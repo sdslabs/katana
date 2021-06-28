@@ -5,6 +5,7 @@ import (
 
 	g "github.com/sdslabs/katana/configs"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -15,15 +16,15 @@ var (
 	}
 )
 
-func PingStatefulSets(ctx context.Context, kubeclientset *kubernetes.Clientset, opts metav1.ListOptions) ([]*ResourceStatus, bool, error) {
+func PingStatefulSets(ctx context.Context, kubeclientset *kubernetes.Clientset, opts map[string]string) ([]*ResourceStatus, bool, error) {
 	setsInterface := kubeclientset.AppsV1().StatefulSets(g.KatanaConfig.KubeNameSpace)
-	sets, err := setsInterface.List(ctx, opts)
+	sets, err := setsInterface.List(ctx, metav1.ListOptions{LabelSelector: labels.Set(opts).AsSelector().String()})
 	if err != nil {
 		return nil, false, err
 	}
 
 	pingresult := make([]*ResourceStatus, len(sets.Items))
-	var allReady bool = true
+	allReady := true
 	for i, set := range sets.Items {
 		status := &ResourceStatus{
 			Name:          set.Name,
@@ -38,15 +39,15 @@ func PingStatefulSets(ctx context.Context, kubeclientset *kubernetes.Clientset, 
 	return pingresult, allReady, nil
 }
 
-func PingDeployments(ctx context.Context, kubeclientset *kubernetes.Clientset, opts metav1.ListOptions) ([]*ResourceStatus, bool, error) {
-	setsInterface := kubeclientset.AppsV1().Deployments(g.KatanaConfig.KubeNameSpace)
-	deployments, err := setsInterface.List(ctx, opts)
+func PingDeployments(ctx context.Context, kubeclientset *kubernetes.Clientset, opts map[string]string) ([]*ResourceStatus, bool, error) {
+	deploymentsInterface := kubeclientset.AppsV1().Deployments(g.KatanaConfig.KubeNameSpace)
+	deployments, err := deploymentsInterface.List(ctx, metav1.ListOptions{LabelSelector: labels.Set(opts).AsSelector().String()})
 	if err != nil {
 		return nil, false, err
 	}
 
 	pingresult := make([]*ResourceStatus, len(deployments.Items))
-	var allReady bool = true
+	allReady := true
 	for i, deployment := range deployments.Items {
 		status := &ResourceStatus{
 			Name:          deployment.Name,
@@ -63,7 +64,7 @@ func PingDeployments(ctx context.Context, kubeclientset *kubernetes.Clientset, o
 
 func PollDeployments(kubeclientset *kubernetes.Clientset, done chan<- error) {
 	ctx := context.Background()
-	opts := metav1.ListOptions{}
+	var opts map[string]string
 	go func() {
 		for {
 			allReady := true

@@ -41,6 +41,8 @@ daemonport = 3004
 [services.sshprovider]
 host = "localhost"
 port = 2222
+creds_file = "teamcreds.json"
+password_length = 10
 
 [mongo]
 url = "mongodb://scar:scar@localhost:27017/?authSource=admin"

@@ -29,6 +29,8 @@ var (
 
 	ChallengeDeployerConfig = ServicesConfig.ChallengeDeployer
 
+	SSHProviderConfig = ServicesConfig.SSHProvider
+
 	AdminConfig = KatanaConfig.AdminConfig
 
 	TeamVmConfig = KatanaConfig.TeamVmConfig

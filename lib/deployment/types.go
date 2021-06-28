@@ -3,7 +3,6 @@ package deployment
 import (
 	"context"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -31,4 +30,4 @@ type ResourceStatus struct {
 	Ready         bool
 }
 
-type ResourcePinger func(context.Context, *kubernetes.Clientset, metav1.ListOptions) ([]*ResourceStatus, bool, error)
+type ResourcePinger func(context.Context, *kubernetes.Clientset, map[string]string) ([]*ResourceStatus, bool, error)
