@@ -34,4 +34,6 @@ var (
 	AdminConfig = KatanaConfig.AdminConfig
 
 	TeamVmConfig = KatanaConfig.TeamVmConfig
+
+	MongoConfig = KatanaConfig.Mongo
 )

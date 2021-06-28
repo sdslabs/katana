@@ -5,7 +5,7 @@ type API struct {
 	Host string `toml:"host"`
 }
 
-type Cluster struct {
+type ClusterCfg struct {
 	DeploymentLabel string   `toml:"deploymentlabel"`
 	BroadcastCount  uint     `toml:"broadcastcount"`
 	BroadcastLabel  string   `toml:"broadcastlabel"`
@@ -46,6 +46,10 @@ type SSHProviderCfg struct {
 	Port        uint   `toml:"port"`
 	CredsFile   string `toml:"creds_file"`
 	PasswordLen uint   `toml:"password_length"`
+}
+
+type MongoCfg struct {
+	URL string `toml:"url"`
 }
 
 type KatanaCfg struct {
