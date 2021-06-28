@@ -32,3 +32,13 @@ func FetchDocs(ctx context.Context, collectionName string, filter bson.M, opts .
 	}
 	return data
 }
+
+func FetchSingleTeam(teamName string) (*CTFTeam, error) {
+	collection := link.Collection(TeamsCollection)
+	team := &CTFTeam{}
+	ctx := context.Background()
+	if err := collection.FindOne(ctx, bson.M{UsernameKey: teamName}).Decode(team); err != nil {
+		return nil, err
+	}
+	return team, nil
+}

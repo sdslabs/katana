@@ -6,6 +6,7 @@ import (
 
 	"github.com/gliderlabs/ssh"
 	g "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/lib/mongo"
 	"github.com/sdslabs/katana/lib/utils"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
@@ -56,10 +57,20 @@ func sessionHandler(s ssh.Session) {
 	}
 }
 
-func Server() {
-	ssh.Handle(sessionHandler)
-	log.Println("starting ssh server on port 2222")
-	log.Fatal(ssh.ListenAndServe(":2222", nil))
+func passwordHandler(s ssh.Context, password string) bool {
+	team, err := mongo.FetchSingleTeam(s.User())
+	if err != nil {
+		return false
+	}
+	return utils.CompareHashWithPassword(team.Password, password)
+}
+
+func Server() *ssh.Server {
+	return &ssh.Server{
+		Addr:            fmt.Sprintf("%s:%d", g.SSHProviderConfig.Host, g.SSHProviderConfig.Port),
+		Handler:         sessionHandler,
+		PasswordHandler: passwordHandler,
+	}
 }
 
 func init() {
