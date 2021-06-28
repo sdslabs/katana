@@ -10,11 +10,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-// Get kubernetes clientset
-func GetClient() (*kubernetes.Clientset, error) {
+// Get kubernetes REST config
+func getKubeConfig() (*rest.Config, error) {
 	var pathToCfg string
 	if g.KatanaConfig.KubeConfig == "" {
 		pathToCfg = filepath.Join(
@@ -24,7 +25,12 @@ func GetClient() (*kubernetes.Clientset, error) {
 		pathToCfg = g.KatanaConfig.KubeConfig
 	}
 
-	config, err := clientcmd.BuildConfigFromFlags("", pathToCfg)
+	return clientcmd.BuildConfigFromFlags("", pathToCfg)
+}
+
+// Get kubernetes clientset
+func GetKubeClient() (*kubernetes.Clientset, error) {
+	config, err := getKubeConfig()
 	if err != nil {
 		return nil, err
 	}

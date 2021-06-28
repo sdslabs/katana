@@ -1,6 +1,7 @@
 package sshproviderservice
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -42,18 +43,19 @@ func sessionHandler(s ssh.Session) {
 	)
 	exec, err := remotecommand.NewSPDYExecutor(kubeConfig, "POST", req.URL())
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(s, "ERROR: %s", err.Error())
+		s.Exit(1)
 	}
 	err = exec.Stream(remotecommand.StreamOptions{
 		Stdin:  s,
 		Stdout: s,
 		Stderr: s,
 	})
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	log.Fatal(err)
+	if err != nil {
+		fmt.Fprintf(s, "ERROR: %s", err.Error())
+		s.Exit(1)
+	}
 }
 
 func Server() {
