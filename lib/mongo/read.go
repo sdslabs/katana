@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/sdslabs/katana/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -33,9 +34,9 @@ func FetchDocs(ctx context.Context, collectionName string, filter bson.M, opts .
 	return data
 }
 
-func FetchSingleTeam(teamName string) (*CTFTeam, error) {
+func FetchSingleTeam(teamName string) (*types.CTFTeam, error) {
 	collection := link.Collection(TeamsCollection)
-	team := &CTFTeam{}
+	team := &types.CTFTeam{}
 	ctx := context.Background()
 	if err := collection.FindOne(ctx, bson.M{UsernameKey: teamName}).Decode(team); err != nil {
 		return nil, err

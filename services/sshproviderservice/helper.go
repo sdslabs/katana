@@ -7,6 +7,7 @@ import (
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/mongo"
 	"github.com/sdslabs/katana/lib/utils"
+	"github.com/sdslabs/katana/types"
 )
 
 func createTeams() error {
@@ -30,7 +31,7 @@ func createTeams() error {
 			return err
 		}
 
-		team := CTFTeam{
+		team := types.CTFTeam{
 			Index:    i,
 			Name:     pod.Name,
 			PodName:  pod.Name,
