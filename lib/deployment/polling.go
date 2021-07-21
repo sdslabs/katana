@@ -4,29 +4,30 @@ import (
 	"context"
 
 	g "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
 )
 
 var (
-	pingers = []ResourcePinger{
+	pingers = []types.ResourcePinger{
 		PingDeployments,
 		PingStatefulSets,
 	}
 )
 
-func PingStatefulSets(ctx context.Context, kubeclientset *kubernetes.Clientset, opts map[string]string) ([]*ResourceStatus, bool, error) {
+func PingStatefulSets(ctx context.Context, kubeclientset *kubernetes.Clientset, opts map[string]string) ([]*types.ResourceStatus, bool, error) {
 	setsInterface := kubeclientset.AppsV1().StatefulSets(g.KatanaConfig.KubeNameSpace)
 	sets, err := setsInterface.List(ctx, metav1.ListOptions{LabelSelector: labels.Set(opts).AsSelector().String()})
 	if err != nil {
 		return nil, false, err
 	}
 
-	pingresult := make([]*ResourceStatus, len(sets.Items))
+	pingresult := make([]*types.ResourceStatus, len(sets.Items))
 	allReady := true
 	for i, set := range sets.Items {
-		status := &ResourceStatus{
+		status := &types.ResourceStatus{
 			Name:          set.Name,
 			TotalReplicas: *set.Spec.Replicas,
 			ReadyReplicas: set.Status.ReadyReplicas,
@@ -39,17 +40,17 @@ func PingStatefulSets(ctx context.Context, kubeclientset *kubernetes.Clientset, 
 	return pingresult, allReady, nil
 }
 
-func PingDeployments(ctx context.Context, kubeclientset *kubernetes.Clientset, opts map[string]string) ([]*ResourceStatus, bool, error) {
+func PingDeployments(ctx context.Context, kubeclientset *kubernetes.Clientset, opts map[string]string) ([]*types.ResourceStatus, bool, error) {
 	deploymentsInterface := kubeclientset.AppsV1().Deployments(g.KatanaConfig.KubeNameSpace)
 	deployments, err := deploymentsInterface.List(ctx, metav1.ListOptions{LabelSelector: labels.Set(opts).AsSelector().String()})
 	if err != nil {
 		return nil, false, err
 	}
 
-	pingresult := make([]*ResourceStatus, len(deployments.Items))
+	pingresult := make([]*types.ResourceStatus, len(deployments.Items))
 	allReady := true
 	for i, deployment := range deployments.Items {
-		status := &ResourceStatus{
+		status := &types.ResourceStatus{
 			Name:          deployment.Name,
 			TotalReplicas: *deployment.Spec.Replicas,
 			ReadyReplicas: deployment.Status.ReadyReplicas,
@@ -68,7 +69,7 @@ func PollDeployments(kubeclientset *kubernetes.Clientset, done chan<- error) {
 	go func() {
 		for {
 			allReady := true
-			var results []*ResourceStatus
+			var results []*types.ResourceStatus
 			for _, pinger := range pingers {
 				result, ready, err := pinger(ctx, kubeclientset, opts)
 				if err != nil {

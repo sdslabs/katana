@@ -9,6 +9,7 @@ import (
 	"text/template"
 
 	g "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/types"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -80,7 +81,7 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset) error {
 	clusterConfig := g.ClusterConfig
 
-	deploymentConfig := ManifestConfig{
+	deploymentConfig := types.ManifestConfig{
 		FluentHost:            fmt.Sprintf("\"elasticsearch.%s.svc.cluster.local\"", g.KatanaConfig.KubeNameSpace),
 		KubeNameSpace:         g.KatanaConfig.KubeNameSpace,
 		TeamCount:             clusterConfig.TeamCount,

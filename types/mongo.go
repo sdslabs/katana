@@ -1,4 +1,9 @@
-package sshproviderservice
+package types
+
+type AdminUser struct {
+	Username string `json:"username" bson:"username" binding:"required" `
+	Password string `json:"password" bson:"password" binding:"required"`
+}
 
 type CTFTeam struct {
 	Index    int    `json:"id" bson:"password" binding:"required"`

@@ -7,6 +7,7 @@ import (
 
 	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
+	"github.com/sdslabs/katana/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -23,7 +24,7 @@ func setupAdmin() {
 		log.Fatal(err)
 	}
 
-	admin := AdminUser{
+	admin := types.AdminUser{
 		Username: adminUser.Username,
 		Password: pwd,
 	}
