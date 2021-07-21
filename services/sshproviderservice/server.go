@@ -3,6 +3,7 @@ package sshproviderservice
 import (
 	"fmt"
 	"log"
+	"net"
 
 	"github.com/gliderlabs/ssh"
 	g "github.com/sdslabs/katana/configs"
@@ -67,7 +68,7 @@ func passwordHandler(s ssh.Context, password string) bool {
 
 func Server() *ssh.Server {
 	return &ssh.Server{
-		Addr:            fmt.Sprintf("%s:%d", g.SSHProviderConfig.Host, g.SSHProviderConfig.Port),
+		Addr:            net.JoinHostPort(g.SSHProviderConfig.Host, fmt.Sprintf("%d", g.SSHProviderConfig.Port)),
 		Handler:         sessionHandler,
 		PasswordHandler: passwordHandler,
 	}

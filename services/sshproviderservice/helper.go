@@ -10,8 +10,7 @@ import (
 )
 
 func createTeams() error {
-	teamlabels := make(map[string]string)
-	teamlabels["app"] = g.ClusterConfig.TeamLabel
+	teamlabels := utils.GetTeamPodLabels()
 	var teams []interface{}
 	teamPods, err := utils.GetPods(kubeClientset, teamlabels)
 	if err != nil {
