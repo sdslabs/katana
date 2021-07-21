@@ -14,7 +14,12 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-// Get kubernetes REST config
+const (
+	appLabelKey        = "app"
+	deploymentLabelKey = "deployment"
+)
+
+// GetKubeConfig returns a kubernetes REST config object
 func GetKubeConfig() (*rest.Config, error) {
 	var pathToCfg string
 	if g.KatanaConfig.KubeConfig == "" {
@@ -28,7 +33,7 @@ func GetKubeConfig() (*rest.Config, error) {
 	return clientcmd.BuildConfigFromFlags("", pathToCfg)
 }
 
-// Get kubernetes clientset
+// GetKubeClient returns a kubernetes clientset
 func GetKubeClient() (*kubernetes.Clientset, error) {
 	config, err := GetKubeConfig()
 	if err != nil {
@@ -57,4 +62,10 @@ func GetPods(clientset *kubernetes.Clientset, lbls map[string]string) ([]v1.Pod,
 	}
 
 	return pods.Items, nil
+}
+
+func GetTeamPodLabels() map[string]string {
+	return map[string]string{
+		appLabelKey: g.ClusterConfig.TeamLabel,
+	}
 }

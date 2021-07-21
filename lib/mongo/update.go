@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"github.com/sdslabs/katana/types"
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,8 +10,6 @@ import (
 
 func UpdateOne(ctx context.Context, collectionName string, filter bson.M, data interface{}, option *options.FindOneAndUpdateOptions) error {
 	collection := link.Collection(collectionName)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
 	return collection.FindOneAndUpdate(ctx, filter, bson.M{"$set": data}, option).Err()
 }
 
