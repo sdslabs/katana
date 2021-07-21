@@ -22,7 +22,7 @@ import (
 )
 
 // ApplyManifest applies a given manifest to the cluster
-func ApplyManifest(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset, manifest []byte) error {
+func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset, manifest []byte) error {
 	dd, err := dynamic.NewForConfig(kubeconfig)
 	if err != nil {
 		return err
@@ -43,7 +43,7 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset, ma
 
 		unstructuredObj := &unstructured.Unstructured{Object: unstructuredMap}
 
-		gr, err := restmapper.GetAPIGroupResources(kubeclient.Discovery())
+		gr, err := restmapper.GetAPIGroupResources(kubeclientset.Discovery())
 		if err != nil {
 			return err
 		}
@@ -71,17 +71,16 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset, ma
 
 	if err != io.EOF {
 		return err
-	} else {
-		return nil
 	}
+	return nil
 }
 
 // DeployCluster retrieves and applies all the manifest templates specified in config
 // after injecting the necessary values
-func DeployCluster(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset) error {
+func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset) error {
 	clusterConfig := g.ClusterConfig
 
-	deploymentConfig := DeploymentConfig{
+	deploymentConfig := ManifestConfig{
 		FluentHost:            fmt.Sprintf("\"elasticsearch.%s.svc.cluster.local\"", g.KatanaConfig.KubeNameSpace),
 		KubeNameSpace:         g.KatanaConfig.KubeNameSpace,
 		TeamCount:             clusterConfig.TeamCount,
@@ -109,7 +108,7 @@ func DeployCluster(kubeconfig *rest.Config, kubeclient *kubernetes.Clientset) er
 			return err
 		}
 
-		if err = ApplyManifest(kubeconfig, kubeclient, manifest.Bytes()); err != nil {
+		if err = ApplyManifest(kubeconfig, kubeclientset, manifest.Bytes()); err != nil {
 			return err
 		}
 	}

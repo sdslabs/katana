@@ -1,8 +1,10 @@
 kubeconfig = ""
 kubehost = "http://localhost"
 kubenamespace = "default"
+verbosity = 3
 
 [cluster]
+deploymentlabel = "katana"
 broadcastcount = 2
 broadcastlabel = "broadcast"
 teamcount = 3
@@ -35,3 +37,16 @@ challengedir = "/opt/challenges/"
 tmpdir = "/tmp/"
 initfile = "run.sh"
 daemonport = 3004
+
+[services.sshprovider]
+host = "localhost"
+port = 2222
+creds_file = "teamcreds.txt"
+password_length = 10
+
+[mongo]
+url = "mongodb://scar:scar@localhost:27017/?authSource=admin"
+
+[admin]
+username = "sdslabs"
+password = "sdslabs"

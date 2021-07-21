@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	config       g.ChallengeDeployerConfig
+	config       g.ChallengeDeployerCfg
 	katanaConfig *g.KatanaCfg
 	kubeclient   *kubernetes.Clientset
 )

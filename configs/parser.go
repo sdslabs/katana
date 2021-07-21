@@ -27,7 +27,13 @@ var (
 
 	ClusterConfig = KatanaConfig.Cluster
 
-	ChallengeDeployerServiceConfig = ServicesConfig.ChallengeDeployer
+	ChallengeDeployerConfig = ServicesConfig.ChallengeDeployer
+
+	SSHProviderConfig = ServicesConfig.SSHProvider
+
+	AdminConfig = KatanaConfig.AdminConfig
 
 	TeamVmConfig = KatanaConfig.TeamVmConfig
+
+	MongoConfig = KatanaConfig.Mongo
 )

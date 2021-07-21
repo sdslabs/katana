@@ -15,6 +15,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
+	"github.com/sdslabs/katana/lib/utils"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -165,7 +166,7 @@ func SendFile(file *os.File, params map[string]string, filename, uri string) err
 	return nil
 }
 
-// Send given file to the broadcast service, to be forwarded to all pods marked with app=cofig.Teamlabel
+// broadcast sends given file to the broadcast service, to be forwarded to all pods marked with app=cofig.Teamlabel
 func broadcast(file string) error {
 	chal, err := os.Open(filepath.Join("challenges", file))
 	if err != nil {
@@ -173,9 +174,8 @@ func broadcast(file string) error {
 	}
 	defer chal.Close()
 
-	lbl := make(map[string]string)
-	lbl["app"] = katanaConfig.Cluster.TeamLabel
-	teamPods, err := getPods(lbl)
+	lbls := utils.GetTeamPodLabels()
+	teamPods, err := getPods(lbls)
 	if err != nil {
 		return err
 	}
