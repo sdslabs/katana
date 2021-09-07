@@ -8,8 +8,8 @@ terraform {
 }
 
 provider "google" {
-  project     = "tensile-site-325304"
-  credentials = "/home/rohithvb/Downloads/tensile-site-325304-d2945003c5df.json"
+  project     = "<Project Name>"
+  credentials = "<File Path>.json"
   region      = "us-central1"
   zone        = "us-central1-c"
 }
