@@ -10,3 +10,7 @@ katana
 test.go
 vendor/*
 *.log
+.terraform.lock.hcl
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
