@@ -9,6 +9,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.1.0
 	github.com/golang/protobuf v1.4.3
 	github.com/googleapis/gnostic v0.5.3 // indirect
+	github.com/jasonlvhit/gocron v0.0.1
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.0.0
