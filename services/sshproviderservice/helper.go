@@ -35,6 +35,7 @@ func createTeams() error {
 			Name:     pod.Name,
 			PodName:  pod.Name,
 			Password: hashed,
+			Score:    0,
 		}
 		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s\n", i, team.Name, pwd)
 		teams = append(teams, team)

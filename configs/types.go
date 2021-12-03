@@ -52,6 +52,12 @@ type MongoCfg struct {
 	URL string `toml:"url"`
 }
 
+type FlagCfg struct {
+	FlagLength            uint   `toml:"flaglength"`
+	TickPeriod            uint   `toml:"tickperiod"`
+	SubmissionServicePort string `toml:"submissionport"`
+}
+
 type KatanaCfg struct {
 	KubeHost      string              `toml:"kubehost"`
 	KubeNameSpace string              `toml:"kubenamespace"`
@@ -62,4 +68,5 @@ type KatanaCfg struct {
 	Mongo         MongoCfg            `toml:"mongo"`
 	TeamVmConfig  TeamChallengeConfig `toml:"teamvm"`
 	AdminConfig   AdminCfg            `toml:"admin"`
+	FlagConfig    FlagCfg             `toml:"flag"`
 }

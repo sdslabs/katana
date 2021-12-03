@@ -18,7 +18,6 @@ manifests = [
     "elasticsearch_statefulset.yaml",
     "kibana.yaml",
     "fluentd-daemonset.yaml",
-    "ingress.yml"
 ]
 
 [services.api]
@@ -50,3 +49,8 @@ url = "mongodb://scar:scar@localhost:27017/?authSource=admin"
 [admin]
 username = "sdslabs"
 password = "sdslabs"
+
+[flag]
+flaglength = 10
+tickperiod = 300
+submissionport = 4040
