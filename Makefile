@@ -8,6 +8,19 @@ GOBIN := $(PROJECTROOT)/bin
 UTILDIR := $(PROJECTROOT)/scripts/utils
 SPINNER := $(UTILDIR)/spinner.sh
 BUILDIR := $(PROJECTROOT)/scripts/build
+CONTROLLER_MANIFEST:= $(PROJECTROOT)/manifests/dev/expose-controller.yml
+HELM_MANIFEST:= $(PROJECTROOT)/manifests/templates/helm-values.yml
+OPENVPN_MANIFEST:= $(PROJECTROOT)/manifests/templates/helm-values.yml
+
+KEY_NAME := team
+
+NO_OF_TEAMS:= 10
+OPENVPN_NAMESPACE := openvpn
+
+POD_COMMAND =$(shell kubectl get pods --namespace $(OPENVPN_NAMESPACE) -l "app=openvpn,release=openvpn" -o jsonpath='{ .items[0].metadata.name }') 
+SERVICE_NAME_COMMAND =$(shell kubectl get svc --namespace $(OPENVPN_NAMESPACE) -l "app=openvpn,release=openvpn" -o jsonpath='{ .items[0].metadata.name }') 
+SERVICE_IP_COMMAND=$(shell kubectl get svc --namespace $(OPENVPN_NAMESPACE) -l "app=openvpn,release=openvpn" -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
+# CHALLENGE_DEPLOYER_IP :=  $(shell minikube service nginx-ingress-controller --url -n kube-system)
 
 CREATEBIN := $(shell [ ! -d ./bin ] && mkdir bin)
 
@@ -61,6 +74,26 @@ prepare-for-pr: fmt lint
 	echo "-----------------\n"  &&\
 	exit 0)
 
+gen-certificates:
+	$(eval POD_NAME := $(POD_COMMAND))
+	$(eval SERVICE_NAME := $(SERVICE_NAME_COMMAND))
+	$(eval SERVICE_IP := $(SERVICE_IP_COMMAND))
+	for n in $$(seq 1 $(NO_OF_TEAMS)); do \
+	kubectl --namespace $(OPENVPN_NAMESPACE) exec -it $(POD_NAME) /etc/openvpn/setup/newClientCert.sh $(KEY_NAME)-$$n $(SERVICE_IP) && \
+	kubectl --namespace $(OPENVPN_NAMESPACE) exec -it $(POD_NAME) cat "/etc/openvpn/certs/pki/$(KEY_NAME)-$$n.ovpn" > $(KEY_NAME)-$$n.ovpn; \
+	done
+
+gen-vpn: set-env
+	helm install openvpn -f $(HELM_MANIFEST) stable/openvpn --namespace openvpn
+	minikube tunnel
+
+set-env:
+	minikube start --driver=docker && \
+	minikube addons enable ingress  && \
+	kubectl apply -f $(CONTROLLER_MANIFEST) && \
+	go build && \
+	./katana 
+
 # Prints help message
 help:
 	@echo "KATANA"
@@ -71,3 +104,6 @@ help:
 	@echo "clean 			- Clean the build cache"
 	@echo "prepare-for-pr 	- Prepare the code for PR after fmt, lint and checking uncommitted files"
 	@echo "lint    			- Lint code using golangci-lint"
+	@echo "set-env" 		- Setup Katana environment  
+	@echo "gen-vpn"         - Generate VPN configurations
+
