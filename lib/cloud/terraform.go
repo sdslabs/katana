@@ -5,10 +5,9 @@ import (
 	"log"
 	"os"
 
+	"github.com/hashicorp/terraform-exec/tfexec"
 	"github.com/hashicorp/terraform-exec/tfinstall"
 )
-
-// "github.com/hashicorp/terraform-exec/tfexec"
 
 func InitializeTf() error {
 	workingDir, err := os.Getwd()
@@ -49,12 +48,12 @@ func DestroyTf() error {
 	return nil
 }
 
-// func obtainTfexec(path string) (*tfexec.Terraform, error) {
-// 	workingDir, err := os.Getwd()
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func obtainTfexec(path string) (*tfexec.Terraform, error) {
+	workingDir, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
 
-// 	workingDir += pathToCloudPackage + path
-// 	return tfexec.NewTerraform(workingDir, execPath)
-// }
+	workingDir += pathToCloudPackage + path
+	return tfexec.NewTerraform(workingDir, execPath)
+}
