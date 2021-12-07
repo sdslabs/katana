@@ -2,6 +2,7 @@ package cloud
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-exec/tfexec"
 	restclient "k8s.io/client-go/rest"
@@ -10,7 +11,7 @@ import (
 type azure struct {
 }
 
-func (az azure) ApplyCluster() error {
+func ApplyAzureCluster() error {
 
 	tf, err := obtainTfexec(pathToAzureTf)
 	if err != nil {
@@ -25,19 +26,11 @@ func (az azure) ApplyCluster() error {
 	if err != nil {
 		return err
 	}
-	output, err := tf.Output(context.Background())
 
-	if err != nil {
-		return err
-	}
-
-	for k, v := range output {
-
-	}
 	return nil
 }
 
-func (az azure) DestroyCluster() error {
+func DestroyAzureCluster() error {
 	tf, err := obtainTfexec(pathToAzureTf)
 	if err != nil {
 		return err
@@ -51,7 +44,19 @@ func (az azure) DestroyCluster() error {
 	return nil
 }
 
-func (az azure) GetKubeConfig() (*restclient.Config, error) {
+func GetAzureKubeConfig() (*restclient.Config, error) {
+	tf, err := obtainTfexec(pathToAzureTf)
+	if err != nil {
+		return nil, err
+	}
+	output, err := tf.Output(context.Background())
 
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(output)
+	for k, v := range output {
+		fmt.Println(k, v.Value)
+	}
 	return nil, nil
 }

@@ -8,9 +8,11 @@ tmp/*
 !tmp/.gitkeep
 katana
 test.go
-vendor/
 *.log
 .terraform.lock.hcl
 .terraform/
 terraform.tfstate
 terraform.tfstate.backup
+.vscode/
+tfinstall/
+.terraform.tfstate.lock.info

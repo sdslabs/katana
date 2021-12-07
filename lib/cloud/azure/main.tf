@@ -13,7 +13,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "rg" {
   name     = "katana"
-  location = "india"
+  location = "centralindia"
 }
 
 resource "azurerm_kubernetes_cluster" "cluster" {
