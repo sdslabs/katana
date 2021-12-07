@@ -12,6 +12,7 @@ type CTFTeam struct {
 	Name     string `json:"name" bson:"username" binding:"required"`
 	PodName  string `json:"podname" bson:"podname" binding:"required"`
 	Password string `json:"password" bson:"password" binding:"required"`
+  PublicKey string `json:"publicKey" bson:"publicKey" binding:"required"` // TODO : initialize
 	Score    int    `json:"score" bson:"score" binding:"required"`
 }
 
