@@ -18,6 +18,7 @@ manifests = [
     "elasticsearch_statefulset.yaml",
     "kibana.yaml",
     "fluentd-daemonset.yaml",
+    "ingress.yml"
 ]
 
 [services.api]
