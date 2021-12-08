@@ -10,7 +10,6 @@ spec:
   template:
     metadata:
       labels:
-        deployment: {{.DeploymentLabel}}
         app: {{.BroadcastLabel}}
     spec:
       containers:
