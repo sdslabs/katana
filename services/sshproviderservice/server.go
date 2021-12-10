@@ -1,6 +1,7 @@
 package sshproviderservice
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"net"
@@ -66,11 +67,26 @@ func passwordHandler(s ssh.Context, password string) bool {
 	return utils.CompareHashWithPassword(team.Password, password)
 }
 
+func publicKeyHandler(s ssh.Context, key ssh.PublicKey) bool {
+	team, err := mongo.FetchSingleTeam(s.User())
+	if err != nil {
+		return false
+	}
+
+	publicKey, _, _, _, err := ssh.ParseAuthorizedKey([]byte(team.PublicKey))
+	if err != nil {
+		return false
+	}
+
+	return bytes.Equal(publicKey.Marshal(), key.Marshal())
+}
+
 func Server() *ssh.Server {
 	return &ssh.Server{
-		Addr:            net.JoinHostPort(g.SSHProviderConfig.Host, fmt.Sprintf("%d", g.SSHProviderConfig.Port)),
-		Handler:         sessionHandler,
-		PasswordHandler: passwordHandler,
+		Addr:             net.JoinHostPort(g.SSHProviderConfig.Host, fmt.Sprintf("%d", g.SSHProviderConfig.Port)),
+		Handler:          sessionHandler,
+		PasswordHandler:  passwordHandler,
+		PublicKeyHandler: publicKeyHandler,
 	}
 }
 
