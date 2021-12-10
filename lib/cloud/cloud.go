@@ -1,8 +1,12 @@
 package cloud
 
-// restclient "k8s.io/client-go/rest"
+var PathToCloudPackage string = "/lib/cloud"
+var RelativePathToTfexe string = "/tfinstall"
+var ExecPath string
+var PathToAzureTf string = "/azure"
 
-var pathToCloudPackage string = "/lib/cloud"
-var relativePathToTfexe string = "/tfinstall"
-var execPath string
-var pathToAzureTf string = "/azure"
+type Cloud interface {
+	CreateCluster() error
+	DestroyCluster() error
+	ObtainKubeConfig() error
+}

@@ -16,3 +16,4 @@ terraform.tfstate.backup
 .vscode/
 tfinstall/
 .terraform.tfstate.lock.info
+kubeconfig

@@ -16,7 +16,7 @@ func InitializeTf() error {
 		return err
 	}
 
-	tfExecDir := workingDir + relativePathToTfexe
+	tfExecDir := workingDir + RelativePathToTfexe
 	err = os.Mkdir(tfExecDir, 0755)
 	if err != nil {
 		if strings.Contains(err.Error(), "file exists") {
@@ -32,7 +32,7 @@ func InitializeTf() error {
 			return err
 		}
 	}
-	execPath, err = tfinstall.Find(context.Background(), tfinstall.LatestVersion(tfExecDir, false))
+	ExecPath, err = tfinstall.Find(context.Background(), tfinstall.LatestVersion(tfExecDir, false))
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func DestroyTf() error {
 		return err
 	}
 
-	err = os.RemoveAll(workingDir + relativePathToTfexe)
+	err = os.RemoveAll(workingDir + RelativePathToTfexe)
 
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -65,7 +65,7 @@ func obtainTfexec(path string) (*tfexec.Terraform, error) {
 		return nil, err
 	}
 
-	execPath = workingDir + relativePathToTfexe + "/terraform"
-	workingDir += pathToCloudPackage + path
-	return tfexec.NewTerraform(workingDir, execPath)
+	ExecPath = workingDir + RelativePathToTfexe + "/terraform"
+	workingDir += PathToCloudPackage + path
+	return tfexec.NewTerraform(workingDir, ExecPath)
 }
