@@ -32,7 +32,7 @@ func InitializeTf() error {
 			return err
 		}
 	}
-	ExecPath, err = tfinstall.Find(context.Background(), tfinstall.LatestVersion(tfExecDir, false))
+	_, err = tfinstall.Find(context.Background(), tfinstall.LatestVersion(tfExecDir, false))
 	if err != nil {
 		return err
 	}
@@ -59,13 +59,12 @@ func DestroyTf() error {
 	return nil
 }
 
-func obtainTfexec(path string) (*tfexec.Terraform, error) {
+func obtainTfexec() (*tfexec.Terraform, error) {
 	workingDir, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
 
-	ExecPath = workingDir + RelativePathToTfexe + "/terraform"
-	workingDir += PathToCloudPackage + path
-	return tfexec.NewTerraform(workingDir, ExecPath)
+	execPath := workingDir + RelativePathToTfexe + "/terraform"
+	return tfexec.NewTerraform(workingDir, execPath)
 }

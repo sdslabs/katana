@@ -61,6 +61,12 @@ type AzureCfg struct {
 	ClusterName       string `toml:"cluster_name"`
 	Location          string `toml:"location"`
 }
+
+type GCPCfg struct {
+	ProjectID       string `toml:"project_id"`
+	CredentialsFile string `toml:"credentials_file"`
+	ClusterName     string `toml:"cluster_name"`
+}
 type KatanaCfg struct {
 	KubeHost      string              `toml:"kubehost"`
 	KubeNameSpace string              `toml:"kubenamespace"`
@@ -73,4 +79,5 @@ type KatanaCfg struct {
 	AdminConfig   AdminCfg            `toml:"admin"`
 	CloudConfig   CloudCfg            `toml:"cloud"`
 	AzureConfig   AzureCfg            `toml:"azure"`
+	GCPConfig     GCPCfg              `toml:"gcp"`
 }

@@ -20,7 +20,7 @@ func (az Azure) CreateCluster() error {
 		return err
 	}
 
-	tf, err := obtainTfexec(PathToAzureTf)
+	tf, err := obtainTfexec()
 	if err != nil {
 		return err
 	}
@@ -38,7 +38,7 @@ func (az Azure) CreateCluster() error {
 }
 
 func (az Azure) DestroyCluster() error {
-	tf, err := obtainTfexec(PathToAzureTf)
+	tf, err := obtainTfexec()
 	if err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func (az Azure) DestroyCluster() error {
 }
 
 func (az Azure) ObtainKubeConfig() error {
-	tf, err := obtainTfexec(PathToAzureTf)
+	tf, err := obtainTfexec()
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (az Azure) ObtainKubeConfig() error {
 	str := string(output["kube_config"].Value[1 : len(output["kube_config"].Value)-1])
 	str2 := strings.Replace(str, "\\n", "\n", -1)
 
-	err = os.WriteFile(workingDir+PathToCloudPackage+PathToAzureTf+"/kubeconfig",
+	err = os.WriteFile(workingDir+"/kubeconfig",
 		[]byte(str2), 0644)
 	return nil
 }
@@ -111,7 +111,6 @@ func createAzureTerraformFile() error {
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(workingDir+PathToCloudPackage+PathToAzureTf+"/main.tf",
-		manifest.Bytes(), 0644)
+	err = os.WriteFile(workingDir+"/main.tf", manifest.Bytes(), 0644)
 	return nil
 }

@@ -58,3 +58,8 @@ provider=
 resource_group_name=
 cluster_name=
 location=
+
+[gcp]
+project_id=
+credentials_file =
+cluster_name=
