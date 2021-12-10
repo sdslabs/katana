@@ -53,4 +53,8 @@ password = "sdslabs"
 
 [cloud]
 provider=
-gcpcredspath=
+
+[azure]
+resource_group_name=
+cluster_name=
+location=

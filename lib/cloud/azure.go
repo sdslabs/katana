@@ -1,17 +1,24 @@
 package cloud
 
 import (
+	"bytes"
 	"context"
 	"os"
 	"strings"
+	"text/template"
 
 	"github.com/hashicorp/terraform-exec/tfexec"
+	g "github.com/sdslabs/katana/configs"
 )
 
 type Azure struct {
 }
 
 func (az Azure) CreateCluster() error {
+	err := createAzureTerraformFile()
+	if err != nil {
+		return err
+	}
 
 	tf, err := obtainTfexec(PathToAzureTf)
 	if err != nil {
@@ -65,5 +72,46 @@ func (az Azure) ObtainKubeConfig() error {
 
 	err = os.WriteFile(workingDir+PathToCloudPackage+PathToAzureTf+"/kubeconfig",
 		[]byte(str2), 0644)
+	return nil
+}
+
+func createAzureTerraformFile() error {
+	azureConfig := g.KatanaConfig.AzureConfig
+
+	if azureConfig.ResourceGroupName == "" {
+		azureConfig.ResourceGroupName = "katana"
+	}
+
+	if azureConfig.ClusterName == "" {
+		azureConfig.ClusterName = "katanaCluster"
+	}
+
+	if azureConfig.Location == "" {
+		azureConfig.Location = "centralindia"
+	}
+
+	azureConfig.ResourceGroupName = "\"" + azureConfig.ResourceGroupName + "\""
+	azureConfig.ClusterName = "\"" + azureConfig.ClusterName + "\""
+	azureConfig.Location = "\"" + azureConfig.Location + "\""
+
+	pathToTemplate := "./manifests/templates/azure_template.tf"
+
+	tmpl, err := template.ParseFiles(pathToTemplate)
+	if err != nil {
+		return err
+	}
+	manifest := &bytes.Buffer{}
+
+	err = tmpl.Execute(manifest, azureConfig)
+	if err != nil {
+		return err
+	}
+
+	workingDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(workingDir+PathToCloudPackage+PathToAzureTf+"/main.tf",
+		manifest.Bytes(), 0644)
 	return nil
 }

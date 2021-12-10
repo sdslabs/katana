@@ -12,12 +12,12 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "katana"
-  location = "centralindia"
+  name     = {{.ResourceGroupName}}
+  location = {{.Location}}
 }
 
 resource "azurerm_kubernetes_cluster" "cluster" {
-  name                = "katanaCluster"
+  name                = {{.ClusterName}}
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   dns_prefix          = "katanaCluster-dns"

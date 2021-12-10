@@ -53,10 +53,14 @@ type MongoCfg struct {
 }
 
 type CloudCfg struct {
-	Provider           string `toml:"provider"`
-	GCPCredentialsPath string `toml:"gcpcredspath"`
+	Provider string `toml:"provider"`
 }
 
+type AzureCfg struct {
+	ResourceGroupName string `toml:"resource_group_name"`
+	ClusterName       string `toml:"cluster_name"`
+	Location          string `toml:"location"`
+}
 type KatanaCfg struct {
 	KubeHost      string              `toml:"kubehost"`
 	KubeNameSpace string              `toml:"kubenamespace"`
@@ -68,4 +72,5 @@ type KatanaCfg struct {
 	TeamVmConfig  TeamChallengeConfig `toml:"teamvm"`
 	AdminConfig   AdminCfg            `toml:"admin"`
 	CloudConfig   CloudCfg            `toml:"cloud"`
+	AzureConfig   AzureCfg            `toml:"azure"`
 }
