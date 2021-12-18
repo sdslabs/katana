@@ -43,3 +43,23 @@ func FetchSingleTeam(teamName string) (*types.CTFTeam, error) {
 	}
 	return team, nil
 }
+
+func FetchFlag(flagValue string) (*types.Flag, error) {
+	collection := link.Collection(FlagsCollection)
+	flag := &types.Flag{}
+	ctx := context.Background()
+	if err := collection.FindOne(ctx, bson.M{ValueKey: flagValue}).Decode(flag); err != nil {
+		return nil, err
+	}
+	return flag, nil
+}
+
+func FetchChallenge(challengeId int) (*types.Challenge, error) {
+	collection := link.Collection(ChallengesCollection)
+	challenge := &types.Challenge{}
+	ctx := context.Background()
+	if err := collection.FindOne(ctx, bson.M{IDKey: challengeId}).Decode(challenge); err != nil {
+		return nil, err
+	}
+	return challenge, nil
+}

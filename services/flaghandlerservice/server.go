@@ -13,84 +13,80 @@ import (
 	"github.com/sdslabs/katana/types"
 )
 
-type Team struct {
-	TeamName string
-	TeamID   int
-}
-
 func server() {
 	ln, err := net.Listen(configs.FlagConfig.SubmissionServicePort, "tcp")
 	if err != nil {
-		log.Fatal("Failed to Start Flag Submission Service")
+		log.Fatal(ServiceFail)
 	}
 	defer ln.Close()
-	log.Println("Flag Submission Service Started at port", configs.FlagConfig.SubmissionServicePort)
-	connectedTeam := Team{}
+	log.Println(ServiceSuccess, configs.FlagConfig.SubmissionServicePort)
+	connectedTeam := types.CTFTeam{}
 
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
 			fmt.Println(err)
 			if err := conn.Close(); err != nil {
-				log.Println("Failed to close", err)
+				log.Println(ClosingError, err)
 			}
 			continue
 		}
 
-		log.Println("Connected to", conn.RemoteAddr())
+		log.Println(Connected, conn.RemoteAddr())
 		go handleConnection(conn, connectedTeam)
 	}
 }
 
-func handleConnection(conn net.Conn, connectedTeam Team) {
+func handleConnection(conn net.Conn, connectedTeam types.CTFTeam) {
 	defer func() {
 		if err := conn.Close(); err != nil {
-			log.Println("Error Closing", err)
+			log.Println(ClosingError, err)
 		}
 	}()
-	writeToCient(conn, "Connected to Flag Submission Service\nInitiate your session by `init <teamName> <password>`\n")
+	writeToCient(conn, InitInstruction)
 
 	for {
 		cmdLine := make([]byte, (1024 * 4))
 		n, err := conn.Read(cmdLine)
 
 		if n == 0 || err != nil {
-			log.Println("Connection Read err", err)
+			log.Println(ReadError, err)
 			return
 		}
 
 		cmd, param, password := parseCommand(string(cmdLine[0:n]))
 
 		if cmd == "" {
-			writeToCient(conn, "Inavlid Command\n")
+			writeToCient(conn, InvalidCommand)
 			continue
 		}
 		switch cmd {
 		case "init":
 			if param == "" || password == "" {
-				writeToCient(conn, "Invalid Login Parameters\n")
+				writeToCient(conn, InvalidParams)
 				continue
-			} else if (Team{}) != connectedTeam {
-				writeToCient(conn, "Team is already Logged in\n")
+			} else if (types.CTFTeam{}) != connectedTeam {
+				writeToCient(conn, TeamAlreadyExists)
 				continue
 			} else {
-				if checkTeam(param) {
-					connectedTeam.TeamAddress = conn.RemoteAddr().String()
-					connectedTeam.TeamID = param
-					writeToCient(conn, "Team successfully connected,\n Enter flags to submit them\n")
+				if condition, team := checkTeam(param, password); condition {
+					connectedTeam = team
+					writeToCient(conn, TeamConnected)
 					continue
 				} else {
-					writeToCient(conn, "Invalid TeamID\n")
+					writeToCient(conn, InvalidCreds)
 					continue
 				}
 			}
 		case "exit":
 
 		default:
-			if status, points := submitFlag(cmd); status {
-				writeToCient(conn, "Submitted successfully, points:"+strconv.Itoa(points)+"\n")
+			if (types.CTFTeam{}) == connectedTeam {
+				writeToCient(conn, NoLogin)
+			} else if status, points := submitFlag(cmd, connectedTeam); status {
+				writeToCient(conn, SubmitSuccess+strconv.Itoa(points)+"\n")
 			} else {
-				writeToCient(conn, "Invalid Flag")
+				writeToCient(conn, InvalidFlag)
 			}
 		}
 	}
@@ -129,13 +125,9 @@ func checkTeam(teamName string, password string) (bool, types.CTFTeam) {
 	return false, *team
 }
 
-func submitFlag(flag string) (bool, int) {
-	return true, 10
-}
-
 func writeToCient(conn net.Conn, message string) {
 	if _, err := conn.Write([]byte(message)); err != nil {
-		log.Println("failed to write", err)
+		log.Println(WriteError, err)
 		return
 	}
 }
