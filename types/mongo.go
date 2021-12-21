@@ -18,7 +18,6 @@ type CTFTeam struct {
 
 type Challenge struct {
 	ID     int    `json:"id" bson:"id" binding:"required"`
-	TeamID int    `json:"teamid" bson:"teamid" binding:"required"`
 	Name   string `json:"name" bson:"name" binding:"required"`
 	Points int    `json:"points" bson:"points" binding:"required"`
 }
@@ -31,7 +30,8 @@ type Flag struct {
 }
 
 type Submission struct {
-	Submitter   int    `json:"submitter" bson:"submitter" binding:"required"`
-	ChallengeID int    `json:"challengeid" bson:"challengeid" binding:"required"`
-	Flag        string `json:"flag" bson:"flag" binding:"required"`
+	SubmittedBy int       `json:"submittedby" bson:"submittedby" binding:"required"`
+	ChallengeID int       `json:"challengeid" bson:"challengeid" binding:"required"`
+	Flag        string    `json:"flag" bson:"flag" binding:"required"`
+	Time        time.Time `json:"time" bson:"time" binding:"required"`
 }

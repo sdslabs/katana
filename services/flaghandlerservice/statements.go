@@ -19,7 +19,7 @@ const (
 
 	TeamAlreadyExists = "Team is already Logged in\n"
 
-	TeamConnected = "Team successfully connected,\n Enter flags to submit them\n"
+	TeamConnected = "Team successfully connected,\nEnter flags to submit them\n"
 
 	InvalidCreds = "Invalid Team Credentials\n"
 
@@ -30,4 +30,6 @@ const (
 	NoLogin = "Please login Team first \n"
 
 	WriteError = "Failed To Write"
+
+	TotalScore = " Total Score: "
 )

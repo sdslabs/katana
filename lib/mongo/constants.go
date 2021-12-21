@@ -20,4 +20,8 @@ const (
 	ValueKey = "value"
 
 	IDKey = "id"
+
+	SubmittedBy = "submittedby"
+
+	Flag = "flag"
 )

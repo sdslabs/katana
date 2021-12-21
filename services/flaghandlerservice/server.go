@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"regexp"
 	"strconv"
-	"strings"
+	"sync"
 
 	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/mongo"
@@ -13,12 +14,15 @@ import (
 	"github.com/sdslabs/katana/types"
 )
 
-func server() {
-	ln, err := net.Listen(configs.FlagConfig.SubmissionServicePort, "tcp")
+func Server(wg sync.WaitGroup) {
+	ln, err := net.Listen("tcp", configs.FlagConfig.SubmissionServicePort)
 	if err != nil {
-		log.Fatal(ServiceFail)
+		log.Fatal(ServiceFail, err)
 	}
-	defer ln.Close()
+	defer func() {
+		ln.Close()
+		wg.Done()
+	}()
 	log.Println(ServiceSuccess, configs.FlagConfig.SubmissionServicePort)
 	connectedTeam := types.CTFTeam{}
 
@@ -79,42 +83,28 @@ func handleConnection(conn net.Conn, connectedTeam types.CTFTeam) {
 				}
 			}
 		case "exit":
+			return
 
 		default:
 			if (types.CTFTeam{}) == connectedTeam {
 				writeToCient(conn, NoLogin)
 			} else if status, points := submitFlag(cmd, connectedTeam); status {
-				writeToCient(conn, SubmitSuccess+strconv.Itoa(points)+"\n")
+				connectedTeam.Score = connectedTeam.Score + points
+				writeToCient(conn, SubmitSuccess+strconv.Itoa(points)+TotalScore+strconv.Itoa(connectedTeam.Score)+"\n")
 			} else {
 				writeToCient(conn, InvalidFlag)
 			}
 		}
 	}
 }
-
 func parseCommand(cmdLine string) (cmd, param, password string) {
-	parts := strings.Split(cmdLine, " ")
-	if len(parts) == 3 {
-		cmd = strings.TrimSpace(parts[0])
-		param = strings.TrimSpace(parts[1])
-		password = strings.TrimSpace(parts[2])
-		return
+	r, _ := regexp.Compile("(init|exit|[A-Za-z0-9]+)([[:blank:]]([A-Za-z0-9]+)[[:blank:]]([A-Za-z0-9]+))?")
+	matched := r.FindStringSubmatchIndex(cmdLine)
+	if matched[6] == -1 {
+		return cmdLine[matched[2]:matched[3]], "", ""
 	}
-	if len(parts) == 2 {
-		cmd = strings.TrimSpace(parts[0])
-		param = strings.TrimSpace(parts[1])
-		password = ""
-		return
-	}
-	if len(parts) == 1 {
-		cmd = strings.TrimSpace(parts[0])
-		param = ""
-		password = ""
-		return
-	}
-	return "", "", ""
+	return cmdLine[matched[2]:matched[3]], cmdLine[matched[6]:matched[7]], cmdLine[matched[8]:matched[9]]
 }
-
 func checkTeam(teamName string, password string) (bool, types.CTFTeam) {
 	team := &types.CTFTeam{}
 	if team, err := mongo.FetchSingleTeam(teamName); err == nil {

@@ -53,7 +53,7 @@ type MongoCfg struct {
 }
 
 type FlagCfg struct {
-	FlagLength            uint   `toml:"flaglength"`
+	FlagLength            int    `toml:"flaglength"`
 	TickPeriod            uint   `toml:"tickperiod"`
 	SubmissionServicePort string `toml:"submissionport"`
 }
