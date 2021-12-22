@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -67,11 +68,10 @@ func (az Azure) ObtainKubeConfig() error {
 		return err
 	}
 
-	str := string(output["kube_config"].Value[1 : len(output["kube_config"].Value)-1])
-	str2 := strings.Replace(str, "\\n", "\n", -1)
+	primitiveKubeConfig := string(output["kube_config"].Value[:])
+	modifiedKubeConfig := strings.Trim(strings.Replace(primitiveKubeConfig, "\\n", "\n", -1), "\"")
 
-	err = os.WriteFile(workingDir+"/kubeconfig",
-		[]byte(str2), 0644)
+	err = os.WriteFile(filepath.Join(workingDir, "kubeconfig"), []byte(modifiedKubeConfig), 0644)
 	return nil
 }
 
@@ -94,7 +94,12 @@ func createAzureTerraformFile() error {
 	azureConfig.ClusterName = "\"" + azureConfig.ClusterName + "\""
 	azureConfig.Location = "\"" + azureConfig.Location + "\""
 
-	pathToTemplate := "./manifests/templates/azure_template.tf"
+	workingDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	pathToTemplate := filepath.Join(workingDir, "manifests", "templates", "azure_template.tf")
 
 	tmpl, err := template.ParseFiles(pathToTemplate)
 	if err != nil {
@@ -107,10 +112,6 @@ func createAzureTerraformFile() error {
 		return err
 	}
 
-	workingDir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(workingDir+"/main.tf", manifest.Bytes(), 0644)
+	err = os.WriteFile(filepath.Join(workingDir, "main.tf"), manifest.Bytes(), 0644)
 	return nil
 }

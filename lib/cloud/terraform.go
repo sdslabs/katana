@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/hashicorp/terraform-exec/tfexec"
@@ -16,7 +17,7 @@ func InitializeTf() error {
 		return err
 	}
 
-	tfExecDir := workingDir + RelativePathToTfexe
+	tfExecDir := filepath.Join(workingDir, RelativePathToTfexe)
 	err = os.Mkdir(tfExecDir, 0755)
 	if err != nil {
 		if strings.Contains(err.Error(), "file exists") {
@@ -46,7 +47,7 @@ func DestroyTf() error {
 		return err
 	}
 
-	err = os.RemoveAll(workingDir + RelativePathToTfexe)
+	err = os.RemoveAll(filepath.Join(workingDir, RelativePathToTfexe))
 
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -65,6 +66,6 @@ func obtainTfexec() (*tfexec.Terraform, error) {
 		return nil, err
 	}
 
-	execPath := workingDir + RelativePathToTfexe + "/terraform"
+	execPath := filepath.Join(workingDir, RelativePathToTfexe, "terraform")
 	return tfexec.NewTerraform(workingDir, execPath)
 }

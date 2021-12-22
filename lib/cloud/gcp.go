@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"path/filepath"
 	"text/template"
 
 	"github.com/hashicorp/terraform-exec/tfexec"
@@ -66,7 +67,12 @@ func createGCPTerraformFile() error {
 	gcpConfig.ProjectID = "\"" + gcpConfig.ProjectID + "\""
 	gcpConfig.CredentialsFile = "\"" + gcpConfig.CredentialsFile + "\""
 
-	pathToTemplate := "./manifests/templates/gcp_template.tf"
+	workingDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	pathToTemplate := filepath.Join(workingDir, "manifests", "templates", "gcp_template.tf")
 
 	tmpl, err := template.ParseFiles(pathToTemplate)
 	if err != nil {
@@ -79,10 +85,6 @@ func createGCPTerraformFile() error {
 		return err
 	}
 
-	workingDir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(workingDir+"/main.tf", manifest.Bytes(), 0644)
+	err = os.WriteFile(filepath.Join(workingDir, "main.tf"), manifest.Bytes(), 0644)
 	return nil
 }

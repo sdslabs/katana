@@ -52,14 +52,14 @@ username = "sdslabs"
 password = "sdslabs"
 
 [cloud]
-provider=
+provider=""
 
 [azure]
-resource_group_name=
-cluster_name=
-location=
+resource_group_name=""
+cluster_name=""
+location=""
 
 [gcp]
-project_id=
-credentials_file =
-cluster_name=
+project_id=""
+credentials_file =""
+cluster_name=""
