@@ -10,4 +10,18 @@ const (
 	UsernameKey = "username"
 
 	PasswordKey = "password"
+
+	FlagsCollection = "flags"
+
+	ChallengesCollection = "challenges"
+
+	SubmissionsCollection = "submissions"
+
+	ValueKey = "value"
+
+	IDKey = "id"
+
+	SubmittedBy = "submittedby"
+
+	Flag = "flag"
 )
