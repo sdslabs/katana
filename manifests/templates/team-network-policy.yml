@@ -1,16 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: team-vm-policy
+  namespace: katana-teams
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          networking/namespace: katana-teams
+---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: test-network-policy
+  name: allow-internet-only
   namespace: katana-teams
 spec:
+  podSelector: {}
   policyTypes:
   - Egress
-  podSelector:
-    matchLabels:
-      networking/allow-internet-egress: "true"
-  # egress:
-  # - to:
-  #   - namespaceSelector:
-  #     matchLabels:
+  egress:
+  - ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+  - to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+
+
 
