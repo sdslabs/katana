@@ -12,16 +12,26 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: katana-teams
+  labels:
+    type : team-pod
 spec:
   selector:
     matchLabels:
       app: {{.TeamLabel}}
+      type: team-pod
   replicas: {{.TeamCount}}
   template:
     metadata:
       labels:
         app: {{.TeamLabel}}
     spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              type: team-pod 
       containers:
       - name: teamvm
         image: scar26/sdskatanad:latest
@@ -45,5 +55,4 @@ spec:
             valueFrom:
               configMapKeyRef:
                 name: teamvm-config
-                key: daemon_port       
-
+                key: daemon_port        
