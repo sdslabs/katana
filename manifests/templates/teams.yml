@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   name: teamvm-config
 data:
-    challenge_dir: {{.ChallengDir}}
+    challenge_dir: {{.ChallengeDir}}
     tmp_dir: {{.TempDir}} 
     init_file: {{.InitFile}}
     daemon_port: "{{.DaemonPort}}"

@@ -15,7 +15,7 @@ type ManifestConfig struct {
 	BroadcastPort         uint
 	KubeNameSpace         string
 	FluentHost            string
-	ChallengDir           string
+	ChallengeDir           string
 	TempDir               string
 	InitFile              string
 	DaemonPort            uint

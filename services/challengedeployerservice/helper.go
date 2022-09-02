@@ -166,7 +166,7 @@ func SendFile(file *os.File, params map[string]string, filename, uri string) err
 	return nil
 }
 
-// broadcast sends given file to the broadcast service, to be forwarded to all pods marked with app=cofig.Teamlabel
+// broadcast sends given file to the broadcast service, to be forwarded to all pods marked with app=config.Teamlabel
 func broadcast(file string) error {
 	chal, err := os.Open(filepath.Join("challenges", file))
 	if err != nil {
