@@ -65,9 +65,43 @@ func GetPods(clientset *kubernetes.Clientset, lbls map[string]string) ([]v1.Pod,
 	return pods.Items, nil
 }
 
+// Returns all pods in input node
+func GetPodsInNode(clientset *kubernetes.Clientset, nodeName string) ([]v1.Pod, error) {
+	client := clientset.CoreV1()
+	podsInterface := client.Pods(g.KatanaConfig.KubeNameSpace)
+	filter := metav1.ListOptions{
+		FieldSelector: "spec.nodeName=" + nodeName,
+		LabelSelector: labels.Set(GetBroadcastPodLabels()).AsSelector().String(),
+	}
+	pods, err := podsInterface.List(context.Background(), filter)
+	if err != nil {
+		return nil, err
+	}
+
+	return pods.Items, nil
+}
+
+// Returns node to which input pod belongs
+func GetNode(clientset *kubernetes.Clientset, podName string) (string, error) {
+	client := clientset.CoreV1()
+	podsInterface := client.Pods(g.KatanaConfig.KubeNameSpace)
+	pod, err := podsInterface.Get(context.Background(), podName, metav1.GetOptions{})
+	if(err != nil) {
+		return "", err
+	}
+	return pod.Spec.NodeName, nil
+} 
+
 // Returns labels of all team pods in the cluster
 func GetTeamPodLabels() map[string]string {
-	return map[string]string{
+	return map[string]string {
 		appLabelKey: g.ClusterConfig.TeamLabel,
+	}
+}
+
+// Returns labels of all broadcast pods in the cluster
+func GetBroadcastPodLabels() map[string]string {
+	return map[string]string{
+		appLabelKey: g.ClusterConfig.BroadcastLabel,
 	}
 }
