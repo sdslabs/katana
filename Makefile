@@ -40,7 +40,7 @@ build-cli:
 ## Lint the code
 install-golint:
 	@printf "🔨 Installing golint\n" 
-	@./scripts/install_golint.sh
+	@./scripts/install-golint.sh
 	@printf "👍 Done\n"
 
 ## Format the code
@@ -52,7 +52,7 @@ fmt:
 ## Check codebase for style mistakes
 lint: install-golint
 	@printf "🔨 Linting\n"
-	@golint ./...
+	@golangci-lint run
 	@printf "👍 Done\n"
 
 ## Clean build files
