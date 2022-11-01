@@ -45,7 +45,9 @@ func sessionHandler(s ssh.Session) {
 	exec, err := remotecommand.NewSPDYExecutor(kubeConfig, "POST", req.URL())
 	if err != nil {
 		fmt.Fprintf(s, "ERROR: %s", err.Error())
-		s.Exit(1)
+		if err := s.Exit(1); err != nil {
+			fmt.Printf("Failed to connect to server: %s", err)
+		}
 	}
 	err = exec.Stream(remotecommand.StreamOptions{
 		Stdin:  s,
@@ -55,7 +57,9 @@ func sessionHandler(s ssh.Session) {
 
 	if err != nil {
 		fmt.Fprintf(s, "ERROR: %s", err.Error())
-		s.Exit(1)
+		if err := s.Exit(1); err != nil {
+			fmt.Printf("Failed to stream data to remote server: %s", err)
+		}
 	}
 }
 

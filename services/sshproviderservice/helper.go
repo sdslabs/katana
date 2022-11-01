@@ -1,5 +1,7 @@
+//nolint
 package sshproviderservice
 
+// TODO remove nolint later
 import (
 	"fmt"
 	"os"

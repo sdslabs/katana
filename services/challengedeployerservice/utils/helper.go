@@ -13,7 +13,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/go-git/go-git/v5"
+	git "github.com/go-git/go-git/v5"
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/sdslabs/katana/lib/utils"
 	v1 "k8s.io/api/core/v1"
@@ -84,7 +84,7 @@ func Clone(remote string, local string, auth *githttp.BasicAuth) error {
 		return err
 	}
 
-	if _, err := git.PlainClone(fmt.Sprintf(tmpdir), false, cloneConfig); err != nil {
+	if _, err := git.PlainClone(tmpdir, false, cloneConfig); err != nil {
 		return err
 	}
 	return compressAndMove(tmpdir, fmt.Sprintf("challenges/%s.zip", local))
@@ -93,7 +93,7 @@ func Clone(remote string, local string, auth *githttp.BasicAuth) error {
 // Compress the src directory into <dst>.zip
 func compressAndMove(src string, dst string) error {
 	if exists(dst) {
-		return fmt.Errorf("File %s: already exists or cannot be accessed", dst)
+		return fmt.Errorf("file %s: already exists or cannot be accessed", dst)
 	}
 
 	outfile, err := os.Create(dst)
@@ -168,9 +168,14 @@ func SendFile(file *os.File, params map[string]string, filename, uri string) err
 	}
 
 	req, err := http.NewRequest("POST", uri, body)
+	if err != nil {
+		fmt.Printf("Failed to wrap and return new request: %s", err)
+	}
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 
-	client.Do(req)
+	if _, err := client.Do(req); err != nil {
+		fmt.Printf("Failed to send response: %s", err)
+	}
 	return nil
 }
 
