@@ -1,4 +1,4 @@
-package api
+package master
 
 import (
 	"fmt"
@@ -6,8 +6,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	c "github.com/sdslabs/katana/api/controllers"
 	cfg "github.com/sdslabs/katana/configs"
+	c "github.com/sdslabs/katana/services/master/controllers"
 )
 
 func Server() error {
@@ -36,6 +36,5 @@ func Server() error {
 	admin.Get("/:name", c.HelloAdmin)
 	admin.Get("/cluster/:id", c.ClusterInfo)
 
-	fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port)
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port))
 }

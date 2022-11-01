@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/sdslabs/katana/api"
+	"github.com/sdslabs/katana/services/master"
 	"github.com/spf13/cobra"
 )
 
@@ -25,7 +25,7 @@ var runCmd = &cobra.Command{
 		// }
 
 		// apiServer := api.Server()
-		return api.Server()
+		return master.Server()
 
 		// if err := g.Wait(); err != nil {
 		// 	os.Exit(1)
