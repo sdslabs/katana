@@ -87,13 +87,15 @@ gen-vpn: set-env
 	helm install openvpn -f $(HELM_MANIFEST) stable/openvpn --namespace openvpn
 	minikube tunnel
 
-set-env:
+set-env: build
 	minikube start --driver=docker && \
 	minikube addons enable ingress  && \
 	kubectl apply -f $(CONTROLLER_MANIFEST) && \
-	sudo -- sh -c "echo \"$(minikube service nginx-ingress-controller --url -n kube-system | awk '{print substr($0,8)}' | awk '{print substr($0, 1, length($0)-6)}' | head -1)    challengedeployer.katana.local\" >> /etc/hosts" &&\
-	go build && \
-	./katana 
+	cp config.sample.toml config.toml && \
+	./bin/katana run
+
+build:
+	cd cmd && go build -o ../bin/katana
 
 # Prints help message
 help:
@@ -107,4 +109,5 @@ help:
 	@echo "lint    			- Lint code using golangci-lint"
 	@echo "set-env" 		- Setup Katana environment  
 	@echo "gen-vpn"         - Generate VPN configurations
+	@echo "build"         	- Build katana binary
 

@@ -14,7 +14,7 @@ func Server() error {
 	fiberConfig := fiber.Config{
 		ReadTimeout:           5 * time.Second,
 		WriteTimeout:          30 * time.Second,
-		DisableStartupMessage: true,
+		DisableStartupMessage: false,
 	}
 
 	app := fiber.New(fiberConfig)
@@ -35,6 +35,6 @@ func Server() error {
 	admin := api.Group("/admin")
 	admin.Get("/:name", c.HelloAdmin)
 	admin.Get("/cluster/:id", c.ClusterInfo)
-
+	fmt.Printf("Listening on %s:%d\n", cfg.APIConfig.Host, cfg.APIConfig.Port)
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port))
 }
