@@ -91,6 +91,7 @@ set-env:
 	minikube start --driver=docker && \
 	minikube addons enable ingress  && \
 	kubectl apply -f $(CONTROLLER_MANIFEST) && \
+	sudo -- sh -c "echo \"$(minikube service nginx-ingress-controller --url -n kube-system | awk '{print substr($0,8)}' | awk '{print substr($0, 1, length($0)-6)}' | head -1)    challengedeployer.katana.local\" >> /etc/hosts" &&\
 	go build && \
 	./katana 
 
