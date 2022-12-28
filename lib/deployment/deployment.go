@@ -16,6 +16,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 	yamlutil "k8s.io/apimachinery/pkg/util/yaml"
+	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -77,10 +78,15 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 				if err != nil {
 					return err
 				}
-				<-watcher.ResultChan()
-				_, err = dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{})
-				if err != nil {
-					return err
+				defer watcher.Stop()
+				for event := range watcher.ResultChan() {
+					if event.Type == watch.Deleted {
+						_, err = dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{})
+						if err != nil {
+							return err
+						}
+						break
+					}
 				}
 			}
 		}
