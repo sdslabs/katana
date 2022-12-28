@@ -69,7 +69,20 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 		}
 
 		if _, err := dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{}); err != nil {
-			return err
+			if _, err := dri.Update(context.Background(), unstructuredObj, metav1.UpdateOptions{}); err != nil {
+				_ = dri.Delete(context.Background(), unstructuredObj.GetName(), metav1.DeleteOptions{})
+				watcher, err := dri.Watch(context.Background(), metav1.ListOptions{
+					FieldSelector: fmt.Sprintf("metadata.name=%s", unstructuredObj.GetName()),
+				})
+				if err != nil {
+					return err
+				}
+				<-watcher.ResultChan()
+				_, err = dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{})
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 
