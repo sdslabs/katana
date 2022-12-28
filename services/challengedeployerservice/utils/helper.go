@@ -21,10 +21,18 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	g "github.com/sdslabs/katana/configs"
+)
+
+
+var (
+	config       = g.ChallengeDeployerConfig
+	KatanaConfig = g.KatanaConfig
+	kubeclient   *kubernetes.Clientset
 )
 
 // Get kubernetes client
-func getClient(pathToCfg string) error {
+func GetClient(pathToCfg string) error {
 	if pathToCfg == "" {
 		pathToCfg = filepath.Join(
 			os.Getenv("HOME"), ".kube", "config",
@@ -46,7 +54,7 @@ func getClient(pathToCfg string) error {
 
 func getPods(lbls map[string]string) ([]v1.Pod, error) {
 	set := labels.Set(lbls)
-	pods, err := kubeclient.CoreV1().Pods(katanaConfig.KubeNameSpace).List(context.Background(), metav1.ListOptions{LabelSelector: set.AsSelector().String()})
+	pods, err := kubeclient.CoreV1().Pods(KatanaConfig.KubeNameSpace).List(context.Background(), metav1.ListOptions{LabelSelector: set.AsSelector().String()})
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +72,7 @@ func exists(path string) bool {
 }
 
 // Clone the provided remote repository into repos/<local>
-func clone(remote string, local string, auth *githttp.BasicAuth) error {
+func Clone(remote string, local string, auth *githttp.BasicAuth) error {
 	cloneConfig := &git.CloneOptions{
 		URL:      remote,
 		Progress: os.Stdout,
@@ -167,7 +175,7 @@ func SendFile(file *os.File, params map[string]string, filename, uri string) err
 }
 
 // broadcast sends given file to the broadcast service, to be forwarded to all pods marked with app=cofig.Teamlabel
-func broadcast(file string) error {
+func Broadcast(file string) error {
 	chal, err := os.Open(filepath.Join("challenges", file))
 	if err != nil {
 		return err
@@ -193,5 +201,5 @@ func broadcast(file string) error {
 	params := make(map[string]string)
 	params["targets"] = string(addressesEncoded)
 
-	return SendFile(chal, params, file, fmt.Sprintf("%s:%d", katanaConfig.KubeHost, config.BroadcastPort))
+	return SendFile(chal, params, file, fmt.Sprintf("%s:%d", KatanaConfig.KubeHost, config.BroadcastPort))
 }
