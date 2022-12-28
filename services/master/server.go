@@ -33,7 +33,8 @@ func Server() error {
 	api := app.Group("/api/v1")
 
 	admin := api.Group("/admin")
-	admin.Get("/:name", c.HelloAdmin)
+	admin.Get("/echo/:name", c.HelloAdmin)
+	admin.Get("/infraSet", c.InfraSet)
 	admin.Get("/cluster/:id", c.ClusterInfo)
 	fmt.Printf("Listening on %s:%d\n", cfg.APIConfig.Host, cfg.APIConfig.Port)
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port))
