@@ -8,7 +8,10 @@ require (
 	github.com/gliderlabs/ssh v0.2.2
 	github.com/go-git/go-git/v5 v5.2.0
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
-	github.com/gofiber/fiber/v2 v2.39.0
+	github.com/gofiber/fiber v1.14.6
+	github.com/gofiber/fiber/v2 v2.40.1
+	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang-jwt/jwt/v4 v4.4.3
 	github.com/golang/protobuf v1.5.2
 	github.com/googleapis/gnostic v0.5.3 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect

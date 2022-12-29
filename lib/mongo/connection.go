@@ -59,6 +59,6 @@ func Test() {
 	log.Println(res)
 }
 
-func init() {
+func Init() {
 	go setup()
 }

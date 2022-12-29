@@ -43,3 +43,13 @@ func FetchSingleTeam(teamName string) (*types.CTFTeam, error) {
 	}
 	return team, nil
 }
+
+func FetchSingleAdmin(username string) (*types.AdminUser, error) {
+	collection := link.Collection(AdminCollection)
+	admin := &types.AdminUser{}
+	ctx := context.Background()
+	if err := collection.FindOne(ctx, bson.M{UsernameKey: username}).Decode(admin); err != nil {
+		return nil, err
+	}
+	return admin, nil
+}
