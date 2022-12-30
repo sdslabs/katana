@@ -1,8 +1,7 @@
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
   name: elasticsearch
-  namespace: {{.KubeNameSpace}}
   labels:
     app: elasticsearch
 spec:

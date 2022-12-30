@@ -14,12 +14,16 @@ manifests = [
     "teams.yml",
     "broadcast.yml",
     "broadcast-service.yml",
-    "elasticsearch_svc.yml",
-    "elasticsearch_statefulset.yml",
-    "kibana.yml",
-    "fluentd-daemonset.yml",
     "ingress.yml",
-    "openvpn.yml"
+    "openvpn.yml",
+    "es-sts.yml",
+    "es-svc.yml",
+    "fluentd-ds.yml",
+    "fluentd-rb.yml",
+    "fluentd-role.yml",
+    "fluentd-sa.yml",
+    "kibana-deployment.yml",
+    "kibana-svc.yml"
 ]
 
 [services.api]

@@ -9,16 +9,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
-	"github.com/sdslabs/katana/lib/utils"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
 func InfraSet(c *fiber.Ctx) error {
 
-	if !utils.VerifyToken(c) {
-		return c.SendString("Unauthorized")
-	}
+	// if !utils.VerifyToken(c) {
+	// 	return c.SendString("Unauthorized")
+	// }
 
 	pathToCfg := filepath.Join(
 		os.Getenv("HOME"), ".kube", "config",
