@@ -2,12 +2,21 @@ package flaghandlerservice
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
 	"time"
+
+	"os/exec"
 
 	"github.com/sdslabs/katana/lib/mongo"
 	"github.com/sdslabs/katana/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 func checkSubmission(submission *types.Submission) bool {
@@ -45,4 +54,45 @@ func submitFlag(value string, team types.CTFTeam) (bool, int) {
 		return false, 0
 	}
 	return true, points
+}
+
+func getflag(container string, script string) {
+	// hard coded script name and container, will become parameter later
+	pathToCfg := filepath.Join(
+		os.Getenv("HOME"), ".kube", "config",
+	)
+	fmt.Println(g.KatanaConfig.KubeNameSpace)
+	config, err := clientcmd.BuildConfigFromFlags("", pathToCfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	clientset, err := kubernetes.NewForConfig(config)
+	pods, err := clientset.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, pod := range pods.Items {
+		podName := pod.Name
+		cmd := exec.Command("kubectl", "cp", script, podName+":"+script, "-c", container)
+		err := cmd.Run()
+		if err != nil {
+			fmt.Println("error aaya hai bhaiya")
+			fmt.Println(err)
+		}
+		out, erro := exec.Command("kubectl", "exec", podName, "-c", container, "--", "bash", "-c", "./"+script).Output()
+		if erro != nil {
+			fmt.Println(err)
+		}
+		output := string(out)
+		_, err = mongo.FetchFlag(output)
+		if err != nil {
+			fmt.Println(podName + " ka container " + container + "is not running")
+		}
+		err = exec.Command("kubectl", "exec", podName, "-c", container, "--", "rm", script).Run()
+		if err != nil {
+			fmt.Println("error aaya hai bhaiya")
+			fmt.Println(err)
+		}
+	}
+	return
 }
