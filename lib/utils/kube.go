@@ -2,11 +2,13 @@ package utils
 
 import (
 	"context"
+	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 
 	g "github.com/sdslabs/katana/configs"
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
@@ -43,13 +45,13 @@ func GetKubeClient() (*kubernetes.Clientset, error) {
 	return kubernetes.NewForConfig(config)
 }
 
-func GetPodByName(clientset *kubernetes.Clientset, podName string) (*v1.Pod, error) {
+func GetPodByName(clientset *kubernetes.Clientset, podName string) (*corev1.Pod, error) {
 	client := clientset.CoreV1()
 	podsInterface := client.Pods(g.KatanaConfig.KubeNameSpace)
 	return podsInterface.Get(context.Background(), podName, metav1.GetOptions{})
 }
 
-func GetPods(clientset *kubernetes.Clientset, lbls map[string]string) ([]v1.Pod, error) {
+func GetPods(clientset *kubernetes.Clientset, lbls map[string]string) ([]corev1.Pod, error) {
 	client := clientset.CoreV1()
 	podsInterface := client.Pods(g.KatanaConfig.KubeNameSpace)
 	filter := metav1.ListOptions{
@@ -68,4 +70,38 @@ func GetTeamPodLabels() map[string]string {
 	return map[string]string{
 		appLabelKey: g.ClusterConfig.TeamLabel,
 	}
+}
+
+func GetClusterIP() string {
+	clientset, err := GetKubeClient()
+	if err != nil {
+		log.Println(err)
+		// handle error
+	}
+
+	nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		fmt.Println(err)
+		// handle error
+	}
+	var minikubeNode *corev1.Node
+	for _, node := range nodes.Items {
+		if node.Spec.ProviderID == "minikube" {
+			minikubeNode = &node
+			break
+		}
+	}
+
+	var minikubeIP string
+	fmt.Print()
+	fmt.Println(minikubeNode)
+	for _, address := range minikubeNode.Status.Addresses {
+		if address.Type == corev1.NodeExternalIP {
+			fmt.Println(address.Address)
+			minikubeIP = address.Address
+			break
+		}
+	}
+	log.Println(minikubeIP)
+	return minikubeIP
 }
