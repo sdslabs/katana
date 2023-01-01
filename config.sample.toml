@@ -23,7 +23,13 @@ manifests = [
     "fluentd-role.yml",
     "fluentd-sa.yml",
     "kibana-deployment.yml",
-    "kibana-svc.yml"
+    "kibana-svc.yml",
+    "mongodb-client.yaml",
+    "mongodb-deployment.yaml",
+    "mongodb-nodeport-svc.yaml",
+    "mongodb-pv.yaml",
+    "mongodb-pvc.yaml",
+    "mongodb-secrets.yaml"
 ]
 
 [services.api]
@@ -50,7 +56,7 @@ creds_file = "teamcreds.txt"
 password_length = 10
 
 [mongo]
-url = "mongodb://scar:scar@localhost:27017/?authSource=admin"
+url = "mongodb://adminuser:password123@192.168.67.2:32000/?directConnection=true&appName=mongosh+1.6.1"
 
 [admin]
 username = "sdslabs"
