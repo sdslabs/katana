@@ -15,6 +15,8 @@ type ManifestConfig struct {
 	BroadcastPort         uint
 	KubeNameSpace         string
 	FluentHost            string
+	TeamPodName           string
+	ContainerName         string
 	ChallengDir           string
 	TempDir               string
 	InitFile              string

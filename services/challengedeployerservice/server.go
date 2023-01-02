@@ -23,7 +23,7 @@ func DeployToAll(localFilePath string, pathInPod string, ns ...string) error {
 	// Loop over pods
 	for _, pod := range pods {
 		// Copy file into pod
-		if err := utils.CopyIntoPod(pod.Name, "teamvm", pathInPod, localFilePath, ns...); err != nil {
+		if err := utils.CopyIntoPod(pod.Name, g.TeamVmConfig.ContainerName, pathInPod, localFilePath, ns...); err != nil {
 			log.Println(err)
 			return err
 		}

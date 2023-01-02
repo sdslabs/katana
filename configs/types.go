@@ -35,10 +35,12 @@ type ServicesCfg struct {
 }
 
 type TeamChallengeConfig struct {
-	ChallengeDir string `toml:"challengedir"`
-	TempDir      string `toml:"tmpdir"`
-	InitFile     string `toml:"initfile"`
-	DaemonPort   uint   `toml:"daemonport"`
+	TeamPodName   string `toml:"teampodname"`
+	ContainerName string `toml:"containername"`
+	ChallengeDir  string `toml:"challengedir"`
+	TempDir       string `toml:"tmpdir"`
+	InitFile      string `toml:"initfile"`
+	DaemonPort    uint   `toml:"daemonport"`
 }
 
 type SSHProviderCfg struct {

@@ -44,6 +44,8 @@ teamclientport = 3004
 challengeartifactlabel = "challfile"
 
 [teamvm]
+teampodname = "katana-teams"
+containername = "teamvm"
 challengedir = "/opt/challenges/"
 tmpdir = "/tmp/"
 initfile = "run.sh"

@@ -111,6 +111,8 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 		BroadcastCount:        clusterConfig.BroadcastCount,
 		BroadcastLabel:        clusterConfig.BroadcastLabel,
 		BroadcastPort:         g.ServicesConfig.ChallengeDeployer.BroadcastPort,
+		TeamPodName:           g.TeamVmConfig.TeamPodName,
+		ContainerName:         g.TeamVmConfig.ContainerName,
 		ChallengDir:           g.TeamVmConfig.ChallengeDir,
 		TempDir:               g.TeamVmConfig.TempDir,
 		InitFile:              g.TeamVmConfig.InitFile,

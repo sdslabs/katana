@@ -11,7 +11,7 @@ data:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: katana-teams
+  name: {{.TeamPodName}}
 spec:
   selector:
     matchLabels:
@@ -23,7 +23,7 @@ spec:
         app: {{.TeamLabel}}
     spec:
       containers:
-      - name: teamvm
+      - name: {{.ContainerName}}
         image: scar26/sdskatanad:latest
         env:
           - name: CHALLENGE_DIR 
