@@ -9,7 +9,7 @@ import (
 
 func DeployToAll(localFilePath string, pathInPod string, ns ...string) error {
 
-	if err := getClient(g.KatanaConfig.KubeConfig); err != nil {
+	if err := GetClient(g.KatanaConfig.KubeConfig); err != nil {
 		return err
 	}
 
