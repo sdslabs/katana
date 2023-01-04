@@ -14,7 +14,7 @@ import (
 )
 
 var ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
-var client, err = mongo.Connect(ctx, options.Client().ApplyURI(configs.MongoConfig.URL))
+var client, err = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+configs.MongoConfig.Username+":"+configs.MongoConfig.Password+"@"+utils.GetMongoIP()+":"+configs.MongoConfig.Port+"/?directConnection=true&appName=mongosh+"+configs.MongoConfig.Version))
 var link = client.Database(projectDatabase)
 
 func setupAdmin() {

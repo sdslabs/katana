@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"context"
+	"fmt"
+	"log"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -8,10 +11,21 @@ import (
 	"github.com/sdslabs/katana/lib/mongo"
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func DB(c *fiber.Ctx) error {
+	client, err := utils.GetKubeClient()
+	if err != nil {
+		log.Println(err)
+	}
+	service, err := client.CoreV1().Services("default").Get(context.TODO(), "mongo-nodeport-svc", metav1.GetOptions{})
+	if err != nil {
+		log.Println(err)
+	}
 
+	// Print the IP address of the service
+	fmt.Println(service.Spec.ClusterIP)
 	mongo.Init()
 
 	return c.SendString("Database setup completed")

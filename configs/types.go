@@ -51,7 +51,11 @@ type SSHProviderCfg struct {
 }
 
 type MongoCfg struct {
-	URL string `toml:"url"`
+	Username string `toml:"username"`
+	Password string `toml:"password"`
+	Port     string `toml:"port"`
+	Version  string `toml:"mongosh_version"`
+	URL      string `toml:"url"`
 }
 
 type KatanaCfg struct {

@@ -74,37 +74,19 @@ func GetTeamPodLabels() map[string]string {
 	}
 }
 
-func GetClusterIP() string {
-	clientset, err := GetKubeClient()
+func GetMongoIP() string {
+	client, err := GetKubeClient()
 	if err != nil {
-		log.Println(err)
-		// handle error
+		log.Fatal(err)
+	}
+	service, err := client.CoreV1().Services("default").Get(context.TODO(), "mongo-nodeport-svc", metav1.GetOptions{})
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
-	if err != nil {
-		fmt.Println(err)
-		// handle error
-	}
-	var minikubeNode *corev1.Node
-	for _, node := range nodes.Items {
-		if node.Spec.ProviderID == "minikube" {
-			minikubeNode = &node
-			break
-		}
-	}
-	var minikubeIP string
-	fmt.Print()
-	fmt.Println(minikubeNode)
-	for _, address := range minikubeNode.Status.Addresses {
-		if address.Type == corev1.NodeExternalIP {
-			fmt.Println(address.Address)
-			minikubeIP = address.Address
-			break
-		}
-	}
-	log.Println(minikubeIP)
-	return minikubeIP
+	// Print the IP address of the service
+	fmt.Println(service.Spec.ClusterIP)
+	return service.Spec.ClusterIP
 }
 
 func CopyIntoPod(podName string, containerName string, pathInPod string, localFilePath string, ns ...string) error {
