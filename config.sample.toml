@@ -60,7 +60,7 @@ password_length = 10
 [mongo]
 username = "adminuser"
 password = "password123"
-port = "27017"
+port = "32000"
 mongosh_version = "1.6.1"
 url = "mongodb://adminuser:password123@192.168.67.2:32000/?directConnection=true&appName=mongosh+1.6.1"
 
