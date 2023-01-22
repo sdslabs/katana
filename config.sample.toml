@@ -24,12 +24,12 @@ manifests = [
     "fluentd-sa.yml",
     "kibana-deployment.yml",
     "kibana-svc.yml",
-    "mongodb-client.yaml",
-    "mongodb-deployment.yaml",
-    "mongodb-nodeport-svc.yaml",
-    "mongodb-pv.yaml",
-    "mongodb-pvc.yaml",
-    "mongodb-secrets.yaml"
+    "mongodb-client.yml",
+    "mongodb-deployment.yml",
+    "mongodb-nodeport-svc.yml",
+    "mongodb-pv.yml",
+    "mongodb-pvc.yml",
+    "mongodb-secrets.yml",
 ]
 
 [services.api]
@@ -62,7 +62,6 @@ username = "adminuser"
 password = "password123"
 port = "32000"
 mongosh_version = "1.6.1"
-url = "mongodb://adminuser:password123@192.168.67.2:32000/?directConnection=true&appName=mongosh+1.6.1"
 
 [admin]
 username = "sdslabs"
