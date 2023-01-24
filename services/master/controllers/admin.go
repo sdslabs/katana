@@ -5,9 +5,14 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/sdslabs/katana/lib/foundry"
+	"github.com/sdslabs/katana/lib/utils"
 )
 
 func HelloAdmin(c *fiber.Ctx) error {
+
+	if !utils.VerifyToken(c) {
+		return c.SendStatus(403)
+	}
 	msg := fmt.Sprintf("Hello, admin %s 👋!", c.Params("name"))
 	return c.SendString(msg)
 }
