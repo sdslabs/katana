@@ -1,4 +1,4 @@
-//nolint
+// nolint
 package sshproviderservice
 
 // TODO remove nolint later
@@ -12,7 +12,7 @@ import (
 	"github.com/sdslabs/katana/types"
 )
 
-func createTeams() error {
+func CreateTeams() error {
 	teamlabels := utils.GetTeamPodLabels()
 	var teams []interface{}
 	teamPods, err := utils.GetPods(kubeClientset, teamlabels)
@@ -20,7 +20,7 @@ func createTeams() error {
 		return err
 	}
 
-	credsFile, err := os.Open(g.SSHProviderConfig.CredsFile)
+	credsFile, err := os.Create(g.SSHProviderConfig.CredsFile)
 	if err != nil {
 		return err
 	}
