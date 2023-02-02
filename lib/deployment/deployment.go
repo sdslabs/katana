@@ -24,7 +24,7 @@ import (
 )
 
 // ApplyManifest applies a given manifest to the cluster
-func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset, manifest []byte) error {
+func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset, manifest []byte, namespace string) error {
 	dd, err := dynamic.NewForConfig(kubeconfig)
 	if err != nil {
 		return err
@@ -62,7 +62,7 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 		var dri dynamic.ResourceInterface
 		if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
 			if unstructuredObj.GetNamespace() == "" {
-				unstructuredObj.SetNamespace(g.KatanaConfig.KubeNameSpace)
+				unstructuredObj.SetNamespace(namespace)
 			}
 			dri = dd.Resource(mapping.Resource).Namespace(unstructuredObj.GetNamespace())
 		} else {
@@ -128,12 +128,10 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 		if err != nil {
 			return err
 		}
-
 		if err = tmpl.Execute(manifest, deploymentConfig); err != nil {
 			return err
 		}
-
-		if err = ApplyManifest(kubeconfig, kubeclientset, manifest.Bytes()); err != nil {
+		if err = ApplyManifest(kubeconfig, kubeclientset, manifest.Bytes(), g.KatanaConfig.KubeNameSpace); err != nil {
 			return err
 		}
 	}
