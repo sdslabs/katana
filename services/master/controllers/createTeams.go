@@ -19,71 +19,11 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func CreateTeam(namespace string, i string) *coreV1.Pod {
+func CreateTeam(namespace string, i string) string {
 	// ctfTeam := new(types.CTFTeam)
 	log.Println("Creating pod for team " + i)
-	teamPod := &coreV1.Pod{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "katana-team-" + i,
-			Namespace: namespace,
-		},
-		Spec: coreV1.PodSpec{
-			Containers: []coreV1.Container{
-				{
-					Name:  "teamvm",
-					Image: "scar26/sdskatanad",
-					Env: []coreV1.EnvVar{
-						{
-							Name: "CHALLENGE_DIR",
-							ValueFrom: &coreV1.EnvVarSource{
-								ConfigMapKeyRef: &coreV1.ConfigMapKeySelector{
-									LocalObjectReference: coreV1.LocalObjectReference{
-										Name: "teamvm-config",
-									},
-									Key: "challenge_dir",
-								},
-							},
-						},
-						{
-							Name: "TMP_DIR",
-							ValueFrom: &coreV1.EnvVarSource{
-								ConfigMapKeyRef: &coreV1.ConfigMapKeySelector{
-									LocalObjectReference: coreV1.LocalObjectReference{
-										Name: "teamvm-config",
-									},
-									Key: "tmp_dir",
-								},
-							},
-						},
-						{
-							Name: "INIT_FILE",
-							ValueFrom: &coreV1.EnvVarSource{
-								ConfigMapKeyRef: &coreV1.ConfigMapKeySelector{
-									LocalObjectReference: coreV1.LocalObjectReference{
-										Name: "teamvm-config",
-									},
-									Key: "init_file",
-								},
-							},
-						},
-						{
-							Name: "DAEMON_PORT",
-							ValueFrom: &coreV1.EnvVarSource{
-								ConfigMapKeyRef: &coreV1.ConfigMapKeySelector{
-									LocalObjectReference: coreV1.LocalObjectReference{
-										Name: "teamvm-config",
-									},
-									Key: "daemon_port",
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
 
-	return teamPod
+	return "PlaceHolder"
 }
 
 func CreateTeams(c *fiber.Ctx) error {
@@ -105,13 +45,10 @@ func CreateTeams(c *fiber.Ctx) error {
 				Name: "katana-team-ns-" + strconv.Itoa(i),
 			},
 		}
-
 		_, err = client.CoreV1().Namespaces().Create(c.Context(), nsName, metav1.CreateOptions{})
 		if err != nil {
 			log.Fatal(err)
 		}
-		//pod := CreateTeam("katana-team-ns-"+strconv.Itoa(i), strconv.Itoa(i))
-		//_, err = client.CoreV1().Pods(pod.Namespace).Create(c.Context(), pod, metav1.CreateOptions{})
 		manifest := &bytes.Buffer{}
 		tmpl, err := template.ParseFiles(filepath.Join(clusterConfig.ManifestDir, "teams.yml"))
 		if err != nil {
@@ -146,14 +83,9 @@ func CreateTeams(c *fiber.Ctx) error {
 		if err != nil {
 			log.Fatal(err)
 		}
-		if err = deployment.ApplyManifest(config, client, manifest.Bytes(), g.KatanaConfig.KubeNameSpace); err != nil {
+		if err = deployment.ApplyManifest(config, client, manifest.Bytes(), "katana-team-ns-"+strconv.Itoa(i)); err != nil {
 			return err
 		}
-		//config, err := clientcmd.BuildConfigFromFlags("", pathToCfg)
-		//err = deployment.ApplyManifest(config, client, manifest.Bytes(), g.KatanaConfig.KubeNameSpace)
-		//if err != nil {
-		//	log.Fatal(err)
-		//}
 	}
 	return c.SendString("No. of Teams Created:" + c.Params("number") + "\n")
 }
