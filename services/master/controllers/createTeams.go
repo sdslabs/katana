@@ -75,7 +75,6 @@ func CreateTeams(c *fiber.Ctx) error {
 		if err = tmpl.Execute(manifest, deploymentConfig); err != nil {
 			return err
 		}
-		fmt.Printf("This is what manifest bytes looks like: %s", manifest.Bytes())
 		pathToCfg := filepath.Join(
 			os.Getenv("HOME"), ".kube", "config",
 		)
