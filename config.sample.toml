@@ -62,7 +62,6 @@ password = "password123"
 port = "32000"
 mongosh_version = "1.6.1"
 cluster_url = "challengedeployer.katana.local"
-url = "mongodb://adminuser:password123@192.168.67.2:32000/?directConnection=true&appName=mongosh+1.6.1"
 
 [admin]
 username = "sdslabs"
