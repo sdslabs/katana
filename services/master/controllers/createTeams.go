@@ -86,5 +86,5 @@ func CreateTeams(c *fiber.Ctx) error {
 			return err
 		}
 	}
-	return c.SendString("No. of Teams Created:" + c.Params("number") + "\n")
+	return c.SendString("Successfully created " + strconv.Itoa(noOfTeams) + " teams")
 }
