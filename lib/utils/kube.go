@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	g "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/types"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -167,4 +168,26 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 
 	log.Println("File copied successfully")
 	return nil
+}
+
+func DeploymentConfig() types.ManifestConfig {
+	clusterConfig := g.ClusterConfig
+	config := types.ManifestConfig{
+		FluentHost:            fmt.Sprintf("\"elasticsearch.%s.svc.cluster.local\"", g.KatanaConfig.KubeNameSpace),
+		KubeNameSpace:         g.KatanaConfig.KubeNameSpace,
+		TeamCount:             clusterConfig.TeamCount,
+		TeamLabel:             clusterConfig.TeamLabel,
+		BroadcastCount:        clusterConfig.BroadcastCount,
+		BroadcastLabel:        clusterConfig.BroadcastLabel,
+		BroadcastPort:         g.ServicesConfig.ChallengeDeployer.BroadcastPort,
+		TeamPodName:           g.TeamVmConfig.TeamPodName,
+		ContainerName:         g.TeamVmConfig.ContainerName,
+		ChallengDir:           g.TeamVmConfig.ChallengeDir,
+		TempDir:               g.TeamVmConfig.TempDir,
+		InitFile:              g.TeamVmConfig.InitFile,
+		DaemonPort:            g.TeamVmConfig.DaemonPort,
+		ChallengeDeployerHost: g.ServicesConfig.ChallengeDeployer.Host,
+		ChallengeArtifact:     g.ServicesConfig.ChallengeDeployer.ArtifactLabel,
+	}
+	return config
 }

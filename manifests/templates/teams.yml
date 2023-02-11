@@ -16,7 +16,6 @@ spec:
   selector:
     matchLabels:
       app: {{.TeamLabel}}
-  replicas: {{.TeamCount}}
   template:
     metadata:
       labels:

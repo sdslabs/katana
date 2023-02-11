@@ -9,7 +9,7 @@ import (
 	"text/template"
 
 	g "github.com/sdslabs/katana/configs"
-	"github.com/sdslabs/katana/types"
+	"github.com/sdslabs/katana/lib/utils"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -24,7 +24,7 @@ import (
 )
 
 // ApplyManifest applies a given manifest to the cluster
-func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset, manifest []byte) error {
+func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset, manifest []byte, namespace string) error {
 	dd, err := dynamic.NewForConfig(kubeconfig)
 	if err != nil {
 		return err
@@ -62,7 +62,7 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 		var dri dynamic.ResourceInterface
 		if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
 			if unstructuredObj.GetNamespace() == "" {
-				unstructuredObj.SetNamespace(g.KatanaConfig.KubeNameSpace)
+				unstructuredObj.SetNamespace(namespace)
 			}
 			dri = dd.Resource(mapping.Resource).Namespace(unstructuredObj.GetNamespace())
 		} else {
@@ -103,23 +103,7 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset) error {
 	clusterConfig := g.ClusterConfig
 
-	deploymentConfig := types.ManifestConfig{
-		FluentHost:            fmt.Sprintf("\"elasticsearch.%s.svc.cluster.local\"", g.KatanaConfig.KubeNameSpace),
-		KubeNameSpace:         g.KatanaConfig.KubeNameSpace,
-		TeamCount:             clusterConfig.TeamCount,
-		TeamLabel:             clusterConfig.TeamLabel,
-		BroadcastCount:        clusterConfig.BroadcastCount,
-		BroadcastLabel:        clusterConfig.BroadcastLabel,
-		BroadcastPort:         g.ServicesConfig.ChallengeDeployer.BroadcastPort,
-		TeamPodName:           g.TeamVmConfig.TeamPodName,
-		ContainerName:         g.TeamVmConfig.ContainerName,
-		ChallengDir:           g.TeamVmConfig.ChallengeDir,
-		TempDir:               g.TeamVmConfig.TempDir,
-		InitFile:              g.TeamVmConfig.InitFile,
-		DaemonPort:            g.TeamVmConfig.DaemonPort,
-		ChallengeDeployerHost: g.ServicesConfig.ChallengeDeployer.Host,
-		ChallengeArtifact:     g.ServicesConfig.ChallengeDeployer.ArtifactLabel,
-	}
+	deploymentConfig := utils.DeploymentConfig()
 
 	for _, m := range clusterConfig.Manifests {
 		manifest := &bytes.Buffer{}
@@ -128,12 +112,10 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 		if err != nil {
 			return err
 		}
-
 		if err = tmpl.Execute(manifest, deploymentConfig); err != nil {
 			return err
 		}
-
-		if err = ApplyManifest(kubeconfig, kubeclientset, manifest.Bytes()); err != nil {
+		if err = ApplyManifest(kubeconfig, kubeclientset, manifest.Bytes(), g.KatanaConfig.KubeNameSpace); err != nil {
 			return err
 		}
 	}

@@ -37,6 +37,7 @@ func Server() error {
 	admin.Get("/infraSet", c.InfraSet)
 	admin.Get("/db", c.DB)
 	admin.Post("/login", c.Login)
+	admin.Get("/createTeams/:number", c.CreateTeams)
 	admin.Post("/logs", c.Logs)
 	admin.Get("/deploy", c.Deploy)
 	admin.Get("/cluster/:id", c.ClusterInfo)
