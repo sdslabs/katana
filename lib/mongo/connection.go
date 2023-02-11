@@ -47,6 +47,10 @@ func setup() {
 	} else {
 		log.Println("MongoDB Connection Established")
 		setupAdmin()
+		// Create Flags Collection
+		if err = link.CreateCollection(context.Background(), FlagsCollection); err != nil {
+			log.Println(err)
+		}
 	}
 }
 

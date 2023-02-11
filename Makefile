@@ -98,6 +98,9 @@ set-env: build
 build:
 	cd cmd && go build -o ../bin/katana
 
+run: build
+	./bin/katana run
+
 # Prints help message
 help:
 	@echo "KATANA"

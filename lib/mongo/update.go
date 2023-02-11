@@ -20,3 +20,7 @@ func UpsertOne(ctx context.Context, collectionName string, filter bson.M, data i
 func AddAdmin(ctx context.Context, admin types.AdminUser) error {
 	return UpsertOne(ctx, AdminCollection, bson.M{UsernameKey: admin.Username}, admin)
 }
+
+func UpdateFlag(ctx context.Context, flag types.Flag) error {
+	return UpsertOne(ctx, FlagsCollection, bson.M{TeamNameKey: flag.Team}, flag)
+}

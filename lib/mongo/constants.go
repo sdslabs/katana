@@ -5,6 +5,10 @@ const (
 
 	TeamsCollection = "teams"
 
+	FlagsCollection = "flags"
+
+	TeamNameKey = "team"
+
 	AdminCollection = "admins"
 
 	UsernameKey = "username"

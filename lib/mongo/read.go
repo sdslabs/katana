@@ -53,3 +53,13 @@ func FetchSingleAdmin(username string) (*types.AdminUser, error) {
 	}
 	return admin, nil
 }
+
+func FetchFlag(teamName string) (*types.Flag, error) {
+	collection := link.Collection(FlagsCollection)
+	flag := &types.Flag{}
+	ctx := context.Background()
+	if err := collection.FindOne(ctx, bson.M{TeamNameKey: teamName}).Decode(flag); err != nil {
+		return nil, err
+	}
+	return flag, nil
+}
