@@ -9,7 +9,7 @@ import (
 	"text/template"
 
 	g "github.com/sdslabs/katana/configs"
-	"github.com/sdslabs/katana/types"
+	"github.com/sdslabs/katana/lib/utils"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -103,23 +103,7 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset) error {
 	clusterConfig := g.ClusterConfig
 
-	deploymentConfig := types.ManifestConfig{
-		FluentHost:            fmt.Sprintf("\"elasticsearch.%s.svc.cluster.local\"", g.KatanaConfig.KubeNameSpace),
-		KubeNameSpace:         g.KatanaConfig.KubeNameSpace,
-		TeamCount:             clusterConfig.TeamCount,
-		TeamLabel:             clusterConfig.TeamLabel,
-		BroadcastCount:        clusterConfig.BroadcastCount,
-		BroadcastLabel:        clusterConfig.BroadcastLabel,
-		BroadcastPort:         g.ServicesConfig.ChallengeDeployer.BroadcastPort,
-		TeamPodName:           g.TeamVmConfig.TeamPodName,
-		ContainerName:         g.TeamVmConfig.ContainerName,
-		ChallengDir:           g.TeamVmConfig.ChallengeDir,
-		TempDir:               g.TeamVmConfig.TempDir,
-		InitFile:              g.TeamVmConfig.InitFile,
-		DaemonPort:            g.TeamVmConfig.DaemonPort,
-		ChallengeDeployerHost: g.ServicesConfig.ChallengeDeployer.Host,
-		ChallengeArtifact:     g.ServicesConfig.ChallengeDeployer.ArtifactLabel,
-	}
+	deploymentConfig := utils.DeploymentConfig()
 
 	for _, m := range clusterConfig.Manifests {
 		manifest := &bytes.Buffer{}

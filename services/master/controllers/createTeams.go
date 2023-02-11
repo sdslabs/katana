@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -13,7 +12,6 @@ import (
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/utils"
-	"github.com/sdslabs/katana/types"
 	coreV1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/clientcmd"
@@ -27,6 +25,11 @@ import (
 } */
 
 func CreateTeams(c *fiber.Ctx) error {
+
+	// if !utils.VerifyToken(c) {
+	// 	return c.SendString("Unauthorized")
+	// }
+
 	clusterConfig := g.ClusterConfig
 	client, err := utils.GetKubeClient()
 	if err != nil {
@@ -54,23 +57,7 @@ func CreateTeams(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-		deploymentConfig := types.ManifestConfig{
-			FluentHost:            fmt.Sprintf("\"elasticsearch.%s.svc.cluster.local\"", g.KatanaConfig.KubeNameSpace),
-			KubeNameSpace:         g.KatanaConfig.KubeNameSpace,
-			TeamCount:             clusterConfig.TeamCount,
-			TeamLabel:             clusterConfig.TeamLabel,
-			BroadcastCount:        clusterConfig.BroadcastCount,
-			BroadcastLabel:        clusterConfig.BroadcastLabel,
-			BroadcastPort:         g.ServicesConfig.ChallengeDeployer.BroadcastPort,
-			TeamPodName:           g.TeamVmConfig.TeamPodName,
-			ContainerName:         g.TeamVmConfig.ContainerName,
-			ChallengDir:           g.TeamVmConfig.ChallengeDir,
-			TempDir:               g.TeamVmConfig.TempDir,
-			InitFile:              g.TeamVmConfig.InitFile,
-			DaemonPort:            g.TeamVmConfig.DaemonPort,
-			ChallengeDeployerHost: g.ServicesConfig.ChallengeDeployer.Host,
-			ChallengeArtifact:     g.ServicesConfig.ChallengeDeployer.ArtifactLabel,
-		}
+		deploymentConfig := utils.DeploymentConfig()
 
 		if err = tmpl.Execute(manifest, deploymentConfig); err != nil {
 			return err
@@ -86,5 +73,5 @@ func CreateTeams(c *fiber.Ctx) error {
 			return err
 		}
 	}
-	return c.SendString("Successfully created " + strconv.Itoa(noOfTeams) + " teams")
+	return c.SendString("Successfully created teams")
 }
