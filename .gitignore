@@ -10,3 +10,4 @@ katana
 test.go
 vendor/*
 *.log
+docs/themes/*
