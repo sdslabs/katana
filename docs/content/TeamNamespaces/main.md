@@ -2,9 +2,17 @@
 title: "Team Namespaces"
 ---
 
+# Introduction
+
 As seen in the image below, each team has its own namespace. This is to ensure that each team has its own set of resources and does not interfere with other teams. This also allows for a more secure environment as each team can only access its own namespace.
 
 ![Image Not Found](/team-namespaces-architecture.png)
+
+# Setup
+
+To deploy the database, you first need to set up the infrastructure with the help of the `/api/v2/admin/createTeams/:number` endpoint where `/:number` is the number of teams you want to initialise.
+
+# Go Code For Team Namespaces
 
 The following code in the `createTeams.go` controller is responsible for creating the namespaces for the teams and deploying the required resources into the namespaces.
 
