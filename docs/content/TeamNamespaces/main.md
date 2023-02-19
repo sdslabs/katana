@@ -6,7 +6,7 @@ As seen in the image below, each team has its own namespace. This is to ensure t
 
 ![Image Not Found](/team-namespaces-architecture.png)
 
-The following code in the ```createTeams.go``` controller is responsible for creating the namespaces for the teams and deploying the required resources into the namespaces.
+The following code in the `createTeams.go` controller is responsible for creating the namespaces for the teams and deploying the required resources into the namespaces.
 
 ```Golang
 func CreateTeams(c *fiber.Ctx) error {
