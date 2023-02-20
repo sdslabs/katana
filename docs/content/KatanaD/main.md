@@ -14,7 +14,7 @@ Each team under it's own namespace has a master pod. We have names the general s
 
 ## Structure
 
-The DockerFile can be accessed from here.
+The DockerFile can be accessed from [here.](https://github.com/sdslabs/katanad/blob/mainpod/Dockerfile)
 
 ## General Flow
 
