@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,6 +13,40 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
+
+func sshkeyExists(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
+}
+
+func sshkeyCreate() {
+	f, err := os.Create("testFile.txt")
+
+	app := "ssh-keygen"
+	arg0 := "-t"
+	arg1 := "ed25519"
+	arg2 := "-C"
+	arg3 := "\"test@gmail.com\""
+	arg4 := "-f"
+	arg5 := "/tmp/ssh_admin"
+	arg6 := "-q"
+	arg7 := "-P"
+	arg8 := "\"\""
+
+	cmd := exec.Command(app, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+
+	stdout, err := cmd.Output()
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	fmt.Println(string(stdout))
+
+	defer f.Close()
+
+}
 
 func InfraSet(c *fiber.Ctx) error {
 
@@ -40,6 +75,16 @@ func InfraSet(c *fiber.Ctx) error {
 	}
 
 	fmt.Println(kubeclient)
+
+	var file string = "/tmp/ssh_admin"
+	exist := sshkeyExists(file)
+
+	if exist {
+		fmt.Println("Admin ssh file exists")
+	} else {
+		fmt.Println("Creating ssh keys")
+		sshkeyCreate()
+	}
 
 	return c.SendString("Infrastructure setup completed")
 }
