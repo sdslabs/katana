@@ -1,3 +1,30 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mongo-client
+  name: mongo-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-client
+  template:
+    metadata:
+      labels:
+        app: mongo-client
+    spec:
+      containers:
+      - image: mongo
+        name: mongo-client
+        env:
+        - name: mongo-client_INITDB_ROOT_USERNAME
+          value: 'dummy'
+        - name: mongo-client_INITDB_ROOT_PASSWORD
+          value: 'dummy'
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -59,3 +86,55 @@ spec:
       - name: "mongo-data-dir"
         persistentVolumeClaim:
           claimName: "mongo-data"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mongo
+  name: mongo-nodeport-svc
+spec:
+  ports:
+  - port: 27017
+    protocol: TCP
+    targetPort: 27017
+    nodePort: 32000
+  selector:
+    app: mongo
+  type: NodePort
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-data-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /data/mongo
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-data
+spec:
+  accessModes:
+    - ReadWriteOnce 
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+data:
+  password: cGFzc3dvcmQxMjM= #password123
+  username: YWRtaW51c2Vy #adminuser
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: mongo-creds
