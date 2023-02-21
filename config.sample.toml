@@ -16,12 +16,7 @@ manifests = [
     "ingress.yml",
     "openvpn.yml",
     "logs.yml",
-    "mongodb-client.yml",
-    "mongodb-deployment.yml",
-    "mongodb-nodeport-svc.yml",
-    "mongodb-pv.yml",
-    "mongodb-pvc.yml",
-    "mongodb-secrets.yml",
+    "mongo.yml",
     "gogs.yml",
 ]
 
