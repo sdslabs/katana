@@ -1,0 +1,90 @@
+---
+apiVersion: v1
+data:
+  password: cGFzc3dvcmQxMjM= #password123
+  username: YWRtaW51c2Vy #adminuser
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: mongo-creds
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi #Change this storage size to match the size of the volume you created
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data/mysql" #Change this path to match the path of the volume you created
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - image: mysql:5.7 #Change this image to match the version of MySQL you are using
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: password
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+          
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mysql
+  name: mysql-nodeport-svc
+spec:
+  ports:
+  - port: 3306
+    targetPort: 3306
+    nodePort: 32001
+  selector:
+    app: mysql
+  type: NodePort

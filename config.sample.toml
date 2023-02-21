@@ -15,6 +15,7 @@ manifests = [
     "broadcast-service.yml",
     "ingress.yml",
     "openvpn.yml",
+    "mysql.yml",
     "logs.yml",
     "mongo.yml",
     "gogs.yml",
