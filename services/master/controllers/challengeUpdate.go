@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os/exec"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 func git(arg string) {
@@ -18,6 +20,7 @@ func git(arg string) {
 	fmt.Println(string(stdout))
 }
 
-func main() {
+func ChallengeUpdate(c *fiber.Ctx) error {
 	git("pull")
+	//TODO : Apply yaml file and up challenge in container in docker
 }
