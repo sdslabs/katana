@@ -29,9 +29,7 @@ manifests = [
     "mongodb-pv.yml",
     "mongodb-pvc.yml",
     "mongodb-secrets.yml",
-    "mysql-secret.yml",
-    "mysql-storage.yml",
-    "mysql-deployment.yml",
+    "mysql.yml",
     "gogs.yml",
 ]
 
