@@ -78,3 +78,12 @@ spec:
   selector:
     app: mysql
   type: NodePort
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret
+type: kubernetes.io/basic-auth
+stringData:
+  password: test1234
