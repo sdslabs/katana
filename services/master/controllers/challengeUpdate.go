@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func ChallenegUpdate(c *fiber.Ctx) error {
+func ChallengeUpdate(c *fiber.Ctx) error {
 
 	cmd := exec.Command("/bin/sh", "../../../teams/team1/script.sh")
 	stdout, err := cmd.Output()
