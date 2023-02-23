@@ -76,7 +76,7 @@ func InfraSet(c *fiber.Ctx) error {
 
 	fmt.Println(kubeclient)
 
-	var filelocation string = "~/tmp/ssh_admin"
+	var filelocation string = "/tmp/ssh_admin"
 	exist := sshkeyExists(filelocation)
 
 	if exist {
