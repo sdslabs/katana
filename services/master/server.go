@@ -38,7 +38,7 @@ func Server() error {
 	admin.Get("/db", c.DB)
 	admin.Post("/login", c.Login)
 	admin.Get("/createTeams/:number", c.CreateTeams)
-	admin.Get("/challengeUpdate", c.ChallengeUpdate)
+	admin.Post("/challengeUpdate", c.ChallengeUpdate)
 	admin.Post("/logs", c.Logs)
 	admin.Get("/deploy", c.Deploy)
 	admin.Get("/gitServer", c.GitServer)
