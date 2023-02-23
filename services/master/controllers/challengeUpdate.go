@@ -1,4 +1,4 @@
-package main
+package controllers
 
 import (
 	"fmt"
@@ -21,6 +21,7 @@ func git(arg string) {
 }
 
 func ChallengeUpdate(c *fiber.Ctx) error {
-	git("pull")
+	fmt.Println("Hello")
 	//TODO : Apply yaml file and up challenge in container in docker
+	return c.SendString("Challenge successfully pulled from gi")
 }
