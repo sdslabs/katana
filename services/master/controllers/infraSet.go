@@ -19,8 +19,8 @@ func sshkeyExists(path string) bool {
 	return !os.IsNotExist(err)
 }
 
-func sshkeyCreate() {
-	f, err := os.Create("testFile.txt")
+func sshkeyCreate(path string) {
+	//f, err := os.Create("testFile.txt")
 
 	app := "ssh-keygen"
 	arg0 := "-t"
@@ -28,7 +28,7 @@ func sshkeyCreate() {
 	arg2 := "-C"
 	arg3 := "\"test@gmail.com\""
 	arg4 := "-f"
-	arg5 := "/tmp/ssh_admin"
+	arg5 := path
 	arg6 := "-q"
 	arg7 := "-P"
 	arg8 := "\"\""
@@ -44,7 +44,7 @@ func sshkeyCreate() {
 
 	fmt.Println(string(stdout))
 
-	defer f.Close()
+	//defer f.Close()
 
 }
 
@@ -76,14 +76,14 @@ func InfraSet(c *fiber.Ctx) error {
 
 	fmt.Println(kubeclient)
 
-	var file string = "/tmp/ssh_admin"
-	exist := sshkeyExists(file)
+	var filelocation string = "/tmp/ssh_admin"
+	exist := sshkeyExists(filelocation)
 
 	if exist {
 		fmt.Println("Admin ssh file exists")
 	} else {
 		fmt.Println("Creating ssh keys")
-		sshkeyCreate()
+		sshkeyCreate(filelocation)
 	}
 
 	return c.SendString("Infrastructure setup completed")
