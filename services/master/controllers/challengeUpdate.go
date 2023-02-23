@@ -21,6 +21,14 @@ type GogsRequest struct {
 	Repository Repo   `json:"repository"`
 }
 
+//	func Chall() string {
+//		cmd, err := exec.Command("/bin/sh", "asdf.sh").Output()
+//		if err != nil {
+//			fmt.Printf("error %s", err)
+//		}
+//		output := string(cmd)
+//		return output
+//	}
 func ChallengeUpdate(c *fiber.Ctx) error {
 
 	client, err := utils.GetKubeClient()
