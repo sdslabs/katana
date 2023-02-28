@@ -10,3 +10,5 @@ katana
 test.go
 vendor/*
 *.log
+docs/themes/*
+!docs/content/Katana
