@@ -19,6 +19,7 @@ type Teams struct {
 
 func ChallengeUpdate(c *fiber.Ctx) error {
 
+	
 	p := new(Teams)
 	if err := c.BodyParser(p); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(fmt.Sprintf("Failed to parse JSON request body: %v", err))
@@ -26,6 +27,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 
 	// fmt.Println(p.Repository)
 	// fmt.Println(p.Repository.Name)
+	fmt.println("Request Recieved, please wait..pulling repo and building images")
 	teamname := p.Repository.Name
 	//fmt.Println(teamname)
 	
