@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
+<<<<<<< HEAD
 	"strings"
 
+=======
+>>>>>>> dc51e1e (pathing done)
 	"github.com/gofiber/fiber/v2"
 	"github.com/sdslabs/katana/lib/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
