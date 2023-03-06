@@ -21,9 +21,10 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	teamname := req.TEAMNAME
 
 	// Print out the ID value
-	fmt.Printf("Received : %v\n", req.TEAMNAME)
+	fmt.Printf("Received : %v\n", req)
+	fmt.Printf("Test : %s\n", teamname)
 
-	cmd := exec.Command("/bin/sh", "./teams/"+teamname+"/script.sh")
+	cmd := exec.Command("/bin/sh", "./teams/team1/script.sh")
 
 	stdout, err := cmd.Output()
 	if err != nil {
