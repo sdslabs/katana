@@ -28,7 +28,7 @@ func setup() {
 }
 
 func setupGogs() {
-	CreateDatabase(db, gogsDatabase)
+	CreateDatabase(gogsDatabase)
 }
 
 func Init() {

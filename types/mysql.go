@@ -6,7 +6,7 @@ type GogsUser struct {
 	Name               string `json:"name" bson:"name" binding:"required"`
 	FullName           string `json:"full_name" bson:"full_name" binding:"required"`
 	Email              string `json:"email" bson:"email" binding:"required"`
-	Passwd             string `json:"passwd" bson:"passwd" binding:"required"`
+	Password           string `json:"passwd" bson:"passwd" binding:"required"`
 	LoginType          int    `json:"login_type" bson:"login_type" binding:"required"`
 	LoginSource        int    `json:"login_source" bson:"login_source" binding:"required"`
 	LoginName          string `json:"login_name" bson:"login_name" binding:"required"`

@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/sdslabs/katana/lib/mongo"
+	"github.com/sdslabs/katana/lib/mysql"
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,6 +28,7 @@ func DB(c *fiber.Ctx) error {
 	// Print the IP address of the service
 	fmt.Println(service.Spec.ClusterIP)
 	mongo.Init()
+	mysql.Init()
 
 	return c.SendString("Database setup completed")
 }
