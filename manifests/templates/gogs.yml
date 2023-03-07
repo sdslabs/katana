@@ -81,7 +81,6 @@ metadata:
   name: gogs-svc
   namespace: gogs
 spec:
-  type: NodePort
   selector:
     app: gogs
   ports:
@@ -89,12 +88,10 @@ spec:
     protocol: TCP
     port: 10022
     targetPort: 22
-    nodePort: 30022
   - name: http
     protocol: TCP
     port: 18080
     targetPort: 3000
-    nodePort: 30080
 
 # ---
 # apiVersion: extensions/v1beta1
