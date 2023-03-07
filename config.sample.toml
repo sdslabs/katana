@@ -53,6 +53,11 @@ port = "32000"
 mongosh_version = "1.6.1"
 cluster_url = "challengedeployer.katana.local"
 
+[mysql]
+username = "root"
+password = "test1234"
+port = "32001"
+
 [admin]
 username = "sdslabs"
 password = "sdslabs"

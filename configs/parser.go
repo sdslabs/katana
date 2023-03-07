@@ -36,4 +36,6 @@ var (
 	TeamVmConfig = KatanaConfig.TeamVmConfig
 
 	MongoConfig = KatanaConfig.Mongo
+
+	MySQLConfig = KatanaConfig.MySQL
 )

@@ -20,17 +20,17 @@ func DB(c *fiber.Ctx) error {
 	if err != nil {
 		log.Println(err)
 	}
-	service, err := client.CoreV1().Services("default").Get(context.TODO(), "mongo-nodeport-svc", metav1.GetOptions{})
+	mongo.Init()
+	// Print the IP address of the service
+	service, err := client.CoreV1().Services("default").Get(context.TODO(), "mysql-nodeport-svc", metav1.GetOptions{})
 	if err != nil {
 		log.Println(err)
 	}
-
-	// Print the IP address of the service
-	fmt.Println(service.Spec.ClusterIP)
-	mongo.Init()
+	//fmt.Println(service.Spec.ClusterIP)
+	fmt.Println(service.Spec.Ports[0].NodePort) // NodePort (k8s service)
+	//NodePort := strconv.Itoa(int(service.Spec.Ports[0].NodePort))
 	mysql.Init()
-
-	return c.SendString("Database setup completed")
+	return c.SendString("Database setup completed\n")
 }
 
 func Login(c *fiber.Ctx) error {

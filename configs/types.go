@@ -55,7 +55,12 @@ type MongoCfg struct {
 	Password string `toml:"password"`
 	Port     string `toml:"port"`
 	Version  string `toml:"mongosh_version"`
-	URL      string `toml:"url"`
+}
+
+type MySQLCfg struct {
+	Username string `toml:"username"`
+	Password string `toml:"password"`
+	Port     string `toml:"port"`
 }
 
 type KatanaCfg struct {
@@ -68,4 +73,5 @@ type KatanaCfg struct {
 	Mongo         MongoCfg            `toml:"mongo"`
 	TeamVmConfig  TeamChallengeConfig `toml:"teamvm"`
 	AdminConfig   AdminCfg            `toml:"admin"`
+	MySQL         MySQLCfg            `toml:"mysql"`
 }
