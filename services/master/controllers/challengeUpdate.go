@@ -27,7 +27,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 
 	// fmt.Println(p.Repository)
 	// fmt.Println(p.Repository.Name)
-	fmt.println("Request Recieved, please wait..pulling repo and building images")
+	fmt.Println("Request Recieved, please wait..pulling repo and building images")
 	teamname := p.Repository.Name
 	//fmt.Println(teamname)
 	
