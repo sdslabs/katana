@@ -2,16 +2,34 @@ package mysql
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func main() {
+var db *sql.DB
+
+func setup() {
 	db, err := sql.Open("mysql", "root:<yourMySQLdatabasepassword>@tcp(127.0.0.1:3306)/test")
 	if err != nil {
 		panic(err.Error())
 	}
-	defer db.Close()
-	fmt.Println("Success!")
+	err = db.Ping()
+	if err != nil {
+		log.Println("MySQL connection was not established")
+		time.Sleep(5 * time.Second)
+		setup()
+	} else {
+		log.Println("MySQL Connection Established")
+		setupGogs()
+	}
+}
+
+func setupGogs() {
+	CreateDatabase(db, gogsDatabase)
+}
+
+func Init() {
+	go setup()
 }
