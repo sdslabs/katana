@@ -1,4 +1,4 @@
-//nolint
+// nolint
 package sshproviderservice
 
 // TODO remove nolint later
@@ -8,6 +8,7 @@ import (
 
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/mongo"
+	"github.com/sdslabs/katana/lib/mysql"
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
 )
@@ -40,6 +41,8 @@ func createTeams() error {
 		}
 		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s\n", i, team.Name, pwd)
 		teams = append(teams, team)
+
+		mysql.CreateGogsUser(team.Name, pwd)
 	}
 
 	_, err = mongo.CreateTeams(teams)

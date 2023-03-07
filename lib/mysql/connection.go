@@ -11,10 +11,11 @@ import (
 var db *sql.DB
 
 func setup() {
-	db, err := sql.Open("mysql", "root:<yourMySQLdatabasepassword>@tcp(127.0.0.1:3306)/test")
+	database, err := sql.Open("mysql", "root:<yourMySQLdatabasepassword>@tcp(127.0.0.1:3306)/test")
 	if err != nil {
 		panic(err.Error())
 	}
+	db = database
 	err = db.Ping()
 	if err != nil {
 		log.Println("MySQL connection was not established")
