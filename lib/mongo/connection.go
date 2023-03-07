@@ -42,6 +42,7 @@ func setup() {
 	err = client.Ping(ctx, nil)
 	if err != nil {
 		log.Println("MongoDB connection was not established")
+		log.Println("Error: ", err)
 		time.Sleep(5 * time.Second)
 		setup()
 	} else {

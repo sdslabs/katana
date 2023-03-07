@@ -22,7 +22,7 @@ func setup() {
 	err = db.Ping()
 	if err != nil {
 		log.Println("MySQL connection was not established")
-		log.Println("error: ", err)
+		log.Println("Error: ", err)
 		time.Sleep(5 * time.Second)
 		setup()
 	} else {
