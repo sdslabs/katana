@@ -5,6 +5,7 @@ package sshproviderservice
 import (
 	"fmt"
 	"os"
+	"os/exec"
 
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/mongo"
@@ -43,6 +44,17 @@ func createTeams() error {
 		teams = append(teams, team)
 
 		mysql.CreateGogsUser(team.Name, pwd)
+		cmd := exec.Command("kubectl exec ",pod.Name," -- touch sshcreds")
+		err = cmd.Run()
+		if(err != nil){
+			panic(err)
+		}
+		cmd = exec.Command("kubectl exec ",pod.Name," -- sh -c 'echo", pwd,"' >> sshcred")
+		err = cmd.Run()
+		if(err != nil){
+			panic(err)
+		}
+
 	}
 
 	_, err = mongo.CreateTeams(teams)
