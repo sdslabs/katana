@@ -2,20 +2,38 @@ package controllers
 
 import (
 	"bytes"
+	"context"
 	"fmt"
+	"log"
 	"mime/multipart"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/lib/utils"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func GitServer(c *fiber.Ctx) error {
 	var requestBody bytes.Buffer
 	writer := multipart.NewWriter(&requestBody)
+	kubeclient, err := utils.GetKubeClient()
+	if err != nil {
+		log.Println(err)
+	}
 
-	mysqlAddress := configs.ServicesConfig.ChallengeDeployer.Host + ":" + configs.MySQLConfig.Port
-	gitServerAddress := "10.25.1.18"
+	service, err := kubeclient.CoreV1().Services("default").Get(context.TODO(), "mysql-nodeport-svc", metav1.GetOptions{})
+	if err != nil {
+		log.Println(err)
+	}
+
+	mysqlAddress := service.Spec.ClusterIP
+	gogsService, err := kubeclient.CoreV1().Services("gogs").Get(context.TODO(), "gogs-svc", metav1.GetOptions{})
+	if err != nil {
+		log.Println(err)
+	}
+
+	gitServerAddress := gogsService.Spec.ClusterIP + ":18080"
 
 	// Add the form fields
 	writer.WriteField("db_type", "MySQL")
