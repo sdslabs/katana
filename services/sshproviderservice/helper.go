@@ -22,24 +22,26 @@ func CreateTeams() error {
 	if err != nil {
 		return err
 	}
+	podName := teamlabels + "-team-master-pod-0"
 	for i := 0; i < teamnumber; i++ {
 		pwd := utils.GenPassword()
 		hashed, err := utils.HashPassword(pwd)
 		if err != nil {
 			return err
 		}
-		podName := teamlabels + "-teams" + fmt.Sprint(teamnumber)
+		podNamespace := "katana-team-ns-" + fmt.Sprint(i)
 		team := types.CTFTeam{
-			Index:    i,
-			Name:     podName,
-			PodName:  podName,
-			Password: hashed,
+			Index:     i,
+			Name:      podName,
+			PodName:   podName,
+			Password:  hashed,
+			Namespace: podNamespace,
 		}
 		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s\n", i, team.Name, pwd)
 		teams = append(teams, team)
 
 		mysql.CreateGogsUser(team.Name, pwd)
-		cmd := exec.Command("kubectl exec ", podName, " -- touch sshcreds")
+		cmd := exec.Command("kubectl exec --namespace=", podNamespace, " -- touch sshcreds")
 		err = cmd.Run()
 		if err != nil {
 			panic(err)
