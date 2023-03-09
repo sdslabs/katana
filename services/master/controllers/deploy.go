@@ -7,8 +7,8 @@ import (
 
 func Deploy(c *fiber.Ctx) error {
 
-	localFilePath := "/home/paradox/katana/LICENSE"
-	pathInPod := "/opt/katana/LICENSE"
+	localFilePath := "/home/percy/notekeeper.tar.gz"
+	pathInPod := "/opt/katana/katana_web_notekeeper.tar.gz"
 
 	deployer.DeployToAll(localFilePath, pathInPod)
 

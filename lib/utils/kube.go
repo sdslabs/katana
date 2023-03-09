@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"log"
@@ -10,6 +11,7 @@ import (
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/types"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/deprecated/scheme"
@@ -204,4 +206,34 @@ func DeploymentConfig() types.ManifestConfig {
 		ChallengeArtifact:     g.ServicesConfig.ChallengeDeployer.ArtifactLabel,
 	}
 	return config
+}
+
+func Podexecutor(command []string, kubeClientset *kubernetes.Clientset, kubeConfig *rest.Config, podNamespace string) {
+	req := kubeClientset.CoreV1().RESTClient().Post().
+		Resource("pods").
+		Name("katana-team-master-pod-0").
+		Namespace(podNamespace + "-ns").
+		SubResource("exec")
+	req.VersionedParams(&v1.PodExecOptions{
+		Command: command,
+		Stdin:   false,
+		Stdout:  true,
+		Stderr:  true,
+		TTY:     false,
+	}, scheme.ParameterCodec)
+	exec, err := remotecommand.NewSPDYExecutor(kubeConfig, "POST", req.URL())
+	if err != nil {
+		log.Fatal(err)
+	}
+	var stdout, stderr bytes.Buffer
+	err = exec.Stream(remotecommand.StreamOptions{
+		Stdout: &stdout,
+		Stderr: &stderr,
+		Tty:    false,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(stdout.String())
+	log.Println(stderr.String())
 }

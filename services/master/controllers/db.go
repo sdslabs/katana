@@ -27,7 +27,7 @@ func DB(c *fiber.Ctx) error {
 		log.Println(err)
 	}
 	fmt.Println("MySQL Service IP:", service.Spec.ClusterIP)
-	fmt.Println(service.Spec.Ports[0].NodePort) // NodePort (k8s service)
+	fmt.Println(service.Spec.Ports[0].Port) // NodePort (k8s service)
 	//NodePort := strconv.Itoa(int(service.Spec.Ports[0].NodePort))
 	mysql.Init()
 	return c.SendString("Database setup completed\n")

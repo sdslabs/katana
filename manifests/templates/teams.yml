@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - name: {{.ContainerName}}
-        image: scar26/sdskatanad:latest
+        image: percy477/katanad
         env:
           - name: CHALLENGE_DIR 
             valueFrom:

@@ -3,8 +3,13 @@ package sshproviderservice
 
 // TODO remove nolint later
 import (
+	"context"
 	"fmt"
+	"log"
 	"os"
+
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/mongo"
@@ -21,6 +26,7 @@ func CreateTeams(teamnumber int) error {
 		return err
 	}
 	podName := teamlabels + "-team-master-pod-0"
+	gogs := utils.GetGogsIp() + ":18080"
 	for i := 0; i < teamnumber; i++ {
 		pwd := utils.GenPassword()
 		hashed, err := utils.HashPassword(pwd)
@@ -28,6 +34,8 @@ func CreateTeams(teamnumber int) error {
 			return err
 		}
 		podNamespace := "katana-team-" + fmt.Sprint(i)
+		// start watching for container events
+		go envVariables(gogs, pwd, podNamespace)
 		team := types.CTFTeam{
 			Index:    i,
 			Name:     podNamespace,
@@ -41,4 +49,28 @@ func CreateTeams(teamnumber int) error {
 	}
 	_, err = mongo.CreateTeams(teams)
 	return err
+}
+
+func envVariables(gogs string, pwd string, podNamespace string) {
+	watch, _ := kubeClientset.CoreV1().Pods(podNamespace+"-ns").Watch(context.Background(), metav1.ListOptions{})
+	for event := range watch.ResultChan() {
+		p, ok := event.Object.(*v1.Pod)
+		if !ok {
+			log.Fatal("unexpected type")
+		}
+		if p.Status.Phase == "Pending" {
+			log.Println("Pod is being created")
+		} else {
+			log.Println("Pod created")
+			command := []string{"bash", "-c", "echo 'export gogs=" + gogs + "' >> ~/.bashrc"}
+			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
+			command = []string{"bash", "-c", "echo 'export password=" + pwd + "' >> ~/.bashrc"}
+			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
+			command = []string{"bash", "-c", "echo 'export username=" + podNamespace + "' >> ~/.bashrc"}
+			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
+			command = []string{"bash", "-c", "source ~/.bashrc"}
+			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
+			break
+		}
+	}
 }
