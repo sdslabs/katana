@@ -36,11 +36,21 @@ func GetClient(pathToCfg string) error {
 	return nil
 }
 
-func getPods(lbls map[string]string) ([]v1.Pod, error) {
-	set := labels.Set(lbls)
-	pods, err := kubeclient.CoreV1().Pods(g.KatanaConfig.KubeNameSpace).List(context.Background(), metav1.ListOptions{LabelSelector: set.AsSelector().String()})
+func getPods(lbls map[string]string, ns ...string) ([]v1.Pod, error) {
+	var namespace string
+	if len(ns) == 0 {
+		namespace = g.KatanaConfig.KubeNameSpace
+	} else {
+		namespace = ns[0]
+	}
+
+	selector := labels.SelectorFromSet(lbls)
+	pods, err := kubeclient.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: selector.String(),
+	})
 	if err != nil {
 		return nil, err
 	}
+
 	return pods.Items, nil
 }
