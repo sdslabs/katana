@@ -69,10 +69,12 @@ func GetPods(clientset *kubernetes.Clientset, lbls map[string]string) ([]corev1.
 	return pods.Items, nil
 }
 
-func GetTeamPodLabels() map[string]string {
-	return map[string]string{
-		appLabelKey: g.ClusterConfig.TeamLabel,
-	}
+func GetTeamPodLabels() string {
+	return string(g.ClusterConfig.DeploymentLabel)
+}
+
+func GetTeamNumber() int {
+	return int(g.ClusterConfig.TeamCount)
 }
 
 func GetMongoIP() string {

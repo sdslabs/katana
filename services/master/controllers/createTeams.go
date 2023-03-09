@@ -45,7 +45,7 @@ func CreateTeams(c *fiber.Ctx) error {
 		log.Println("Creating Team: " + strconv.Itoa(i))
 		nsName := &coreV1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: "katana-team-ns-" + strconv.Itoa(i),
+				Name: "katana-teams-" + strconv.Itoa(i) + "-ns",
 			},
 		}
 		_, err = client.CoreV1().Namespaces().Create(c.Context(), nsName, metav1.CreateOptions{})

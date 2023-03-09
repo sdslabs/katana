@@ -14,44 +14,39 @@ import (
 	"github.com/sdslabs/katana/types"
 )
 
-func createTeams() error {
+func CreateTeams() error {
 	teamlabels := utils.GetTeamPodLabels()
 	var teams []interface{}
-	teamPods, err := utils.GetPods(kubeClientset, teamlabels)
-	if err != nil {
-		return err
-	}
-
+	teamnumber := utils.GetTeamNumber()
 	credsFile, err := os.Open(g.SSHProviderConfig.CredsFile)
 	if err != nil {
 		return err
 	}
-
-	for i, pod := range teamPods {
+	for i := 0; i < teamnumber; i++ {
 		pwd := utils.GenPassword()
 		hashed, err := utils.HashPassword(pwd)
 		if err != nil {
 			return err
 		}
-
+		podName := teamlabels + "-teams" + fmt.Sprint(teamnumber)
 		team := types.CTFTeam{
 			Index:    i,
-			Name:     pod.Name,
-			PodName:  pod.Name,
+			Name:     podName,
+			PodName:  podName,
 			Password: hashed,
 		}
 		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s\n", i, team.Name, pwd)
 		teams = append(teams, team)
 
 		mysql.CreateGogsUser(team.Name, pwd)
-		cmd := exec.Command("kubectl exec ",pod.Name," -- touch sshcreds")
+		cmd := exec.Command("kubectl exec ", podName, " -- touch sshcreds")
 		err = cmd.Run()
-		if(err != nil){
+		if err != nil {
 			panic(err)
 		}
-		cmd = exec.Command("kubectl exec ",pod.Name," -- sh -c 'echo", pwd,"' >> sshcred")
+		cmd = exec.Command("kubectl exec ", podName, " -- sh -c 'echo", pwd, "' >> sshcred")
 		err = cmd.Run()
-		if(err != nil){
+		if err != nil {
 			panic(err)
 		}
 
