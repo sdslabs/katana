@@ -26,9 +26,9 @@ var (
 func sessionHandler(s ssh.Session) {
 	kubeclient := kubeClientset.CoreV1().RESTClient()
 
-	podName := s.User()
+	Namespace := s.User()
 
-	req := kubeclient.Post().Resource("pods").Name(podName).Namespace(g.KatanaConfig.KubeNameSpace).SubResource("exec")
+	req := kubeclient.Post().Resource("pods").Name("katana-team-master-pod-0").Namespace(Namespace + "-ns").SubResource("exec")
 
 	option := &v1.PodExecOptions{
 		Command: execCmd,
