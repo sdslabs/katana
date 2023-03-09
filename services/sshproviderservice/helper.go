@@ -43,6 +43,7 @@ func CreateTeams(teamnumber int) error {
 			Password: hashed,
 		}
 		mysql.CreateGogsUser(team.Name, pwd)
+		mysql.CreateAccessToken(team.Name, pwd)
 		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s\n", i, team.Name, pwd)
 		teams = append(teams, team)
 	}

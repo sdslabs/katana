@@ -36,19 +36,12 @@ type GogsUser struct {
 	NumMembers         int    `json:"num_members" bson:"num_members" binding:"required"`
 }
 
-type GogsWebhook struct {
-	Id           int    `json:"id" bson:"id" binding:"required"`
-	RepoId       int    `json:"repo_id" bson:"repo_id" binding:"required"`
-	OrgId        int    `json:"org_id" bson:"org_id" binding:"required"`
-	Url          string `json:"url" bson:"url" binding:"required"`
-	ContentType  string `json:"content_type" bson:"content_type" binding:"required"`
-	Secret       string `json:"secret" bson:"secret" binding:"required"`
-	Events       string `json:"events" bson:"events" binding:"required"`
-	IsSsl        bool   `json:"is_ssl" bson:"is_ssl" binding:"required"`
-	IsActive     bool   `json:"is_active" bson:"is_active" binding:"required"`
-	HookTaskType int    `json:"hook_task_type" bson:"hook_task_type" binding:"required"`
-	Meta         string `json:"meta" bson:"meta" binding:"required"`
-	LastStatus   int    `json:"last_status" bson:"last_status" binding:"required"`
-	CreatedUnix  int64  `json:"created_unix" bson:"created_unix" binding:"required"`
-	UpdatedUnix  int64  `json:"updated_unix" bson:"updated_unix" binding:"required"`
+type GogsAccessToken struct {
+	Id          int    `json:"id" bson:"id" binding:"required"`
+	UserId      int    `json:"user_id" bson:"user_id" binding:"required"`
+	Name        string `json:"name" bson:"name" binding:"required"`
+	Sha1        string `json:"sha1" bson:"sha1" binding:"required"`
+	Sha256      string `json:"sha256" bson:"sha256" binding:"required"`
+	CreatedUnix int64  `json:"created_unix" bson:"created_unix" binding:"required"`
+	UpdatedUnix int64  `json:"updated_unix" bson:"updated_unix" binding:"required"`
 }

@@ -63,10 +63,36 @@ func CreateGogsUser(username, password string) error {
 	return nil
 }
 
-func CreateGogsWebhook(database, webhook string) error {
-	_, err := db.Exec("GRANT ALL PRIVILEGES ON " + database + ".* TO '" + webhook + "'@'localhost'")
+func CreateAccessToken(username, token string) error {
+	gogs, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp("+configs.ServicesConfig.ChallengeDeployer.Host+":"+configs.MySQLConfig.Port+")/gogs")
 	if err != nil {
-		log.Println(err)
+		return err
+	}
+
+	sha1 := utils.SHA1(token)
+	sha256 := utils.SHA256(token)
+
+	var uid int
+	err = gogs.QueryRow("SELECT id FROM user WHERE name = '" + username + "'").Scan(&uid)
+	if err != nil {
+		return err
+	}
+
+	// Get time in unix format and convert it to string
+	createdTime := time.Now().Unix()
+
+	accessToken := &types.GogsAccessToken{
+		Name:        username,
+		Sha1:        sha1,
+		Sha256:      sha256,
+		UserId:      uid,
+		CreatedUnix: createdTime,
+		UpdatedUnix: createdTime,
+	}
+
+	_, err = gogs.Exec("INSERT INTO access_token (`id`, `name`, `sha1`, `sha256`, `uid`, `created_unix`, `updated_unix`) VALUES (NULL, '" + accessToken.Name + "', '" + accessToken.Sha1 + "', '" + accessToken.Sha256 + "', '" + strconv.Itoa(accessToken.UserId) + "', '" + strconv.FormatInt(accessToken.CreatedUnix, 10) + "', '" + strconv.FormatInt(accessToken.UpdatedUnix, 10) + "')")
+	if err != nil {
+		return err
 	}
 	return nil
 }
