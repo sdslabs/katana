@@ -172,6 +172,18 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 	return nil
 }
 
+func GetGogsIp() string {
+	client, err := GetKubeClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	service, err := client.CoreV1().Services("gogs").Get(context.TODO(), "gogs-svc", metav1.GetOptions{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	return service.Spec.ClusterIP
+}
+
 func DeploymentConfig() types.ManifestConfig {
 	clusterConfig := g.ClusterConfig
 	config := types.ManifestConfig{
