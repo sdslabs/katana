@@ -26,9 +26,9 @@ var (
 func sessionHandler(s ssh.Session) {
 	kubeclient := kubeClientset.CoreV1().RESTClient()
 
-	podNamespace := s.User()
+	Namespace := s.User()
 
-	req := kubeclient.Post().Resource("pods").Name("katana-team-master-pod-0").Namespace(podNamespace + "-ns").SubResource("exec")
+	req := kubeclient.Post().Resource("pods").Name("katana-team-master-pod-0").Namespace(Namespace + "-ns").SubResource("exec")
 
 	option := &v1.PodExecOptions{
 		Command: execCmd,
@@ -66,11 +66,8 @@ func sessionHandler(s ssh.Session) {
 func passwordHandler(s ssh.Context, password string) bool {
 	team, err := mongo.FetchSingleTeam(s.User())
 	if err != nil {
-		log.Println(err)
 		return false
 	}
-	log.Println(team.Password)
-	log.Println(password)
 	return utils.CompareHashWithPassword(team.Password, password)
 }
 

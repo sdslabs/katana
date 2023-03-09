@@ -34,7 +34,7 @@ func CreateTeams(teamnumber int) error {
 			PodName:  podName,
 			Password: hashed,
 		}
-		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s, Hash: %s\n", i, team.Name, pwd, hashed)
+		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s\n", i, team.Name, pwd)
 		teams = append(teams, team)
 		mysql.CreateGogsUser(team.Name, pwd)
 
