@@ -32,15 +32,14 @@ func CreateTeams() error {
 		podNamespace := "katana-team-ns-" + fmt.Sprint(i)
 		team := types.CTFTeam{
 			Index:     i,
-			Name:      podName,
 			PodName:   podName,
 			Password:  hashed,
 			Namespace: podNamespace,
 		}
-		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s\n", i, team.Name, pwd)
+		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s\n", i, team.Namespace, pwd)
 		teams = append(teams, team)
 
-		mysql.CreateGogsUser(team.Name, pwd)
+		mysql.CreateGogsUser(team.Namespace, pwd)
 		cmd := exec.Command("kubectl exec --namespace=", podNamespace, " -- touch sshcreds")
 		err = cmd.Run()
 		if err != nil {
