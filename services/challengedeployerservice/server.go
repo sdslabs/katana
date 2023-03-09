@@ -18,7 +18,7 @@ func DeployToAll(localFilePath string, pathInPod string) error {
 	// Get pods from different namespaces
 	var pods []v1.Pod
 	numberOfTeams := utils.GetTeamNumber()
-	for i := 1; i <= numberOfTeams; i++ {
+	for i := 0; i < numberOfTeams; i++ {
 		podsInTeam, err := getPods(map[string]string{
 			"app": g.ClusterConfig.TeamLabel,
 		}, "katana-team-"+fmt.Sprint(i)+"-ns")
@@ -28,7 +28,6 @@ func DeployToAll(localFilePath string, pathInPod string) error {
 		}
 		pods = append(pods, podsInTeam...)
 	}
-
 	// Loop over pods
 	for _, pod := range pods {
 		// Copy file into pod

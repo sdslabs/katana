@@ -135,6 +135,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 		log.Printf("Container not found in pod\n")
 		return err
 	}
+	log.Println(podName, namespace, containerName, pathInPod, localFilePath)
 
 	// Create a stream to the container
 	req := client.CoreV1().RESTClient().Post().
@@ -150,6 +151,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 		Stdin:     true,
 		Stdout:    true,
 		Stderr:    true,
+		TTY:       false,
 	}, scheme.ParameterCodec)
 
 	exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
