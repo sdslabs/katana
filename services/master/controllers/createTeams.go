@@ -12,6 +12,7 @@ import (
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/utils"
+	ssh "github.com/sdslabs/katana/services/sshproviderservice"
 	coreV1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/clientcmd"
@@ -43,9 +44,10 @@ func CreateTeams(c *fiber.Ctx) error {
 
 	for i := 0; i < noOfTeams; i++ {
 		log.Println("Creating Team: " + strconv.Itoa(i))
+		namespace := "katana-team-" + strconv.Itoa(i) + "-ns"
 		nsName := &coreV1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: "katana-teams-" + strconv.Itoa(i) + "-ns",
+				Name: namespace,
 			},
 		}
 		_, err = client.CoreV1().Namespaces().Create(c.Context(), nsName, metav1.CreateOptions{})
@@ -69,9 +71,26 @@ func CreateTeams(c *fiber.Ctx) error {
 		if err != nil {
 			log.Fatal(err)
 		}
-		if err = deployment.ApplyManifest(config, client, manifest.Bytes(), "katana-team-ns-"+strconv.Itoa(i)); err != nil {
+		if err = deployment.ApplyManifest(config, client, manifest.Bytes(), namespace); err != nil {
 			return err
 		}
 	}
+	SSH()
 	return c.SendString("Successfully created teams")
+}
+
+func SSH() {
+	ssh.CreateTeams()
+	startServer()
+}
+
+func startServer() {
+	x := ssh.Server()
+	go func() {
+		x.ListenAndServe()
+	}()
+	log.Println("Server up and running")
+	for {
+		//to keeep this server running forever
+	}
 }

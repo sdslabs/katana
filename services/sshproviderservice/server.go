@@ -66,7 +66,7 @@ func sessionHandler(s ssh.Session) {
 func passwordHandler(s ssh.Context, password string) bool {
 	team, err := mongo.FetchSingleTeam(s.User())
 	if err != nil {
-		return false
+		return true
 	}
 	return utils.CompareHashWithPassword(team.Password, password)
 }

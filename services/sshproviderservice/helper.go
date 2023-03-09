@@ -5,11 +5,9 @@ package sshproviderservice
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/mongo"
-	"github.com/sdslabs/katana/lib/mysql"
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
 )
@@ -18,7 +16,7 @@ func CreateTeams() error {
 	teamlabels := utils.GetTeamPodLabels()
 	var teams []interface{}
 	teamnumber := utils.GetTeamNumber()
-	credsFile, err := os.Open(g.SSHProviderConfig.CredsFile)
+	credsFile, err := os.Create(g.SSHProviderConfig.CredsFile)
 	if err != nil {
 		return err
 	}
@@ -29,7 +27,7 @@ func CreateTeams() error {
 		if err != nil {
 			return err
 		}
-		podNamespace := "katana-team-ns-" + fmt.Sprint(i)
+		podNamespace := "katana-team-" + fmt.Sprint(i) + "-ns"
 		team := types.CTFTeam{
 			Index:     i,
 			PodName:   podName,
@@ -39,17 +37,12 @@ func CreateTeams() error {
 		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s\n", i, team.Namespace, pwd)
 		teams = append(teams, team)
 
-		mysql.CreateGogsUser(team.Namespace, pwd)
-		cmd := exec.Command("kubectl exec --namespace=", podNamespace, " -- touch sshcreds")
-		err = cmd.Run()
-		if err != nil {
-			panic(err)
-		}
-		cmd = exec.Command("kubectl exec ", podName, " -- sh -c 'echo", pwd, "' >> sshcred")
-		err = cmd.Run()
-		if err != nil {
-			panic(err)
-		}
+		// mysql.CreateGogsUser(team.Namespace, pwd)
+		// cmd := exec.Command("kubectl", "exec", "--namespace=", podNamespace, " ", podName, " -- ", "echo", pwd, ">> sshcred")
+		// err = cmd.Run()
+		// if err != nil {
+		// 	panic(err)
+		// }
 
 	}
 

@@ -42,7 +42,6 @@ func Server() error {
 	admin.Get("/deploy", c.Deploy)
 	admin.Get("/gitServer", c.GitServer)
 	admin.Get("/cluster/:id", c.ClusterInfo)
-	admin.Get("/ssh", c.SSH)
 	fmt.Printf("Listening on %s:%d\n", cfg.APIConfig.Host, cfg.APIConfig.Port)
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port))
 }
