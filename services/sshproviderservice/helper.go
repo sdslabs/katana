@@ -8,14 +8,14 @@ import (
 
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/mongo"
+	"github.com/sdslabs/katana/lib/mysql"
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
 )
 
-func CreateTeams() error {
+func CreateTeams(teamnumber int) error {
 	teamlabels := utils.GetTeamPodLabels()
 	var teams []interface{}
-	teamnumber := utils.GetTeamNumber()
 	credsFile, err := os.Create(g.SSHProviderConfig.CredsFile)
 	if err != nil {
 		return err
@@ -29,23 +29,16 @@ func CreateTeams() error {
 		}
 		podNamespace := "katana-team-" + fmt.Sprint(i)
 		team := types.CTFTeam{
-			Index:     i,
-			Name: podNamespace,
-			PodName:   podName,
-			Password:  hashed,
+			Index:    i,
+			Name:     podNamespace,
+			PodName:  podName,
+			Password: hashed,
 		}
-		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s\n", i, team.Name, pwd)
+		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s, Hash: %s\n", i, team.Name, pwd, hashed)
 		teams = append(teams, team)
-
-		// mysql.CreateGogsUser(team.Namespace, pwd)
-		// cmd := exec.Command("kubectl", "exec", "--namespace=", podNamespace, " ", podName, " -- ", "echo", pwd, ">> sshcred")
-		// err = cmd.Run()
-		// if err != nil {
-		// 	panic(err)
-		// }
+		mysql.CreateGogsUser(team.Name, pwd)
 
 	}
-
 	_, err = mongo.CreateTeams(teams)
 	return err
 }

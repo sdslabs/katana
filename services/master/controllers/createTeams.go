@@ -75,12 +75,13 @@ func CreateTeams(c *fiber.Ctx) error {
 			return err
 		}
 	}
-	SSH()
+	SSH(noOfTeams)
 	return c.SendString("Successfully created teams")
 }
 
-func SSH() {
-	ssh.CreateTeams()
+func SSH(noOfTeams int) {
+	ok := ssh.CreateTeams(noOfTeams)
+	log.Println(ok)
 	startServer()
 }
 
