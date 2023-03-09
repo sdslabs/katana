@@ -27,14 +27,14 @@ func CreateTeams() error {
 		if err != nil {
 			return err
 		}
-		podNamespace := "katana-team-" + fmt.Sprint(i) + "-ns"
+		podNamespace := "katana-team-" + fmt.Sprint(i)
 		team := types.CTFTeam{
 			Index:     i,
+			Name: podNamespace,
 			PodName:   podName,
 			Password:  hashed,
-			Namespace: podNamespace,
 		}
-		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s\n", i, team.Namespace, pwd)
+		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s\n", i, team.Name, pwd)
 		teams = append(teams, team)
 
 		// mysql.CreateGogsUser(team.Namespace, pwd)
