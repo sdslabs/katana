@@ -3,53 +3,56 @@ package controllers
 import (
 	"fmt"
 	"os/exec"
+
 	"github.com/gofiber/fiber/v2"
 )
 
-
 type Repo struct {
-	Name string `json:"name"`
+	FullName string `json:"full_name"`
 }
 
-type Teams struct {
-	Ref  string `json:"ref"`
-	Before   string `json:"before"`
-	Repository Repo `json:"repository"`
+type GogsRequest struct {
+	Ref        string `json:"ref"`
+	Before     string `json:"before"`
+	Repository Repo   `json:"repository"`
 }
 
 func ChallengeUpdate(c *fiber.Ctx) error {
 
-	
-	p := new(Teams)
-	if err := c.BodyParser(p); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(fmt.Sprintf("Failed to parse JSON request body: %v", err))
+	var p GogsRequest
+	if err := c.BodyParser(&p); err != nil {
+		return err
 	}
 
-	// fmt.Println(p.Repository)
-	// fmt.Println(p.Repository.Name)
-	fmt.Println("Request Recieved, please wait..pulling repo and building images")
-	teamname := p.Repository.Name
-	//fmt.Println(teamname)
-	
-	//for non-blocking the script run
-	ch := make(chan bool)
+	dir := p.Repository.FullName
 
-	go func(){
+	// Git pull in the directory
+	cmd := exec.Command("git", "-C", dir, "pull")
+	err := cmd.Run()
+	if err != nil {
+		fmt.Println(err)
+	}
 
-		cmd := exec.Command("/bin/sh", "./teams/"+teamname+"/script.sh")
-		stdout, err := cmd.Output()
-	        if err != nil {
-                	fmt.Println(err.Error())
-       		 }
-		fmt.Println(string(stdout))
+	// Build the challenge with Dockerfile
+	cmd = exec.Command("docker", "build", "-t", dir, dir)
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println(err)
+	}
 
-		ch <- true
-	}()
+	// Delete the old manifest
+	cmd = exec.Command("kubectl", "delete", "-f", dir+"/challenge.yaml")
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	return c.SendString(fmt.Sprintf("Received Payload"))
-	
-	<-ch
+	// Apply the new manifest
+	cmd = exec.Command("kubectl", "apply", "-f", dir+"/challenge.yaml")
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	return c.SendString("Working")
- 
+	return c.SendString("Challenge updated")
 }
