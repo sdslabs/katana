@@ -10,7 +10,6 @@ import (
 
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/types"
-	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -19,11 +18,6 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/remotecommand"
-)
-
-const (
-	appLabelKey        = "app"
-	deploymentLabelKey = "deployment"
 )
 
 // GetKubeConfig returns a kubernetes REST config object
@@ -50,13 +44,13 @@ func GetKubeClient() (*kubernetes.Clientset, error) {
 	return kubernetes.NewForConfig(config)
 }
 
-func GetPodByName(clientset *kubernetes.Clientset, podName string) (*corev1.Pod, error) {
+func GetPodByName(clientset *kubernetes.Clientset, podName string) (*v1.Pod, error) {
 	client := clientset.CoreV1()
 	podsInterface := client.Pods(g.KatanaConfig.KubeNameSpace)
 	return podsInterface.Get(context.Background(), podName, metav1.GetOptions{})
 }
 
-func GetPods(clientset *kubernetes.Clientset, lbls map[string]string) ([]corev1.Pod, error) {
+func GetPods(clientset *kubernetes.Clientset, lbls map[string]string) ([]v1.Pod, error) {
 	client := clientset.CoreV1()
 	podsInterface := client.Pods(g.KatanaConfig.KubeNameSpace)
 	filter := metav1.ListOptions{
@@ -123,7 +117,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 	}
 
 	// Find the container in the pod
-	var container *corev1.Container
+	var container *v1.Container
 	for _, c := range pod.Spec.Containers {
 		if c.Name == containerName {
 			container = &c
@@ -143,7 +137,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 		SubResource("exec").
 		Param("container", containerName)
 
-	req.VersionedParams(&corev1.PodExecOptions{
+	req.VersionedParams(&v1.PodExecOptions{
 		Container: containerName,
 		Command:   []string{"bash", "-c", "cat > " + pathInPod},
 		Stdin:     true,

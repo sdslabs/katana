@@ -3,9 +3,13 @@ package challengedeployerservice
 import (
 	"fmt"
 	"log"
+	"os"
+	"os/exec"
 
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/config"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -19,6 +23,29 @@ func DeployToAll(localFilePath string, pathInPod string) error {
 	var pods []v1.Pod
 	numberOfTeams := utils.GetTeamNumber()
 	for i := 0; i < numberOfTeams; i++ {
+		path := "katana-team-" + fmt.Sprint(i) + "/" + localFilePath[12:22]
+		err := os.Mkdir("teams/"+path, 0755)
+		if err != nil {
+			log.Println(err)
+		}
+		log.Println("teams/" + path)
+		git.PlainInit("teams/"+path, false)
+		repo, err := git.PlainOpen("teams/" + path)
+		if err != nil {
+			log.Println(err)
+		}
+		remoteConfig := &config.RemoteConfig{
+			Name: "origin",
+			URLs: []string{"http://sdslabs@" + utils.GetGogsIp() + ":18080" + "/" + path}}
+		_, err = repo.CreateRemote(remoteConfig)
+
+		if err != nil {
+			log.Println(err)
+		}
+		err = exec.Command("touch teams/" + path + "/challenge.yaml").Run()
+		if err != nil {
+			log.Println(err)
+		}
 		podsInTeam, err := getPods(map[string]string{
 			"app": g.ClusterConfig.TeamLabel,
 		}, "katana-team-"+fmt.Sprint(i)+"-ns")
