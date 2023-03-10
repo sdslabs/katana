@@ -72,7 +72,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 
 	// Build the challenge image with the Dockerfile in the challenge directory
 	out, err := cli.ImageBuild(context.Background(), strings.NewReader("FROM scratch"), types.ImageBuildOptions{
-		Dockerfile: dir + "/Dockerfile",
+		Dockerfile: "teams" + dir + "/Dockerfile",
 		Tags:       []string{dir},
 	})
 	if err != nil {
