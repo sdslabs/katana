@@ -69,6 +69,18 @@ func CreateGogsAdmin(username, password string) error {
 	if err != nil {
 		return err
 	}
+
+	// Check if an admin already exists
+	var adminCount int
+	err = gogs.QueryRow("SELECT COUNT(*) FROM `user` WHERE is_admin = 1").Scan(&adminCount)
+	if err != nil {
+		return err
+	}
+
+	if adminCount > 0 {
+		return nil
+	}
+
 	createdTime := time.Now().Unix()
 	rand, err := utils.RandomSalt()
 	if err != nil {
