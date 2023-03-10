@@ -62,13 +62,13 @@ func envVariables(gogs string, pwd string, podNamespace string) {
 			log.Println("Pod is being created")
 		} else {
 			log.Println("Pod created")
-			command := []string{"bash", "-c", "echo 'export gogs=" + gogs + "' >> ~/.bashrc"}
+			command := []string{"bash", "-c", "echo 'export GOGS=" + gogs + "' >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
-			command = []string{"bash", "-c", "echo 'export password=" + pwd + "' >> ~/.bashrc"}
+			command = []string{"bash", "-c", "echo 'export PASSWORD=" + pwd + "' >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
-			command = []string{"bash", "-c", "echo 'export username=" + podNamespace + "' >> ~/.bashrc"}
+			command = []string{"bash", "-c", "echo 'export USERNAME=" + podNamespace + "' >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
-			command = []string{"bash", "-c", "source ~/.bashrc"}
+			command = []string{"bash", "-c", "source /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
 			break
 		}

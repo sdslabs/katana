@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"crypto/sha1"
 	"crypto/sha256"
 	"fmt"
 
@@ -33,10 +32,5 @@ func EncodePassword(password, salt string) string {
 
 func SHA256(text string) string {
 	hash := sha256.Sum256([]byte(text))
-	return fmt.Sprintf("%x", hash)
-}
-
-func SHA1(text string) string {
-	hash := sha1.Sum([]byte(text))
 	return fmt.Sprintf("%x", hash)
 }

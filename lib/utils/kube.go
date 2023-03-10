@@ -135,8 +135,6 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 		log.Printf("Container not found in pod\n")
 		return err
 	}
-	log.Println(podName, namespace, containerName, pathInPod, localFilePath)
-
 	// Create a stream to the container
 	req := client.CoreV1().RESTClient().Post().
 		Resource("pods").
@@ -236,6 +234,4 @@ func Podexecutor(command []string, kubeClientset *kubernetes.Clientset, kubeConf
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(stdout.String())
-	log.Println(stderr.String())
 }
