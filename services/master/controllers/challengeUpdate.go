@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -49,7 +48,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 
 	dir := p.Repository.FullName
 	s := strings.Split(dir, "/")
-	name := s[1]
+	challengeName := s[1]
 	teamName := s[0]
 	namespace := teamName + "-ns"
 
@@ -75,11 +74,6 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 
 	// Build the challenge with Dockerfile
 
-	cmd := exec.Command("docker", "build", "-t", dir, dir)
-	err = cmd.Run()
-	if err != nil {
-		fmt.Println(err)
-	}
 	cli, err := docker.NewEnvClient()
 	if err != nil {
 		panic(err)
@@ -98,8 +92,18 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 		panic(err)
 	}
 	defer buildResponse.Body.Close()
-	// Restart the pod using go client
-	err = client.CoreV1().Pods(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
+
+	// Create a labelSelector to get the challenge pod
+	labelSelector := metav1.LabelSelector{
+		MatchLabels: map[string]string{
+			"app": teamName + "_" + challengeName,
+		},
+	}
+
+	// Delete the challenge pod
+	err = client.CoreV1().Pods(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{
+		LabelSelector: metav1.FormatLabelSelector(&labelSelector),
+	})
 	if err != nil {
 		fmt.Println(err)
 	}
