@@ -3,7 +3,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -26,14 +25,6 @@ type GogsRequest struct {
 	Repository Repo   `json:"repository"`
 }
 
-//	func Chall() string {
-//		cmd, err := exec.Command("/bin/sh", "asdf.sh").Output()
-//		if err != nil {
-//			fmt.Printf("error %s", err)
-//		}
-//		output := string(cmd)
-//		return output
-//	}
 func ChallengeUpdate(c *fiber.Ctx) error {
 
 	client, err := utils.GetKubeClient()
@@ -74,24 +65,21 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 
 	// Build the challenge with Dockerfile
 
-	cli, err := docker.NewEnvClient()
+	cli, err := docker.NewClientWithOpts(docker.FromEnv)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
-	dockerfile, err := os.Open(fmt.Sprintf("%s/Dockerfile", dir))
-	if err != nil {
-		panic(err)
-	}
-	buildResponse, err := cli.ImageBuild(context.Background(), dockerfile, types.ImageBuildOptions{
-		Tags:        []string{dir},
-		Context:     dockerfile, // Use the Dockerfile as the build context
-		Remove:      true,       // Remove intermediate containers after a successful build
-		ForceRemove: true,       // Remove the image if it already exists
+
+	// Build the challenge image with the Dockerfile in the challenge directory
+	out, err := cli.ImageBuild(context.Background(), strings.NewReader("FROM scratch"), types.ImageBuildOptions{
+		Dockerfile: dir + "/Dockerfile",
+		Tags:       []string{teamName + "_" + challengeName},
 	})
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
-	defer buildResponse.Body.Close()
+
+	defer out.Body.Close()
 
 	// Create a labelSelector to get the challenge pod
 	labelSelector := metav1.LabelSelector{
