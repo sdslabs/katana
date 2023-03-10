@@ -3,9 +3,12 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 
+	"github.com/docker/docker/api/types"
+	docker "github.com/docker/docker/client"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/gofiber/fiber/v2"
@@ -71,12 +74,30 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	}
 
 	// Build the challenge with Dockerfile
+
 	cmd := exec.Command("docker", "build", "-t", dir, dir)
 	err = cmd.Run()
 	if err != nil {
 		fmt.Println(err)
 	}
-
+	cli, err := docker.NewEnvClient()
+	if err != nil {
+		panic(err)
+	}
+	dockerfile, err := os.Open(fmt.Sprintf("%s/Dockerfile", dir))
+	if err != nil {
+		panic(err)
+	}
+	buildResponse, err := cli.ImageBuild(context.Background(), dockerfile, types.ImageBuildOptions{
+		Tags:        []string{dir},
+		Context:     dockerfile, // Use the Dockerfile as the build context
+		Remove:      true,       // Remove intermediate containers after a successful build
+		ForceRemove: true,       // Remove the image if it already exists
+	})
+	if err != nil {
+		panic(err)
+	}
+	defer buildResponse.Body.Close()
 	// Restart the pod using go client
 	err = client.CoreV1().Pods(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
 	if err != nil {
