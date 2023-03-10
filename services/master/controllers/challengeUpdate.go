@@ -1,17 +1,11 @@
 package controllers
 
 import (
-	"context"
 	"fmt"
 	"os/exec"
-<<<<<<< HEAD
-	"strings"
 
-=======
->>>>>>> dc51e1e (pathing done)
 	"github.com/gofiber/fiber/v2"
 	"github.com/sdslabs/katana/lib/utils"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type Repo struct {
@@ -44,31 +38,31 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 		return err
 	}
 
-	dir := p.Repository.FullName
-	s := strings.Split(dir, "/")
-	name := s[1]
-	teamName := s[0]
-	namespace := teamName + "-ns"
+	// fmt.Println(p.Repository)
+	// fmt.Println(p.Repository.Name)
+	fmt.Println("Request Recieved, please wait..pulling repo and building images")
+	teamname := p.Repository.Name
+	//fmt.Println(teamname)
 
-	// Git pull in the directory
-	cmd := exec.Command("git", "-C", dir, "pull")
-	err = cmd.Run()
-	if err != nil {
-		fmt.Println(err)
-	}
+	//for non-blocking the script run
+	ch := make(chan bool)
 
-	// Build the challenge with Dockerfile
-	cmd = exec.Command("docker", "build", "-t", dir, dir)
-	err = cmd.Run()
-	if err != nil {
-		fmt.Println(err)
-	}
+	go func() {
 
-	// Restart the pod using go client
-	err = client.CoreV1().Pods(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
-	if err != nil {
-		fmt.Println(err)
-	}
+		cmd := exec.Command("/bin/sh", "./teams/"+teamname+"/script.sh")
+		stdout, err := cmd.Output()
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		fmt.Println(string(stdout))
 
-	return c.SendString("Challenge updated")
+		ch <- true
+	}()
+
+	return c.SendString(fmt.Sprintf("Received Payload"))
+
+	<-ch
+
+	return c.SendString("Working")
+
 }
