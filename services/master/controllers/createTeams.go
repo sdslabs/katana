@@ -56,6 +56,14 @@ func CreateTeams(c *fiber.Ctx) error {
 		}
 	}
 
+	// Create a directory named teams in the current directory
+	if _, err := os.Stat("teams"); os.IsNotExist(err) {
+		errDir := os.Mkdir("teams", 0755)
+		if errDir != nil {
+			log.Fatal(err)
+		}
+	}
+
 	for i := 0; i < noOfTeams; i++ {
 		// Create a directory named katana-team-i in the teams directory
 		if _, err := os.Stat("teams/katana-team-" + strconv.Itoa(i)); os.IsNotExist(err) {
