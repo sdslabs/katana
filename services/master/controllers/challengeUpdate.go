@@ -1,13 +1,17 @@
 package controllers
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
+	"strings"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/gofiber/fiber/v2"
+	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type Repo struct {
@@ -40,13 +44,12 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 		return err
 	}
 
-	// fmt.Println(p.Repository)
-	// fmt.Println(p.Repository.Name)
-	fmt.Println("Request Recieved, please wait..pulling repo and building images")
-	teamname := p.Repository.Name
-	//fmt.Println(teamname)
+	dir := p.Repository.FullName
+	s := strings.Split(dir, "/")
+	name := s[1]
+	teamName := s[0]
+	namespace := teamName + "-ns"
 
-	// Git pull in the directory
 	repo, err := git.PlainOpen(dir)
 	if err != nil {
 		fmt.Println(err)
@@ -66,7 +69,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	if err != nil {
 		fmt.Println("Error pulling changes:", err)
 	}
-	
+
 	// Build the challenge with Dockerfile
 	cmd := exec.Command("docker", "build", "-t", dir, dir)
 	err = cmd.Run()
@@ -74,20 +77,12 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 		fmt.Println(err)
 	}
 
-		cmd := exec.Command("/bin/sh", "./teams/"+teamname+"/script.sh")
-		stdout, err := cmd.Output()
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-		fmt.Println(string(stdout))
+	// Restart the pod using go client
+	err = client.CoreV1().Pods(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
+	if err != nil {
+		fmt.Println(err)
+	}
 
-		ch <- true
-	}()
-
-	return c.SendString(fmt.Sprintf("Received Payload"))
-
-	<-ch
-
-	return c.SendString("Working")
+	return c.SendString("Challenge updated")
 
 }
