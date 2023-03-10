@@ -66,6 +66,8 @@ spec:
         env:
         - name: SOCAT_LINK
           value: "false"
+        - name: MY_EXTERNAL_SERVICE_HOST
+          value: fiber-svc
         volumeMounts:
         - name: gogs-persistent-storage
           mountPath: /data
@@ -131,3 +133,17 @@ spec:
             name: gogs-svc
             port:
               number: 18080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fiber-svc
+  namespace: gogs
+spec:
+  type: ExternalName
+  externalName: localhost
+  ports:
+  - name: http
+    port: 3000
+    protocol: TCP
