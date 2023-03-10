@@ -1,10 +1,14 @@
 package controllers
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/sdslabs/katana/lib/utils"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type Repo struct {
@@ -19,16 +23,25 @@ type GogsRequest struct {
 
 func ChallengeUpdate(c *fiber.Ctx) error {
 
+	client, err := utils.GetKubeClient()
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	var p GogsRequest
 	if err := c.BodyParser(&p); err != nil {
 		return err
 	}
 
 	dir := p.Repository.FullName
+	s := strings.Split(dir, "/")
+	name := s[1]
+	teamName := s[0]
+	namespace := teamName + "-ns"
 
 	// Git pull in the directory
 	cmd := exec.Command("git", "-C", dir, "pull")
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -40,16 +53,8 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 		fmt.Println(err)
 	}
 
-	// Delete the old manifest
-	cmd = exec.Command("kubectl", "delete", "-f", dir+"/challenge.yaml")
-	err = cmd.Run()
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	// Apply the new manifest
-	cmd = exec.Command("kubectl", "apply", "-f", dir+"/challenge.yaml")
-	err = cmd.Run()
+	// Restart the pod using go client
+	err = client.CoreV1().Pods(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
 	if err != nil {
 		fmt.Println(err)
 	}
