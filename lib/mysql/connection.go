@@ -33,6 +33,7 @@ func setup() {
 
 func setupGogs() {
 	CreateDatabase(gogsDatabase)
+	CreateGogsAdmin(configs.AdminConfig.Username, configs.AdminConfig.Password)
 }
 
 func Init() {
