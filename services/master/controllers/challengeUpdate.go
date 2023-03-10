@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os/exec"
 
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sdslabs/katana/lib/utils"
 )
@@ -44,10 +46,33 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	teamname := p.Repository.Name
 	//fmt.Println(teamname)
 
-	//for non-blocking the script run
-	ch := make(chan bool)
+	// Git pull in the directory
+	repo, err := git.PlainOpen(dir)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	go func() {
+	auth := &http.BasicAuth{
+		Username: g.AdminConfig.Username,
+		Password: g.AdminConfig.Password,
+	}
+
+	worktree, err := repo.Worktree()
+	worktree.Pull(&git.PullOptions{
+		RemoteName: "origin master",
+		Auth:       auth,
+	})
+
+	if err != nil {
+		fmt.Println("Error pulling changes:", err)
+	}
+	
+	// Build the challenge with Dockerfile
+	cmd := exec.Command("docker", "build", "-t", dir, dir)
+	err = cmd.Run()
+	if err != nil {
+		fmt.Println(err)
+	}
 
 		cmd := exec.Command("/bin/sh", "./teams/"+teamname+"/script.sh")
 		stdout, err := cmd.Output()
