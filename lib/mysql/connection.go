@@ -34,6 +34,7 @@ func setup() {
 func setupGogs() {
 	CreateDatabase(gogsDatabase)
 	CreateGogsAdmin(configs.AdminConfig.Username, configs.AdminConfig.Password)
+	CreateAccessToken(configs.AdminConfig.Username, configs.AdminConfig.Password)
 }
 
 func Init() {
