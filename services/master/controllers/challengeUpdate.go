@@ -7,7 +7,9 @@ import (
 	"strings"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/gofiber/fiber/v2"
+	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -35,7 +37,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	}
 
 	log.Println(p)
-	dir := "katana-team-0/notekeeper"
+	dir := p.Repository.FullName
 	log.Println(dir + " updated")
 	s := strings.Split(dir, "/")
 	challengeName := s[1]
@@ -47,15 +49,17 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 		fmt.Println(err)
 	}
 
-	// auth := &http.BasicAuth{
-	// 	Username: g.AdminConfig.Username,
-	// 	Password: g.AdminConfig.Password,
-	// }
+	auth := &http.BasicAuth{
+		Username: g.AdminConfig.Username,
+		Password: g.AdminConfig.Password,
+	}
 
 	worktree, err := repo.Worktree()
 	resp := worktree.Pull(&git.PullOptions{
 		RemoteName: "origin",
+		Auth:       auth,
 	})
+
 	log.Println(resp)
 	if err != nil {
 		fmt.Println("Error pulling changes:", err)
@@ -82,6 +86,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	// 	log.Println(err)
 	// }
 	// Create a labelSelector to get the challenge pod
+
 	labelSelector := metav1.LabelSelector{
 		MatchLabels: map[string]string{
 			"app": teamName + "_" + challengeName,
