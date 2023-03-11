@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os/exec"
 	"strings"
 
 	"github.com/go-git/go-git/v5"
@@ -66,25 +67,9 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	}
 
 	// Build the challenge with Dockerfile
-	// cli, err := docker.NewClientWithOpts(docker.FromEnv, docker.WithAPIVersionNegotiation(), docker.WithHTTPClient(httpClient))
-	// if err != nil {
-	// 	log.Println(err)
-	// }
-	// buildCtx, err := os.Open("teams/" + dir + "/Dockerfile")
-	// if err != nil {
-	// 	log.Println(err)
-	// }
-	// defer buildCtx.Close()
-	// buildOptions := types.ImageBuildOptions{
-	// 	Context:    buildCtx,
-	// 	Dockerfile: "Dockerfile",
-	// 	Tags:       []string{dir},
-	// }
-	// ctx := context.Background()
-	// _, err = cli.ImageBuild(ctx, buildCtx, buildOptions)
-	// if err != nil {
-	// 	log.Println(err)
-	// }
+	cmd := exec.Command("docker", "build", "-t", dir, "./teams/"+dir)
+	cmd.Run()
+
 	// Create a labelSelector to get the challenge pod
 
 	labelSelector := metav1.LabelSelector{
