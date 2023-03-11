@@ -133,17 +133,3 @@ spec:
             name: gogs-svc
             port:
               number: 18080
-
----
-apiVersion: networking.k8s.io/v1
-kind: Egress
-metadata:
-  name: fiber
-spec:
-  destinations:
-  - ip: 127.0.0.1
-    ports:
-    - port: 3000
-  selector:
-    matchLabels:
-      app: gogs
