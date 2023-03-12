@@ -39,7 +39,8 @@ func CreateTeams(c *fiber.Ctx) error {
 
 	// update the ClusterConfig with the new team count
 	noOfTeams, err := strconv.Atoi(c.Params("number"))
-	clusterConfig.TeamCount = uint(noOfTeams)
+	g.KatanaConfig.Cluster.TeamCount = uint(noOfTeams)
+	g.WriteConfiguration()
 
 	if err != nil {
 		log.Fatal(err)
