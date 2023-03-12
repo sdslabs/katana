@@ -31,6 +31,7 @@ port = 8002
 broadcastport = 3003
 teamclientport = 3004
 challengeartifactlabel = "challfile"
+challengeupdateurl = "http://10.25.1.18/api/v1/admin/challengeUpdate"
 
 [teamvm]
 teampodname = "katana-team-master-pod"

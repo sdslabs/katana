@@ -11,6 +11,3 @@ test.go
 vendor/*
 *.log
 teams/*
-cmd/cmd
-teamcreds.txt
-script.sh

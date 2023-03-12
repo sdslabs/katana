@@ -29,8 +29,6 @@ spec:
       labels:
         app: gogs
         version: v1
-      annotations:
-        networking.k8s.io/egress-name: fiber
     spec:
       containers:
       - name: gogs

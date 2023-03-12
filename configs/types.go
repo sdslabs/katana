@@ -16,11 +16,12 @@ type ClusterCfg struct {
 }
 
 type ChallengeDeployerCfg struct {
-	Host           string `toml:"host"`
-	Port           uint   `toml:"port"`
-	BroadcastPort  uint   `toml:"broadcastport"`
-	TeamClientPort uint   `toml:"teamclientport"`
-	ArtifactLabel  string `toml:"challengeartifactlabel"`
+	Host               string `toml:"host"`
+	Port               uint   `toml:"port"`
+	BroadcastPort      uint   `toml:"broadcastport"`
+	TeamClientPort     uint   `toml:"teamclientport"`
+	ArtifactLabel      string `toml:"challengeartifactlabel"`
+	ChallengeUpdateUrl string `toml:"challengeupdateurl"`
 }
 
 type AdminCfg struct {

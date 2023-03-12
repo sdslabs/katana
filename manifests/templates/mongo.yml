@@ -98,7 +98,6 @@ metadata:
     app: mongo
   name: mongo-nodeport-svc
   namespace: katana
-
 spec:
   ports:
   - port: 27017
@@ -115,7 +114,6 @@ kind: PersistentVolume
 metadata:
   name: mongo-data-pv
   namespace: katana
-
 spec:
   accessModes:
     - ReadWriteOnce
@@ -130,7 +128,6 @@ kind: PersistentVolumeClaim
 metadata:
   name: mongo-data
   namespace: katana
-
 spec:
   accessModes:
     - ReadWriteOnce 
