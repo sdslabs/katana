@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: gogs
+  name: gogss
   # labels:
   #   istio-injection: enabled
 
@@ -27,7 +27,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: gogs-pv-claim
-  namespace: gogs
+  namespace: gogss
   labels:
     app: gogs
 spec:
@@ -42,7 +42,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gogs
-  namespace: gogs
+  namespace: gogss
 spec:
   replicas: 1
   selector:
@@ -60,14 +60,6 @@ spec:
       containers:
       - name: gogs
         image: gogs/gogs:0.13
-        command:
-        - /bin/sh
-        - -c
-        - |
-          while [ ! -f /data/gogs/conf/app.ini ]; do sleep 1; done
-          sleep 10
-          echo 'LOCAL_NETWORK_ALLOWLIST = *' >> /data/gogs/conf/app.ini
-          tail -f /dev/null
         ports:
         - containerPort: 22
           name: ssh
@@ -79,6 +71,13 @@ spec:
         volumeMounts:
         - name: gogs-persistent-storage
           mountPath: /data
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - nohup sh -c "while [ ! -f /data/gogs/conf/app.ini ]; do sleep 1; done && sleep 10 && echo 'LOCAL_NETWORK_ALLOWLIST = *' >> /data/gogs/conf/app.ini" &
       volumes:
       - name: gogs-persistent-storage
         persistentVolumeClaim:
@@ -89,7 +88,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: gogs-svc
-  namespace: gogs
+  namespace: gogss
 spec:
   selector:
     app: gogs
@@ -126,7 +125,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: gogs-ingress
-  namespace: gogs
+  namespace: gogss
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
