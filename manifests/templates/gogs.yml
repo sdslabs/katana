@@ -57,6 +57,13 @@ spec:
       annotations:
         networking.k8s.io/egress-name: fiber
     spec:
+      initContainers:
+      - name: gogs-init
+        image: busybox
+        command: ["/bin/sh", "-c", "echo "LOCAL_NETWORK_ALLOWLIST = *" >> /data/gogs/conf/app.ini"]
+        volumeMounts:
+        - name: gogs-persistent-storage
+          mountPath: /data
       containers:
       - name: gogs
         image: gogs/gogs:0.13
