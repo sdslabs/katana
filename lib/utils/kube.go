@@ -173,7 +173,7 @@ func GetGogsIp() string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	service, err := client.CoreV1().Services("gogs").Get(context.TODO(), "gogs-svc", metav1.GetOptions{})
+	service, err := client.CoreV1().Services("katana").Get(context.TODO(), "gogs-svc", metav1.GetOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}

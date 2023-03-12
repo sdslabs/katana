@@ -42,7 +42,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	challengeName := s[1]
 	teamName := s[0]
 	namespace := teamName + "-ns"
-
+	log.Println("Challenge update request received for", challengeName, "by", teamName)
 	repo, err := git.PlainOpen("teams/" + dir)
 	if err != nil {
 		fmt.Println(err)
@@ -62,6 +62,8 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	if err != nil {
 		fmt.Println("Error pulling changes:", err)
 	}
+
+	log.Println("Pull successful for", teamName, ". Building image...")
 
 	// Build the challenge with Dockerfile
 	cmd := exec.Command("docker", "build", "-t", dir, "./teams/"+dir)
