@@ -60,7 +60,7 @@ spec:
       initContainers:
       - name: gogs-init
         image: busybox
-        command: ["/bin/sh", "-c", "echo "LOCAL_NETWORK_ALLOWLIST = *" >> /data/gogs/conf/app.ini"]
+        command: ["/bin/sh", "-c", "echo \"LOCAL_NETWORK_ALLOWLIST = *\" >> /data/gogs/conf/app.ini"]
         volumeMounts:
         - name: gogs-persistent-storage
           mountPath: /data
