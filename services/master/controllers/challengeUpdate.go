@@ -37,9 +37,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 		return err
 	}
 
-	log.Println(p)
 	dir := p.Repository.FullName
-	log.Println(dir + " updated")
 	s := strings.Split(dir, "/")
 	challengeName := s[1]
 	teamName := s[0]
@@ -56,12 +54,11 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	}
 
 	worktree, err := repo.Worktree()
-	resp := worktree.Pull(&git.PullOptions{
+	worktree.Pull(&git.PullOptions{
 		RemoteName: "origin",
 		Auth:       auth,
 	})
 
-	log.Println(resp)
 	if err != nil {
 		fmt.Println("Error pulling changes:", err)
 	}
@@ -77,17 +74,13 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 			"app": teamName + "_" + challengeName,
 		},
 	}
-	log.Println("Yaha tak sexy 6")
 	// Delete the challenge pod
 	err = client.CoreV1().Pods(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{
 		LabelSelector: metav1.FormatLabelSelector(&labelSelector),
 	})
 	if err != nil {
 		log.Println(err)
-		log.Println("Ye?")
-		log.Println(err)
 	}
-	log.Println("Yaha tak sexy 7")
 	return c.SendString("Challenge updated")
 
 }

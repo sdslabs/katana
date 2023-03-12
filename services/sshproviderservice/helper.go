@@ -58,9 +58,7 @@ func envVariables(gogs string, pwd string, podNamespace string) {
 		if !ok {
 			log.Fatal("unexpected type")
 		}
-		if p.Status.Phase == "Pending" {
-			log.Println("Pod is being created")
-		} else {
+		if p.Status.Phase != "Pending" {
 			log.Println("Pod created")
 			command := []string{"bash", "-c", "echo 'export GOGS=" + gogs + "' >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)

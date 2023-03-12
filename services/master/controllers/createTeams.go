@@ -18,12 +18,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-/* func CreateTeam(namespace string, i string) string {
-	// ctfTeam := new(types.CTFTeam)
-	log.Println("Creating pod for team " + i)
-
-	return "PlaceHolder"
-} */
 
 func CreateTeams(c *fiber.Ctx) error {
 

@@ -28,7 +28,6 @@ func DeployToAll(localFilePath string, pathInPod string) error {
 		if err != nil {
 			log.Println(err)
 		}
-		log.Println("teams/" + path)
 		git.PlainInit("teams/"+path, false)
 		repo, err := git.PlainOpen("teams/" + path)
 		if err != nil {
