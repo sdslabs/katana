@@ -36,7 +36,10 @@ func CreateTeams(c *fiber.Ctx) error {
 	if err != nil {
 		log.Println(err)
 	}
+
+	// update the ClusterConfig with the new team count
 	noOfTeams, err := strconv.Atoi(c.Params("number"))
+	clusterConfig.TeamCount = uint(noOfTeams)
 
 	if err != nil {
 		log.Fatal(err)
@@ -48,7 +51,7 @@ func CreateTeams(c *fiber.Ctx) error {
 		}
 	}
 
-	for i := 0; i < noOfTeams; i++ {
+	for i := 0; i < int(clusterConfig.TeamCount); i++ {
 		// Create a directory named katana-team-i in the teams directory
 		if _, err := os.Stat("teams/katana-team-" + strconv.Itoa(i)); os.IsNotExist(err) {
 			errDir := os.Mkdir("teams/katana-team-"+strconv.Itoa(i), 0755)
@@ -88,7 +91,7 @@ func CreateTeams(c *fiber.Ctx) error {
 			return err
 		}
 	}
-	SSH(noOfTeams)
+	SSH(int(clusterConfig.TeamCount))
 	return c.SendString("Successfully created teams")
 }
 
