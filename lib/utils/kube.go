@@ -78,7 +78,7 @@ func GetMongoIP() string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	service, err := client.CoreV1().Services("default").Get(context.TODO(), "mongo-nodeport-svc", metav1.GetOptions{})
+	service, err := client.CoreV1().Services("katana").Get(context.TODO(), "mongo-nodeport-svc", metav1.GetOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -105,7 +105,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 		return err
 	}
 
-	namespace := "default"
+	namespace := "katana"
 	if len(ns) > 0 {
 		namespace = ns[0]
 	}

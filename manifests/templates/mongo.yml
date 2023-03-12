@@ -5,6 +5,8 @@ metadata:
   labels:
     app: mongo-client
   name: mongo-client
+  namespace: katana
+
 spec:
   replicas: 1
   selector:
@@ -31,6 +33,7 @@ metadata:
   labels:
     app: mongo
   name: mongo
+  namespace: katana
 spec:
   replicas: 1
   selector:
@@ -94,6 +97,8 @@ metadata:
   labels:
     app: mongo
   name: mongo-nodeport-svc
+  namespace: katana
+
 spec:
   ports:
   - port: 27017
@@ -109,6 +114,8 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: mongo-data-pv
+  namespace: katana
+
 spec:
   accessModes:
     - ReadWriteOnce
@@ -122,6 +129,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mongo-data
+  namespace: katana
+
 spec:
   accessModes:
     - ReadWriteOnce 
@@ -138,3 +147,5 @@ kind: Secret
 metadata:
   creationTimestamp: null
   name: mongo-creds
+  namespace: katana
+

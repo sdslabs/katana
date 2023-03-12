@@ -1,15 +1,9 @@
 ---
 apiVersion: v1
-kind: Namespace
-metadata:
-  name: gogs
-  
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: gogs-pv-claim
-  namespace: gogs
+  namespace: katana
   labels:
     app: gogs
 spec:
@@ -24,7 +18,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gogs
-  namespace: gogs
+  namespace: katana
 spec:
   replicas: 1
   selector:
@@ -69,7 +63,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: gogs-svc
-  namespace: gogs
+  namespace: katana
 spec:
   selector:
     app: gogs
@@ -88,7 +82,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: gogs-ingress
-  namespace: gogs
+  namespace: katana
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
