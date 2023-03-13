@@ -6,7 +6,6 @@ metadata:
     app: mongo-client
   name: mongo-client
   namespace: katana
-
 spec:
   replicas: 1
   selector:
@@ -145,4 +144,3 @@ metadata:
   creationTimestamp: null
   name: mongo-creds
   namespace: katana
-
