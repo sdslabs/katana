@@ -13,8 +13,8 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/deprecated/scheme"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/remotecommand"
@@ -78,7 +78,7 @@ func GetMongoIP() string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	service, err := client.CoreV1().Services("default").Get(context.TODO(), "mongo-nodeport-svc", metav1.GetOptions{})
+	service, err := client.CoreV1().Services("katana").Get(context.TODO(), "mongo-nodeport-svc", metav1.GetOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -105,7 +105,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 		return err
 	}
 
-	namespace := "default"
+	namespace := "katana"
 	if len(ns) > 0 {
 		namespace = ns[0]
 	}
@@ -173,7 +173,7 @@ func GetGogsIp() string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	service, err := client.CoreV1().Services("gogs").Get(context.TODO(), "gogs-svc", metav1.GetOptions{})
+	service, err := client.CoreV1().Services("katana").Get(context.TODO(), "gogs-svc", metav1.GetOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}

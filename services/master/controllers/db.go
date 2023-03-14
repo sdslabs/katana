@@ -22,7 +22,7 @@ func DB(c *fiber.Ctx) error {
 	}
 	mongo.Init()
 	// Print the IP address of the service
-	service, err := client.CoreV1().Services("default").Get(context.TODO(), "mysql-nodeport-svc", metav1.GetOptions{})
+	service, err := client.CoreV1().Services("katana").Get(context.TODO(), "mysql-nodeport-svc", metav1.GetOptions{})
 	if err != nil {
 		log.Println(err)
 	}

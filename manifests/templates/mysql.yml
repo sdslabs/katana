@@ -3,6 +3,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: mysql-pv-volume
+  namespace: katana
   labels:
     type: local
 spec:
@@ -19,6 +20,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mysql-pv-claim
+  namespace: katana
 spec:
   storageClassName: manual
   accessModes:
@@ -32,6 +34,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
+  namespace: katana
 spec:
   selector:
     matchLabels:
@@ -70,6 +73,7 @@ metadata:
   labels:
     app: mysql
   name: mysql-nodeport-svc
+  namespace: katana
 spec:
   ports:
   - port: 3306
@@ -84,6 +88,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: mysql-secret
+  namespace: katana
 type: kubernetes.io/basic-auth
 stringData:
   password: test1234

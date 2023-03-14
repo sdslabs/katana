@@ -1,5 +1,6 @@
 kubeconfig = ""
 kubehost = "http://localhost"
+backendurl = "http://10.25.1.18"
 kubenamespace = "default"
 verbosity = 3
 

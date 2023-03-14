@@ -22,13 +22,13 @@ func GitServer(c *fiber.Ctx) error {
 		log.Println(err)
 	}
 
-	service, err := kubeclient.CoreV1().Services("default").Get(context.TODO(), "mysql-nodeport-svc", metav1.GetOptions{})
+	service, err := kubeclient.CoreV1().Services("katana").Get(context.TODO(), "mysql-nodeport-svc", metav1.GetOptions{})
 	if err != nil {
 		log.Println(err)
 	}
 
 	mysqlAddress := service.Spec.ClusterIP
-	gogsService, err := kubeclient.CoreV1().Services("gogs").Get(context.TODO(), "gogs-svc", metav1.GetOptions{})
+	gogsService, err := kubeclient.CoreV1().Services("katana").Get(context.TODO(), "gogs-svc", metav1.GetOptions{})
 	if err != nil {
 		log.Println(err)
 	}

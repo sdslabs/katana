@@ -10,4 +10,4 @@ katana
 test.go
 vendor/*
 *.log
-cmd
+teams/*

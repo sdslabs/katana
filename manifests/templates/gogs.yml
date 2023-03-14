@@ -1,33 +1,9 @@
 ---
 apiVersion: v1
-kind: Namespace
-metadata:
-  name: gogs
-  # labels:
-  #   istio-injection: enabled
-
-# ---
-# apiVersion: v1
-# kind: PersistentVolume
-# metadata:
-#   name: gogs-pv
-#   namespace: gogs
-#   labels:
-#     type: local
-# spec:
-#   accessModes:
-#     - ReadWriteOnce
-#   capacity:
-#     storage: 2Gi
-#   hostPath:
-#     path: /mnt/data/gogs
-
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: gogs-pv-claim
-  namespace: gogs
+  namespace: katana
   labels:
     app: gogs
 spec:
@@ -42,7 +18,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gogs
-  namespace: gogs
+  namespace: katana
 spec:
   replicas: 1
   selector:
@@ -52,7 +28,6 @@ spec:
     metadata:
       labels:
         app: gogs
-        # istio-injection: enabled
         version: v1
     spec:
       containers:
@@ -69,6 +44,13 @@ spec:
         volumeMounts:
         - name: gogs-persistent-storage
           mountPath: /data
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - nohup sh -c "if [ ! -f /data/gogs/conf/app.ini ]; then while [ ! -f /data/gogs/conf/app.ini ]; do sleep 1; done; sleep 10; echo 'LOCAL_NETWORK_ALLOWLIST = *' >> /data/gogs/conf/app.ini; kill 1; fi" &
       volumes:
       - name: gogs-persistent-storage
         persistentVolumeClaim:
@@ -79,7 +61,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: gogs-svc
-  namespace: gogs
+  namespace: katana
 spec:
   selector:
     app: gogs
@@ -93,30 +75,12 @@ spec:
     port: 18080
     targetPort: 3000
 
-# ---
-# apiVersion: extensions/v1beta1
-# kind: Ingress
-# metadata:
-#   name: gogs-ingress
-#   namespace: gogs
-#   annotations:
-#     nginx.ingress.kubernetes.io/rewrite-target: /
-# spec:
-#   rules:
-#   - host: gogs.local
-#     http:
-#       paths:
-#       - path: /
-#         backend:
-#           serviceName: gogs-svc
-#           servicePort: 18080
-
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: gogs-ingress
-  namespace: gogs
+  namespace: katana
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:

@@ -58,15 +58,17 @@ func envVariables(gogs string, pwd string, podNamespace string) {
 		if !ok {
 			log.Fatal("unexpected type")
 		}
-		if p.Status.Phase == "Pending" {
-			log.Println("Pod is being created")
-		} else {
+		if p.Status.Phase != "Pending" {
 			log.Println("Pod created")
 			command := []string{"bash", "-c", "echo 'export GOGS=" + gogs + "' >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
 			command = []string{"bash", "-c", "echo 'export PASSWORD=" + pwd + "' >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
 			command = []string{"bash", "-c", "echo 'export USERNAME=" + podNamespace + "' >> /etc/profile"}
+			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
+			command = []string{"bash", "-c", "echo 'export BACKEND_URL=" + g.KatanaConfig.BackendUrl + "/api/v1/admin/updatechallenge' >> /etc/profile"}
+			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
+			command = []string{"bash", "-c", "echo 'export ADMIN=" + g.AdminConfig.Username + "' >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
 			command = []string{"bash", "-c", "source /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
