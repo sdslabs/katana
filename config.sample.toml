@@ -1,6 +1,6 @@
 kubeconfig = ""
 kubehost = "http://localhost"
-challengeupdateurl = "http://10.25.1.18"
+backendurl = "http://10.25.1.18"
 kubenamespace = "default"
 verbosity = 3
 

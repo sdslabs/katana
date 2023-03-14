@@ -64,15 +64,15 @@ type MySQLCfg struct {
 }
 
 type KatanaCfg struct {
-	KubeHost           string              `toml:"kubehost"`
-	ChallengeUpdateUrl string              `toml:"challengeupdateurl"`
-	KubeNameSpace      string              `toml:"kubenamespace"`
-	KubeConfig         string              `toml:"kubeconfig"`
-	LogFile            string              `toml:"logfile"`
-	Services           ServicesCfg         `toml:"services"`
-	Cluster            ClusterCfg          `toml:"cluster"`
-	Mongo              MongoCfg            `toml:"mongo"`
-	TeamVmConfig       TeamChallengeConfig `toml:"teamvm"`
-	AdminConfig        AdminCfg            `toml:"admin"`
-	MySQL              MySQLCfg            `toml:"mysql"`
+	KubeHost      string              `toml:"kubehost"`
+	BackendUrl    string              `toml:"backendurl"`
+	KubeNameSpace string              `toml:"kubenamespace"`
+	KubeConfig    string              `toml:"kubeconfig"`
+	LogFile       string              `toml:"logfile"`
+	Services      ServicesCfg         `toml:"services"`
+	Cluster       ClusterCfg          `toml:"cluster"`
+	Mongo         MongoCfg            `toml:"mongo"`
+	TeamVmConfig  TeamChallengeConfig `toml:"teamvm"`
+	AdminConfig   AdminCfg            `toml:"admin"`
+	MySQL         MySQLCfg            `toml:"mysql"`
 }

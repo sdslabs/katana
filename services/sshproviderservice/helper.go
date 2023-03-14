@@ -66,7 +66,7 @@ func envVariables(gogs string, pwd string, podNamespace string) {
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
 			command = []string{"bash", "-c", "echo 'export USERNAME=" + podNamespace + "' >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
-			command = []string{"bash", "-c", "echo 'export BACKEND_URL=" + g.KatanaConfig.ChallengeUpdateUrl + "/api/v1/admin/updatechallenge' >> /etc/profile"}
+			command = []string{"bash", "-c", "echo 'export BACKEND_URL=" + g.KatanaConfig.BackendUrl + "/api/v1/admin/updatechallenge' >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
 			command = []string{"bash", "-c", "echo 'export ADMIN=" + g.AdminConfig.Username + "' >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
