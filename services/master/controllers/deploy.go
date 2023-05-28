@@ -6,7 +6,7 @@ import (
 	"regexp"
 
 	"github.com/gofiber/fiber/v2"
-	//"github.com/mholt/archiver/v3"
+	"github.com/mholt/archiver/v3"
 	deployer "github.com/sdslabs/katana/services/challengedeployerservice"
 )
 
@@ -86,10 +86,9 @@ func Deploy(c *fiber.Ctx) error {
 
 		// Loops through all challenges, if multiple uploaded :
 		for _, file := range files {
-			//fmt.Println(file.Filename, file.Size, file.Header["Content-Type"][0])
+			//fmt.Println(file.Filename, file.Size, file.Header["Content-Type"][0]) //prints uploaded file name and size
 
-			//creates folders
-
+			//creates folders for each challenge
 			pattern := `([^/]+)\.tar\.gz$`
 			regex := regexp.MustCompile(pattern)
 			match := regex.FindStringSubmatch(file.Filename)
@@ -108,11 +107,11 @@ func Deploy(c *fiber.Ctx) error {
 			}
 
 			//extract the tar.gz file
-			//err := archiver.Unarchive("./chall/"+foldername+"/"+file.Filename, "./chall/"+foldername+"/"+file.Filename)
-			//if err != nil {
-			//	fmt.Println("Error in unarchiving", err)
-			//	return c.SendString("Error in unarchiving")
-			//}
+			err := archiver.Unarchive("./chall/"+foldername+"/"+file.Filename, "./chall/"+foldername)
+			if err != nil {
+				fmt.Println("Error in unarchiving", err)
+				return c.SendString("Error in unarchiving")
+			}
 			challdeploy(newDirPath, foldername, challengetype)
 			return c.SendString("Deployed")
 		}
