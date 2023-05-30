@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"regexp"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
@@ -19,11 +20,17 @@ func DeployToAll(localFilePath string, pathInPod string) error {
 		return err
 	}
 
+	//regex to find challenge name since localFilePath[12:22] is hardcoded
+	regexPattern := `\/([^\/]+)\.tar\.gz$`
+	regex := regexp.MustCompile(regexPattern)
+	matches := regex.FindStringSubmatch(localFilePath)
+	filename := matches[1]
+
 	// Get pods from different namespaces
 	var pods []v1.Pod
 	numberOfTeams := utils.GetTeamNumber()
 	for i := 0; i < numberOfTeams; i++ {
-		path := "katana-team-" + fmt.Sprint(i) + "/" + localFilePath[12:22]
+		path := "katana-team-" + fmt.Sprint(i) + "/" + filename
 		err := os.Mkdir("teams/"+path, 0755)
 		if err != nil {
 			log.Println(err)
