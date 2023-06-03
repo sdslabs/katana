@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/mholt/archiver/v3"
+	g "github.com/sdslabs/katana/configs"
 	deployer "github.com/sdslabs/katana/services/challengedeployerservice"
 )
 
@@ -114,13 +116,28 @@ func Deploy(c *fiber.Ctx) error {
 				return c.SendString("Error in unarchiving")
 			}
 			challdeploy(newDirPath, foldername, challengetype)
+
+			//Get no.of teams and deploy
+			clusterConfig := g.ClusterConfig
+			numberOfTeams := clusterConfig.TeamCount
+			for i := 0; i < int(numberOfTeams); i++ {
+				deployer.DeployChallenge(foldername, "team-"+strconv.Itoa(i))
+			}
+
 			return c.SendString("Deployed")
 		}
 	}
 	fmt.Println("Ending")
 
 	//WIP for deployer
-	//deployer.DeployChallenge()
+	//Get no.of teams and deploy
+	foldername = "notekeeper"
+	clusterConfig := g.ClusterConfig
+	numberOfTeams := clusterConfig.TeamCount
+	for i := 0; i < int(numberOfTeams); i++ {
+		deployer.DeployChallenge(foldername, "team-"+strconv.Itoa(i))
+	}
+	//deployer.DeployChallenge(foldername)
 
 	return c.SendString("Wrong file")
 }
