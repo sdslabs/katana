@@ -1,6 +1,7 @@
 package challengedeployerservice
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -11,7 +12,9 @@ import (
 	"github.com/go-git/go-git/v5/config"
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
+	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func DeployToAll(localFilePath string, pathInPod string) error {
@@ -72,3 +75,97 @@ func DeployToAll(localFilePath string, pathInPod string) error {
 
 	return nil
 }
+
+func DeployChallenge() error {
+
+	fmt.Println("TEST 1")
+	if err := GetClient(g.KatanaConfig.KubeConfig); err != nil {
+		return err
+	}
+	fmt.Println("TEST 2")
+	//Change namespace
+	deploymentsClient := kubeclient.AppsV1().Deployments(v1.NamespaceDefault)
+
+	fmt.Println("TEST 3")
+	// // Read the deployment YAML file
+	// pwd, _ := os.Getwd()
+	// fmt.Println(pwd)
+	// deploymentYAML, err := ioutil.ReadFile("web_challenge.yaml")
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	fmt.Println("TEST 3.5")
+	// // Open the deployment YAML file
+	// file, err := os.Open("web_challenge.yaml")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer file.Close()
+
+	fmt.Println("TEST 4")
+
+	// Create Deployment struct dynamically when we switch to various challenges other than web.
+	deployment := &appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "chall-notekeeper",
+		},
+		Spec: appsv1.DeploymentSpec{
+			Replicas: int32Ptr(2),
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"app": "chall-notekeeper",
+				},
+			},
+			Template: v1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						"app": "chall-notekeeper",
+					},
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						{
+							Name:            "chall-notekeeper-team-0",
+							Image:           "notekeeper:latest",
+							ImagePullPolicy: v1.PullPolicy("Never"),
+							Ports: []v1.ContainerPort{
+								{
+									Name:          "http",
+									Protocol:      v1.ProtocolTCP,
+									ContainerPort: 80,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// decoder := yaml.NewYAMLOrJSONDecoder(file, 4096)
+	// err = decoder.Decode(deployment)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// fmt.Println("TEST 5")
+	// err = yaml.Unmarshal(deploymentYAML, deployment)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	fmt.Println("TEST 6")
+	// Create Deployment
+	fmt.Println("Creating deployment...")
+	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("TEST 7")
+	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName())
+	return nil
+}
+
+func int32Ptr(i int32) *int32 { return &i }

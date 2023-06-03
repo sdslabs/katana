@@ -73,6 +73,7 @@ func Deploy(c *fiber.Ctx) error {
 
 	challengetype := "web"
 	foldername := ""
+	fmt.Println("Starting")
 	if form, err := c.MultipartForm(); err == nil {
 
 		//sort this
@@ -116,6 +117,10 @@ func Deploy(c *fiber.Ctx) error {
 			return c.SendString("Deployed")
 		}
 	}
+	fmt.Println("Ending")
+
+	//WIP for deployer
+	//deployer.DeployChallenge()
 
 	return c.SendString("Wrong file")
 }
