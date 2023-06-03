@@ -129,15 +129,13 @@ func Deploy(c *fiber.Ctx) error {
 	}
 	fmt.Println("Ending")
 
-	//WIP for deployer
-	//Get no.of teams and deploy
-	foldername = "notekeeper"
-	clusterConfig := g.ClusterConfig
-	numberOfTeams := clusterConfig.TeamCount
-	for i := 0; i < int(numberOfTeams); i++ {
-		deployer.DeployChallenge(foldername, "team-"+strconv.Itoa(i))
-	}
-	//deployer.DeployChallenge(foldername)
+	//In case only want to test the deployer wih empty post request
+	// foldername = "notekeeper"
+	// clusterConfig := g.ClusterConfig
+	// numberOfTeams := clusterConfig.TeamCount
+	// for i := 0; i < int(numberOfTeams); i++ {
+	// 	deployer.DeployChallenge(foldername, "team-"+strconv.Itoa(i))
+	// }
 
 	return c.SendString("Wrong file")
 }
