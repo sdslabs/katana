@@ -17,7 +17,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func DeployToAll(localFilePath string, pathInPod string) error {
+func CopyInPod(localFilePath string, pathInPod string) error {
 
 	if err := GetClient(g.KatanaConfig.KubeConfig); err != nil {
 		return err
@@ -82,7 +82,7 @@ func DeployChallenge(chall_name, team_name string) error {
 	// team_name = "team-0"
 	team_namespace := "katana-" + team_name + "-ns"
 
-	fmt.Println("TEST 1")
+	//fmt.Println("TEST 1")
 	if err := GetClient(g.KatanaConfig.KubeConfig); err != nil {
 		return err
 	}
@@ -92,13 +92,13 @@ func DeployChallenge(chall_name, team_name string) error {
 
 	//fmt.Println("TEST 3")
 	//Get and print all namespaces for testing
-	namespaces, err := kubeclient.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
-	if err != nil {
-		panic(err)
-	}
-	for i := 0; i < len(namespaces.Items); i++ {
-		fmt.Println(namespaces.Items[i].Name)
-	}
+	// namespaces, err := kubeclient.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// for i := 0; i < len(namespaces.Items); i++ {
+	// 	fmt.Println(namespaces.Items[i].Name)
+	// }
 
 	//fmt.Println("TEST 4")
 	// Creates Deployment object and deploys it
@@ -141,6 +141,14 @@ func DeployChallenge(chall_name, team_name string) error {
 	}
 
 	//fmt.Println("TEST 5")
+
+	//Check if deployment already exists
+	deps, err := deploymentsClient.Get(context.TODO(), chall_name, metav1.GetOptions{})
+	if deps.Name == chall_name {
+		fmt.Println("Deployment already exists for the challenge " + chall_name + " in namespace " + team_namespace)
+		return nil
+	}
+
 	// Create Deployment
 	fmt.Println("Creating deployment...")
 	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
@@ -150,11 +158,11 @@ func DeployChallenge(chall_name, team_name string) error {
 		panic(err)
 	}
 
-	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName())
+	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName()+" in namespace "+team_namespace)
 	return nil
 
 	// Trying this method of deployment by reading the YAML file , parsing it and then creating the deployment
-	// The above method also works, but this can be explored when mulitple challenges type are added
+	// The above method also works, but this can be explored when mulitple challenges type are added later on
 	// https://github.com/kubernetes/client-go/issues/193
 
 	// // Read the deployment YAML file
