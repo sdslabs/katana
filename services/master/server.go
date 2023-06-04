@@ -14,10 +14,12 @@ func Server() error {
 	fiberConfig := fiber.Config{
 		ReadTimeout:           5 * time.Second,
 		WriteTimeout:          30 * time.Second,
+		BodyLimit:             10 * 1024 * 1024,
 		DisableStartupMessage: false,
 	}
 
 	app := fiber.New(fiberConfig)
+
 	app.Use(cors.New())
 
 	corsConfig := cors.Config{
