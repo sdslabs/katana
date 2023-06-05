@@ -1,6 +1,6 @@
 kubeconfig = ""
 kubehost = "http://localhost"
-backendurl = "http://10.25.1.18"
+backendurl = "http://192.168.49.1"
 kubenamespace = "default"
 verbosity = 3
 
@@ -8,7 +8,7 @@ verbosity = 3
 deploymentlabel = "katana"
 broadcastcount = 2
 broadcastlabel = "broadcast"
-teamcount = 3
+teamcount = 2
 teamlabel = "ctfteam"
 manifest_dir = "manifests/templates"
 manifests = [
