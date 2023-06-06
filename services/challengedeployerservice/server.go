@@ -76,6 +76,62 @@ func CopyInPod(localFilePath string, pathInPod string) error {
 	return nil
 }
 
+func CreateService(chall_name, team_name string) error {
+
+	team_namespace := "katana-" + team_name + "-ns"
+
+	if err := GetClient(g.KatanaConfig.KubeConfig); err != nil {
+		return err
+	}
+
+	serviceClient := kubeclient.CoreV1().Services(team_namespace)
+
+	service := &v1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: team_namespace,
+			Name:      chall_name,
+		},
+
+		Spec: v1.ServiceSpec{
+			Type: v1.ServiceTypeNodePort,
+			Selector: map[string]string{
+				"app": chall_name,
+			},
+			Ports: []v1.ServicePort{
+				{
+					Name:     "http",
+					Protocol: v1.ProtocolTCP,
+					Port:     80,
+				},
+			},
+		},
+	}
+
+	//Check if service already exists
+	services, err := serviceClient.Get(context.TODO(), chall_name, metav1.GetOptions{})
+	if services.Name == chall_name {
+		fmt.Println("Service already exists for the challenge " + chall_name + " in namespace " + team_namespace)
+	}
+	if err != nil {
+		fmt.Println(" Error in getting services. ")
+		return err
+		// panic(err)
+	}
+
+	// Create Service
+	fmt.Println("Creating service...")
+	result, err := serviceClient.Create(context.TODO(), service, metav1.CreateOptions{})
+	if err != nil {
+		fmt.Println("Error creating service.. ")
+		return err
+		// panic(err)
+	}
+
+	fmt.Printf("Created service %q.\n", result.GetObjectMeta().GetName()+" in namespace "+team_namespace)
+
+	return nil
+}
+
 func DeployChallenge(chall_name, team_name string) error {
 
 	// chall_name = "notekeeper"
@@ -108,7 +164,7 @@ func DeployChallenge(chall_name, team_name string) error {
 			Name:      chall_name,
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: int32Ptr(2),
+			Replicas: int32Ptr(1),
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
 					"app": chall_name,
@@ -128,7 +184,7 @@ func DeployChallenge(chall_name, team_name string) error {
 							ImagePullPolicy: v1.PullPolicy("Never"),
 							Ports: []v1.ContainerPort{
 								{
-									Name:          "http",
+									Name:          "challenge-port",
 									Protocol:      v1.ProtocolTCP,
 									ContainerPort: 80,
 								},
@@ -160,7 +216,6 @@ func DeployChallenge(chall_name, team_name string) error {
 
 	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName()+" in namespace "+team_namespace)
 	return nil
-
 	// Trying this method of deployment by reading the YAML file , parsing it and then creating the deployment
 	// The above method also works, but this can be explored when mulitple challenges type are added later on
 	// https://github.com/kubernetes/client-go/issues/193

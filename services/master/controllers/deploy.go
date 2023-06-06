@@ -158,5 +158,7 @@ func Deploy(c *fiber.Ctx) error {
 	// 	deployer.DeployChallenge(foldername, "team-"+strconv.Itoa(i))
 	// }
 
+	deployer.CreateService("notekeeper", "team-0")
+
 	return c.SendString("Wrong file")
 }
