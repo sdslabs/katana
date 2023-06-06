@@ -139,6 +139,7 @@ func Deploy(c *fiber.Ctx) error {
 			clusterConfig := g.ClusterConfig
 			numberOfTeams := clusterConfig.TeamCount
 			for i := 0; i < int(numberOfTeams); i++ {
+				fmt.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
 				deployer.DeployChallenge(foldername, "team-"+strconv.Itoa(i))
 				deployer.CreateService(foldername, "team-"+strconv.Itoa(i))
 			}
@@ -160,7 +161,17 @@ func Deploy(c *fiber.Ctx) error {
 	//  deployer.CreateService(foldername, "team-"+strconv.Itoa(i))
 	// }
 
-	deployer.CreateService("notekeeper", "team-0")
+	//deployer.CreateService("notekeeper", "team-0")
 
 	return c.SendString("Wrong file")
+}
+
+func DeleteChallenge(c *fiber.Ctx) error {
+
+	chall_name := c.Params("chall_name")
+	//Delete chall directory also ?
+	fmt.Println("Challenge name is : " + chall_name)
+
+	deployer.DeleteChallenge(chall_name)
+	return c.SendString("Deleted challenge" + chall_name + "in all namespaces.")
 }

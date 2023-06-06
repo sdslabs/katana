@@ -40,16 +40,21 @@ func CreateService(chall_name, team_name string) error {
 		},
 	}
 
+	//Get all services
+
 	//Check if service already exists
-	services, err := serviceClient.Get(context.TODO(), chall_name, metav1.GetOptions{})
-	if services.Name == chall_name {
-		fmt.Println("Service already exists for the challenge " + chall_name + " in namespace " + team_namespace)
-		return nil
+	services, err := serviceClient.List(context.TODO(), metav1.ListOptions{})
+	for _, service := range services.Items {
+		if service.Name == chall_name {
+			fmt.Println("Service already exists for the challenge " + chall_name + " in namespace " + team_namespace)
+			return nil
+		}
 	}
+
 	if err != nil {
 		fmt.Println(" Error in getting services. ")
-		return err
-		// panic(err)
+		//return err
+		panic(err)
 	}
 
 	// Create Service
