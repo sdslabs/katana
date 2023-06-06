@@ -140,6 +140,7 @@ func Deploy(c *fiber.Ctx) error {
 			numberOfTeams := clusterConfig.TeamCount
 			for i := 0; i < int(numberOfTeams); i++ {
 				deployer.DeployChallenge(foldername, "team-"+strconv.Itoa(i))
+				deployer.CreateService(foldername, "team-"+strconv.Itoa(i))
 			}
 
 			//Copy challenge in pods and etc.
@@ -156,6 +157,7 @@ func Deploy(c *fiber.Ctx) error {
 	// numberOfTeams := clusterConfig.TeamCount
 	// for i := 0; i < int(numberOfTeams); i++ {
 	// 	deployer.DeployChallenge(foldername, "team-"+strconv.Itoa(i))
+	//  deployer.CreateService(foldername, "team-"+strconv.Itoa(i))
 	// }
 
 	deployer.CreateService("notekeeper", "team-0")
