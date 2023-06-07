@@ -13,21 +13,6 @@ import (
 	deployer "github.com/sdslabs/katana/services/challengedeployerservice"
 )
 
-// Run testdeploy for the basic pod copying test,change challdeploy to testdeploy in Deplloy
-func testdeploy(dirPath, challengename, challengetype string) {
-
-	dirPath, _ = os.Getwd()
-	pattern := `^(.*)/[^/]+/?$`
-	re := regexp.MustCompile(pattern)
-	matches := re.FindStringSubmatch(dirPath)
-	parentPath := matches[1]
-	//fmt.Println(parentPath)
-	localFilePath := parentPath + "/" + challengename + ".tar.gz"
-	pathInPod := "/opt/katana/katana_" + challengetype + "_" + challengename + ".tar.gz"
-	deployer.CopyInPod(localFilePath, pathInPod)
-
-}
-
 func challcopy(dirPath, challengename, challengetype string) {
 
 	localFilePath := dirPath + "/" + challengename + ".tar.gz"
@@ -101,7 +86,6 @@ func Deploy(c *fiber.Ctx) error {
 
 		// Loops through all challenges, if multiple uploaded :
 		for _, file := range files {
-			//fmt.Println(file.Filename, file.Size, file.Header["Content-Type"][0]) //prints uploaded file name and size
 
 			//creates folders for each challenge
 			pattern := `([^/]+)\.tar\.gz$`

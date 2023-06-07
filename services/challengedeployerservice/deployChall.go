@@ -12,29 +12,15 @@ import (
 
 func DeployChallenge(chall_name, team_name string) error {
 
-	// chall_name = "notekeeper"
-	// team_name = "team-0"
 	team_namespace := "katana-" + team_name + "-ns"
 
-	//fmt.Println("TEST 1")
 	if err := GetClient(g.KatanaConfig.KubeConfig); err != nil {
 		return err
 	}
-	//fmt.Println("TEST 2")
+
 	//Change namespace
 	deploymentsClient := kubeclient.AppsV1().Deployments(team_namespace)
 
-	//fmt.Println("TEST 3")
-	//Get and print all namespaces for testing
-	// namespaces, err := kubeclient.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// for i := 0; i < len(namespaces.Items); i++ {
-	// 	fmt.Println(namespaces.Items[i].Name)
-	// }
-
-	//fmt.Println("TEST 4")
 	// Creates Deployment object and deploys it
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -74,8 +60,6 @@ func DeployChallenge(chall_name, team_name string) error {
 		},
 	}
 
-	//fmt.Println("TEST 5")
-
 	//Check if deployment already exists
 	deps, err := deploymentsClient.Get(context.TODO(), chall_name, metav1.GetOptions{})
 	if deps.Name == chall_name {
@@ -94,36 +78,6 @@ func DeployChallenge(chall_name, team_name string) error {
 
 	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName()+" in namespace "+team_namespace)
 	return nil
-	// Trying this method of deployment by reading the YAML file , parsing it and then creating the deployment
-	// The above method also works, but this can be explored when mulitple challenges type are added later on
-	// https://github.com/kubernetes/client-go/issues/193
-
-	// // Read the deployment YAML file
-	// pwd, _ := os.Getwd()
-	// fmt.Println(pwd)
-	// deploymentYAML, err := ioutil.ReadFile("web_challenge.yaml")
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// // Open the deployment YAML file
-	// file, err := os.Open("web_challenge.yaml")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// defer file.Close()
-
-	// decoder := yaml.NewYAMLOrJSONDecoder(file, 4096)
-	// err = decoder.Decode(deployment)
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// fmt.Println("TEST 5")
-	// err = yaml.Unmarshal(deploymentYAML, deployment)
-	// if err != nil {
-	// 	panic(err)
-	// }
 
 }
 
