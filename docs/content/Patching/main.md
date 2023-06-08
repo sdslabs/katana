@@ -14,13 +14,18 @@ The patching service of katana makes use of a locally run git service called Gog
 {{<  toc  >}}
 
 ## Initialisation
-During initialisation (i.e. Infraset), the following stuff happens:
 
- - SSH key generation for the admin
- - SSH key generation for individual pods 
- - User creation on the local Gogs service for each of the team.
- - SSH public key added to each team's account on Gogs
-Gogs is in turn connected to a MySQL server wherein all of this data is actually stored.
+- ### Infraset
+During this time we estbalish MySQL, MongoDB and Gogs pods are created. 
+
+- ### Database Setup
+We establish connection with Mongo and MySQL. A mongoDB admin is established with team credentials. 
+
+- ### GitServer
+We hit the gogsIP/install which creates the gogs tables in the MySQL pod. If using a non-cloud based cluster (like minikube), establish a connection with LoadBalancer [```minikube tunnel```]. As of now you have to hit the Database setup one more time after GitServer to establish the admin user in Git 
+
+- ### Create Teams
+This creates the namespaces, the master pod for each pod. It also creates the user in Gogs database for each  team.
 
 ## Setting up a challenge
 
