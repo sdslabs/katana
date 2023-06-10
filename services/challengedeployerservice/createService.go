@@ -3,18 +3,19 @@ package challengedeployerservice
 import (
 	"context"
 	"fmt"
+	"os/exec"
 
 	g "github.com/sdslabs/katana/configs"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func CreateService(chall_name, team_name string) error {
+func CreateService(chall_name, team_name string) (string, error) {
 
 	team_namespace := "katana-" + team_name + "-ns"
 
 	if err := GetClient(g.KatanaConfig.KubeConfig); err != nil {
-		return err
+		return "", err
 	}
 
 	serviceClient := kubeclient.CoreV1().Services(team_namespace)
@@ -47,7 +48,7 @@ func CreateService(chall_name, team_name string) error {
 	for _, service := range services.Items {
 		if service.Name == chall_name {
 			fmt.Println("Service already exists for the challenge " + chall_name + " in namespace " + team_namespace)
-			return nil
+			return "", nil
 		}
 	}
 
@@ -62,11 +63,32 @@ func CreateService(chall_name, team_name string) error {
 	result, err := serviceClient.Create(context.TODO(), service, metav1.CreateOptions{})
 	if err != nil {
 		fmt.Println("Error creating service.. ")
-		return err
+		return "", err
 		// panic(err)
 	}
 
 	fmt.Printf("Created service %q.\n", result.GetObjectMeta().GetName()+" in namespace "+team_namespace)
 
-	return nil
+	// expose service to localhost
+	// TODO: change implementation when deploying on cluster
+	url, err := ExposeService(chall_name, team_namespace)
+	if err != nil {
+		fmt.Printf("Error in exposing service %s for namespace %s", chall_name, team_namespace)
+		fmt.Println("Error: ", err)
+		return "", err
+	}
+
+	fmt.Printf("Challenge for %s is deployed at %s", team_name, url)
+
+	return url, nil
+}
+
+func ExposeService(service_name, namespace string) (string, error) {
+	// run command to expose service minikube service <service_name> -n <namespace> --url
+	out := exec.Command("minikube", "service", service_name, "-n", namespace, "--url")
+	url, err := out.Output()
+	if err != nil {
+		return "", err
+	}
+	return string(url), nil
 }

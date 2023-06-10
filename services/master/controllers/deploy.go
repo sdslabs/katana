@@ -122,16 +122,23 @@ func Deploy(c *fiber.Ctx) error {
 			//For only testing this and not the /createTeams route, create 3 namespaces (katana-team-0-ns) (katana-team-1-ns) (katana-team-2-ns) manually
 			clusterConfig := g.ClusterConfig
 			numberOfTeams := clusterConfig.TeamCount
+			res := make([][]string, 0)
 			for i := 0; i < int(numberOfTeams); i++ {
 				fmt.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
-				deployer.DeployChallenge(foldername, "team-"+strconv.Itoa(i))
-				deployer.CreateService(foldername, "team-"+strconv.Itoa(i))
+				team_name := "team-" + strconv.Itoa(i)
+				deployer.DeployChallenge(foldername, team_name)
+				url, err := deployer.CreateService(foldername, team_name)
+				if err != nil {
+					res = append(res, []string{team_name, err.Error()})
+				} else {
+					res = append(res, []string{team_name, url})
+				}
 			}
 
 			//Copy challenge in pods and etc.
 			challcopy(newDirPath, foldername, challengetype)
 
-			return c.SendString("Deployed")
+			return c.JSON(res)
 		}
 	}
 	fmt.Println("Ending")
