@@ -12,7 +12,6 @@ import (
 	"github.com/sdslabs/katana/types"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -48,21 +47,6 @@ func GetPodByName(clientset *kubernetes.Clientset, podName string) (*v1.Pod, err
 	client := clientset.CoreV1()
 	podsInterface := client.Pods(g.KatanaConfig.KubeNameSpace)
 	return podsInterface.Get(context.Background(), podName, metav1.GetOptions{})
-}
-
-func GetPods(clientset *kubernetes.Clientset, lbls map[string]string) ([]v1.Pod, error) {
-	client := clientset.CoreV1()
-	podsInterface := client.Pods(g.KatanaConfig.KubeNameSpace)
-	filter := metav1.ListOptions{
-		LabelSelector: labels.Set(lbls).AsSelector().String(),
-	}
-
-	pods, err := podsInterface.List(context.Background(), filter)
-	if err != nil {
-		return nil, err
-	}
-
-	return pods.Items, nil
 }
 
 func GetTeamPodLabels() string {

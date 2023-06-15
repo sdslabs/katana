@@ -1,6 +1,6 @@
 kubeconfig = ""
-kubehost = "http://localhost"
-backendurl = "http://192.168.49.1"
+kubehost = "0.0.0.0"
+backendurl = "http://192.168.49.1:3000"
 kubenamespace = "default"
 verbosity = 3
 
@@ -8,7 +8,7 @@ verbosity = 3
 deploymentlabel = "katana"
 broadcastcount = 2
 broadcastlabel = "broadcast"
-teamcount = 2
+teamcount = 1
 teamlabel = "ctfteam"
 manifest_dir = "manifests/templates"
 manifests = [
@@ -23,7 +23,7 @@ manifests = [
 ]
 
 [services.api]
-host = "localhost"
+host = "0.0.0.0"
 port = 3000
 
 [services.challengedeployer]

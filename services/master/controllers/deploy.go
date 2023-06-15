@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/mholt/archiver/v3"
 	g "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/lib/utils"
 	deployer "github.com/sdslabs/katana/services/challengedeployerservice"
 )
 
@@ -18,7 +19,7 @@ func challcopy(dirPath, challengename, challengetype string) {
 	localFilePath := dirPath + "/" + challengename + ".tar.gz"
 	pathInPod := "/opt/katana/katana_" + challengetype + "_" + challengename + ".tar.gz"
 	fmt.Println("Testing" + localFilePath + "....and..." + pathInPod)
-	//deployer.CopyInPod(localFilePath, pathInPod)
+	deployer.CopyInPod(localFilePath, pathInPod)
 
 }
 
@@ -125,8 +126,8 @@ func Deploy(c *fiber.Ctx) error {
 			res := make([][]string, 0)
 			for i := 0; i < int(numberOfTeams); i++ {
 				fmt.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
-				team_name := "team-" + strconv.Itoa(i)
-				deployer.DeployChallenge(foldername, team_name)
+				team_name := "katana-team-" + strconv.Itoa(i)
+				utils.DeployChallenge(foldername, team_name, false)
 				url, err := deployer.CreateService(foldername, team_name)
 				if err != nil {
 					res = append(res, []string{team_name, err.Error()})

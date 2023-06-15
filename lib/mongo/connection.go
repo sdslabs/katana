@@ -13,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
+var ctx, _ = context.WithTimeout(context.Background(), 20*time.Second)
 var client, err = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+configs.MongoConfig.Username+":"+configs.MongoConfig.Password+"@"+configs.ServicesConfig.ChallengeDeployer.Host+":"+configs.MongoConfig.Port+"/?directConnection=true&appName=mongosh+"+configs.MongoConfig.Version))
 var link = client.Database(projectDatabase)
 

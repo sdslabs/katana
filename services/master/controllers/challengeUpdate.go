@@ -64,24 +64,31 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	}
 
 	log.Println("Pull successful for", teamName, ". Building image...")
-
-	// Build the challenge with Dockerfile
+	patchone,err := exec.Command("docker","inspect","katana-team-1/notekeeper").Output()
 	cmd := exec.Command("docker", "build", "-t", dir, "./teams/"+dir)
+		cmd.Run()
+	cmd = exec.Command("minikube", "image", "load", dir)
 	cmd.Run()
-
-	// Create a labelSelector to get the challenge pod
-
-	labelSelector := metav1.LabelSelector{
-		MatchLabels: map[string]string{
-			"app": teamName + "_" + challengeName,
-		},
-	}
-	// Delete the challenge pod
-	err = client.CoreV1().Pods(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{
-		LabelSelector: metav1.FormatLabelSelector(&labelSelector),
-	})
-	if err != nil {
+	if(err!=nil){
 		log.Println(err)
+	}
+	if(len(patchone)<=3){
+		log.Println("First Patch Found")
+		utils.DeployChallenge(challengeName, teamName, true)
+	} else{	
+		labelSelector := metav1.LabelSelector{
+			MatchLabels: map[string]string{
+				"app": teamName + "_" + challengeName,
+			},
+		}
+		// Delete the challenge pod
+		err = client.CoreV1().Pods(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{
+			LabelSelector: metav1.FormatLabelSelector(&labelSelector),
+		})
+		if err != nil {
+			log.Println("Error")
+			log.Println(err)
+		}
 	}
 	return c.SendString("Challenge updated")
 
