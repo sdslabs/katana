@@ -64,21 +64,22 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	}
 
 	log.Println("Pull successful for", teamName, ". Building image...")
-	patchone,err := exec.Command("docker","inspect","katana-team-1/notekeeper").Output()
+	patchone, err := exec.Command("docker", "inspect", dir).Output()
 	cmd := exec.Command("docker", "build", "-t", dir, "./teams/"+dir)
-		cmd.Run()
+	cmd.Run()
 	cmd = exec.Command("minikube", "image", "load", dir)
 	cmd.Run()
-	if(err!=nil){
+	if err != nil {
 		log.Println(err)
 	}
-	if(len(patchone)<=3){
-		log.Println("First Patch Found")
+	if len(patchone) <= 3 {
+		log.Println("First Patch for", teamName)
 		utils.DeployChallenge(challengeName, teamName, true)
-	} else{	
+	} else {
+		log.Println("Not remaking", teamName)
 		labelSelector := metav1.LabelSelector{
 			MatchLabels: map[string]string{
-				"app": teamName + "_" + challengeName,
+				"app": challengeName,
 			},
 		}
 		// Delete the challenge pod
@@ -90,6 +91,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 			log.Println(err)
 		}
 	}
+	log.Println("Image built for", teamName)
 	return c.SendString("Challenge updated")
 
 }

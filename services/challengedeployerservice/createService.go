@@ -13,9 +13,9 @@ import (
 
 func CreateService(chall_name, team_name string) (string, error) {
 
-	team_namespace := "katana-" + team_name + "-ns"
+	team_namespace := team_name + "-ns"
 	kubeclient, err := utils.GetClient(g.KatanaConfig.KubeConfig)
-	if  err != nil {
+	if err != nil {
 		return "", err
 	}
 	serviceClient := kubeclient.CoreV1().Services(team_namespace)

@@ -21,26 +21,35 @@ func DeployChallenge(chall_name, team_name string, patched bool) error {
 	team_namespace := team_name + "-ns"
 
 	log.Println(team_namespace)
-	kubeclient,err := GetClient(g.KatanaConfig.KubeConfig)
+	kubeclient, err := GetClient(g.KatanaConfig.KubeConfig)
 	if err != nil {
 		return err
 	}
 
 	deploymentsClient := kubeclient.AppsV1().Deployments(team_namespace)
 	imageName := chall_name + ":latest"
-	if(patched){
-		//Delete deployment
-		fmt.Println("Deleting initial deployment...")
-		deletePolicy := metav1.DeletePropagationForeground
-		err = deploymentsClient.Delete(context.TODO(), chall_name, metav1.DeleteOptions{PropagationPolicy: &deletePolicy})
-		if(err != nil){
-			fmt.Println("Error in deleting deployment.")
-			log.Println(err)
-		}
-	
-		imageName = team_name + "/" + chall_name
+	if patched {
+		/// Retrieve the existing deployment
+        existingDeployment, err := deploymentsClient.Get(context.TODO(), chall_name, metav1.GetOptions{})
+        if err != nil {
+            fmt.Println("Error in retrieving existing deployment.")
+            log.Println(err)
+            return err
+        }
+
+        existingDeployment.Spec.Template.Spec.Containers[0].Image = team_name + "/" + chall_name
+
+        _, err = deploymentsClient.Update(context.TODO(), existingDeployment, metav1.UpdateOptions{})
+        if err != nil {
+            fmt.Println("Error in updating deployment.")
+            log.Println(err)
+            return err
+        }
+
+        fmt.Println("Updated deployment with new image.")
+        return nil
 	}
-	
+
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: team_namespace,
@@ -63,7 +72,7 @@ func DeployChallenge(chall_name, team_name string, patched bool) error {
 					Containers: []v1.Container{
 						{
 							Name:            chall_name + "-" + team_name,
-							Image:            imageName,
+							Image:           imageName,
 							ImagePullPolicy: v1.PullPolicy("Never"),
 							Ports: []v1.ContainerPort{
 								{
@@ -93,7 +102,7 @@ func DeployChallenge(chall_name, team_name string, patched bool) error {
 
 func int32Ptr(i int32) *int32 { return &i }
 
-func GetClient(pathToCfg string) (*kubernetes.Clientset,error) {
+func GetClient(pathToCfg string) (*kubernetes.Clientset, error) {
 	if pathToCfg == "" {
 		pathToCfg = filepath.Join(
 			os.Getenv("HOME"), ".kube", "config",
@@ -101,14 +110,14 @@ func GetClient(pathToCfg string) (*kubernetes.Clientset,error) {
 	}
 	config, err := clientcmd.BuildConfigFromFlags("", pathToCfg)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	client, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-	return client,nil
+	return client, nil
 }
 
 func GetPods(lbls map[string]string, ns ...string) ([]v1.Pod, error) {
@@ -120,9 +129,9 @@ func GetPods(lbls map[string]string, ns ...string) ([]v1.Pod, error) {
 	}
 
 	selector := labels.SelectorFromSet(lbls)
-	kubeclient,err := GetClient(g.KatanaConfig.KubeConfig)
+	kubeclient, err := GetClient(g.KatanaConfig.KubeConfig)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	pods, err := kubeclient.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{
 		LabelSelector: selector.String(),
