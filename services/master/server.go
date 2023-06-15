@@ -21,7 +21,7 @@ func Server() error {
 	app := fiber.New(fiberConfig)
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:44859",
+		AllowOrigins: "*",
 	}))
 
 	corsConfig := cors.Config{
