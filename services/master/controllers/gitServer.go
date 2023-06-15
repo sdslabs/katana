@@ -77,6 +77,6 @@ func GitServer(c *fiber.Ctx) error {
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("error while setting up Git Server")
 	}
-
+	
 	return c.SendString("Git Server setup completed\n")
 }

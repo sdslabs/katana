@@ -20,6 +20,7 @@ func challcopy(dirPath, challengename, challengetype string) {
 	pathInPod := "/opt/katana/katana_" + challengetype + "_" + challengename + ".tar.gz"
 	fmt.Println("Testing" + localFilePath + "....and..." + pathInPod)
 	deployer.CopyInPod(localFilePath, pathInPod)
+	deployer.CopyInPod(localFilePath, pathInPod)
 
 }
 
