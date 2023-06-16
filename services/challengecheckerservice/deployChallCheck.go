@@ -7,6 +7,7 @@ import (
 
 	g "github.com/sdslabs/katana/configs"
 	batchv1 "k8s.io/api/batch/v1"
+	batchv1beta "k8s.io/api/batch/v1beta1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -18,33 +19,34 @@ func DeployChallChecker(chall_name, port, team_namespace string) error {
 		return err
 	}
 
-	jobs := kubeclient.BatchV1().CronJobs(namespace)
+	jobs := kubeclient.BatchV1beta1().CronJobs(namespace)
 
-	jobSpec := &batchv1.CronJob{
+	jobSpec := &batchv1beta.CronJob{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      chall_name + "-checker",
 			Namespace: namespace,
 		},
-		Spec: batchv1.CronJobSpec{
+		Spec: batchv1beta.CronJobSpec{
 			Schedule: "* */2 * * *",
-			JobTemplate: batchv1.JobTemplateSpec{
+			JobTemplate: batchv1beta.JobTemplateSpec{
 				Spec: batchv1.JobSpec{
 					Template: v1.PodTemplateSpec{
 						Spec: v1.PodSpec{
 							Containers: []v1.Container{
 								{
 
-									Name:  chall_name + "-checker",
-									Image: "sdslabs/katana-chall-checker:latest",
+									Name:            chall_name + "-checker",
+									Image:           chall_name + "-checker:latest",
+									ImagePullPolicy: v1.PullPolicy("Never"),
 									Env: []v1.EnvVar{
 										{
 											Name:  "URL",
 											Value: "http://" + chall_name + "." + team_namespace + ".svc.cluster.local:" + port,
 										},
 									},
-									// Command: []string{"python3", "checker.py"},
 								},
 							},
+							RestartPolicy: v1.RestartPolicyNever,
 						},
 					},
 				},

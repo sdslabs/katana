@@ -14,7 +14,7 @@ func Server() error {
 	fiberConfig := fiber.Config{
 		ReadTimeout:           5 * time.Second,
 		WriteTimeout:          30 * time.Second,
-		BodyLimit:             10 * 1024 * 1024,
+		BodyLimit:             50 * 1024 * 1024,
 		DisableStartupMessage: false,
 	}
 
@@ -45,6 +45,7 @@ func Server() error {
 	admin.Post("/challengeUpdate", c.ChallengeUpdate)
 	admin.Post("/logs", c.Logs)
 	admin.Post("/deploy", c.Deploy)
+	admin.Post("/deployCheckers", c.DeployCheckers)
 	admin.Get("/gitServer", c.GitServer)
 	admin.Get("/cluster/:id", c.ClusterInfo)
 	admin.Get("/deleteChallenge/:chall_name", c.DeleteChallenge)
