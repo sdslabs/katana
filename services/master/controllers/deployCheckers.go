@@ -20,7 +20,7 @@ func DeployCheckers(c *fiber.Ctx) error {
 			fmt.Println(token[0])
 			c.SendString("Test a")
 		}
-		checkerFiles := form.File["challengeChecker"]
+		checkerFiles := form.File["challengeCheckeryOOO"]
 		// if len(challengeFiles) != len(checkerFiles) {
 		// 	return c.SendString(fmt.Sprintf("No. of challenge files and checker files should be same! Got %d challenge files and %d checker files", len(challengeFiles), len(checkerFiles)))
 		// }
