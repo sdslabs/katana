@@ -66,6 +66,7 @@ type MySQLCfg struct {
 type KatanaCfg struct {
 	KubeHost      string              `toml:"kubehost"`
 	BackendUrl    string              `toml:"backendurl"`
+	RootDirectory string 			  `toml:"rootdirectory"`
 	KubeNameSpace string              `toml:"kubenamespace"`
 	KubeConfig    string              `toml:"kubeconfig"`
 	LogFile       string              `toml:"logfile"`
