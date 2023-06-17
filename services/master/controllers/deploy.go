@@ -27,7 +27,7 @@ func buildimage(foldername string) {
 	// Build the challenge with Dockerfile
 	dirPath, _ := os.Getwd()
 	fmt.Println("Dockerfile for the image is at :")
-	fmt.Println(dirPath + "/chall/" + foldername + "/" + foldername)
+	fmt.Println(dirPath + "/challenges/" + foldername + "/" + foldername)
 	cmd := exec.Command("docker", "build", "-t", foldername, dirPath+"/chall/"+foldername+"/"+foldername)
 	cmd2 := exec.Command("minikube", "image", "load", foldername)
 	cmd.Run()
@@ -37,13 +37,13 @@ func buildimage(foldername string) {
 func createfolder(challengename string) (message int, newDirPath string) {
 
 	basePath, _ := os.Getwd()
-	dirPath := basePath + "/chall" //basepath is .../katana
+	dirPath := basePath + "/challenges" //basepath is .../katana
 
-	// Open the chall directory to check if it exists , create if not
+	// Open the challenges directory to check if it exists , create if not
 	dir, err := os.Open(dirPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			fmt.Println("Chall directory does not exist ,creating directory")
+			fmt.Println("Challenges directory does not exist ,creating directory")
 			os.Mkdir(dirPath, 0777)
 		} else if os.IsPermission(err) {
 			fmt.Println("Error opening challenge directory. Permission Issue", err)
@@ -104,12 +104,12 @@ func Deploy(c *fiber.Ctx) error {
 			}
 
 			//save to disk in that directory
-			if err := c.SaveFile(file, fmt.Sprintf("./chall/%s/%s", foldername, file.Filename)); err != nil {
+			if err := c.SaveFile(file, fmt.Sprintf("./challenges/%s/%s", foldername, file.Filename)); err != nil {
 				return err
 			}
 
 			//extract the tar.gz file
-			err := archiver.Unarchive("./chall/"+foldername+"/"+file.Filename, "./chall/"+foldername)
+			err := archiver.Unarchive("./challenges/"+foldername+"/"+file.Filename, "./chall/"+foldername)
 			if err != nil {
 				fmt.Println("Error in unarchiving", err)
 				return c.SendString("Error in unarchiving")

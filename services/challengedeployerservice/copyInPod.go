@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"regexp"
 
 	"github.com/go-git/go-git/v5"
@@ -41,10 +40,6 @@ func CopyInPod(localFilePath string, pathInPod string) error {
 			URLs: []string{"http://sdslabs@" + utils.GetGogsIp() + ":18080" + "/" + path}}
 		_, err = repo.CreateRemote(remoteConfig)
 
-		if err != nil {
-			log.Println(err)
-		}
-		err = exec.Command("touch teams/" + path + "/challenge.yaml").Run()
 		if err != nil {
 			log.Println(err)
 		}

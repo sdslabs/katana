@@ -54,3 +54,5 @@ func randomChars(n int) (string, error) {
 func RandomSalt() (string, error) {
 	return randomChars(10)
 }
+
+func int32Ptr(i int32) *int32 { return &i }

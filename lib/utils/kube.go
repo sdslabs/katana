@@ -12,6 +12,7 @@ import (
 	"github.com/sdslabs/katana/types"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -33,20 +34,47 @@ func GetKubeConfig() (*rest.Config, error) {
 	return clientcmd.BuildConfigFromFlags("", pathToCfg)
 }
 
-// GetKubeClient returns a kubernetes clientset
-func GetKubeClient() (*kubernetes.Clientset, error) {
-	config, err := GetKubeConfig()
+// GetClient returns a kubernetes clientset
+
+func GetClient(pathToCfg string) (*kubernetes.Clientset, error) {
+	if pathToCfg == "" {
+		pathToCfg = filepath.Join(
+			os.Getenv("HOME"), ".kube", "config",
+		)
+	}
+	config, err := clientcmd.BuildConfigFromFlags("", pathToCfg)
 	if err != nil {
 		return nil, err
 	}
 
-	return kubernetes.NewForConfig(config)
+	client, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
 }
 
-func GetPodByName(clientset *kubernetes.Clientset, podName string) (*v1.Pod, error) {
-	client := clientset.CoreV1()
-	podsInterface := client.Pods(g.KatanaConfig.KubeNameSpace)
-	return podsInterface.Get(context.Background(), podName, metav1.GetOptions{})
+func GetPods(lbls map[string]string, ns ...string) ([]v1.Pod, error) {
+	var namespace string
+	if len(ns) == 0 {
+		namespace = g.KatanaConfig.KubeNameSpace
+	} else {
+		namespace = ns[0]
+	}
+
+	selector := labels.SelectorFromSet(lbls)
+	kubeclient, err := GetClient(g.KatanaConfig.KubeConfig)
+	if err != nil {
+		return nil, err
+	}
+	pods, err := kubeclient.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: selector.String(),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return pods.Items, nil
 }
 
 func GetTeamPodLabels() string {
@@ -58,7 +86,7 @@ func GetTeamNumber() int {
 }
 
 func GetMongoIP() string {
-	client, err := GetKubeClient()
+	client, err := GetClient("")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -78,7 +106,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 		return err
 	}
 
-	client, err := GetKubeClient()
+	client, err := GetClient("")
 	if err != nil {
 		return err
 	}
@@ -153,7 +181,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 }
 
 func GetGogsIp() string {
-	client, err := GetKubeClient()
+	client, err := GetClient("")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -66,7 +66,7 @@ type MySQLCfg struct {
 type KatanaCfg struct {
 	KubeHost      string              `toml:"kubehost"`
 	BackendUrl    string              `toml:"backendurl"`
-	RootDirectory string 			  `toml:"rootdirectory"`
+	RootDirectory string              `toml:"rootdirectory"`
 	KubeNameSpace string              `toml:"kubenamespace"`
 	KubeConfig    string              `toml:"kubeconfig"`
 	LogFile       string              `toml:"logfile"`
@@ -76,4 +76,5 @@ type KatanaCfg struct {
 	TeamVmConfig  TeamChallengeConfig `toml:"teamvm"`
 	AdminConfig   AdminCfg            `toml:"admin"`
 	MySQL         MySQLCfg            `toml:"mysql"`
+	TimeOut       int                 `toml:"timeout"`
 }

@@ -26,7 +26,7 @@ type GogsRequest struct {
 }
 
 func ChallengeUpdate(c *fiber.Ctx) error {
-	client, err := utils.GetKubeClient()
+	client, err := utils.GetClient("")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -64,7 +64,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	}
 
 	log.Println("Pull successful for", teamName, ". Building image...")
-	patchone, err := exec.Command("docker", "inspect", dir).Output()
+	FirstPatch, err := exec.Command("docker", "inspect", dir).Output()
 	cmd := exec.Command("docker", "build", "-t", dir, "./teams/"+dir)
 	cmd.Run()
 	cmd = exec.Command("minikube", "image", "load", dir)
@@ -72,7 +72,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	if err != nil {
 		log.Println(err)
 	}
-	if len(patchone) <= 3 {
+	if len(FirstPatch) <= 3 {
 		log.Println("First Patch for", teamName)
 		utils.DeployChallenge(challengeName, teamName, true)
 	} else {

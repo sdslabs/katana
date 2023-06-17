@@ -17,7 +17,7 @@ import (
 func GitServer(c *fiber.Ctx) error {
 	var requestBody bytes.Buffer
 	writer := multipart.NewWriter(&requestBody)
-	kubeclient, err := utils.GetKubeClient()
+	kubeclient, err := utils.GetClient("")
 	if err != nil {
 		log.Println(err)
 	}

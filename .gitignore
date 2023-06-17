@@ -12,4 +12,3 @@ vendor/*
 *.log
 teams
 teamcreds.txt
-chall/*
