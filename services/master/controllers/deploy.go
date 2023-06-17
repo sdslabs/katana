@@ -75,13 +75,6 @@ func Deploy(c *fiber.Ctx) error {
 	fmt.Println("Starting")
 	if form, err := c.MultipartForm(); err == nil {
 
-		//sort this
-		if token := form.Value["token"]; len(token) > 0 {
-			// Get key value:
-			fmt.Println(token[0])
-			c.SendString("Test a")
-		}
-
 		files := form.File["challenge"]
 
 		// Loops through all challenges, if multiple uploaded :
