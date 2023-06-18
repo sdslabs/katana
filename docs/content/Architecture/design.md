@@ -16,4 +16,4 @@ Challenges are pods that are deployed into the team's namespace. On patching, th
 
 Katana has its own namespace. This namespace is used to deploy Katana components. These components include flag handler service, challenge checker service, logging service, git server. We will discuss these components in more detail in the next section.
 
-{{< img name="arch" size="large" lazy=false >}} // Not working
+![Image not found](/arch.png)
