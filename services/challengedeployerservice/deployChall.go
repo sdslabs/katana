@@ -10,7 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func DeployChallenge(chall_name, team_name string) error {
+func DeployChallenge(chall_name, team_name string, replicas int32) error {
 
 	team_namespace := "katana-" + team_name + "-ns"
 
@@ -28,7 +28,7 @@ func DeployChallenge(chall_name, team_name string) error {
 			Name:      chall_name,
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: int32Ptr(1),
+			Replicas: &replicas,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
 					"app": chall_name,
@@ -80,5 +80,3 @@ func DeployChallenge(chall_name, team_name string) error {
 	return nil
 
 }
-
-func int32Ptr(i int32) *int32 { return &i }

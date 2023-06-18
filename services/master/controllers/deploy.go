@@ -119,7 +119,7 @@ func Deploy(c *fiber.Ctx) error {
 			for i := 0; i < int(numberOfTeams); i++ {
 				fmt.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
 				team_name := "team-" + strconv.Itoa(i)
-				deployer.DeployChallenge(foldername, team_name)
+				deployer.DeployChallenge(foldername, team_name, 1)
 				url, err := deployer.CreateService(foldername, team_name)
 				if err != nil {
 					res = append(res, []string{team_name, err.Error()})
