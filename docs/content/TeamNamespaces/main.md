@@ -16,29 +16,22 @@ To deploy the database, you first need to set up the infrastructure with the hel
 
 The following code in the `createTeams.go` controller is responsible for creating the namespaces for the teams and deploying the required resources into the namespaces.
 
+This function can be found in the create teams controller, in the CreateTeams function.
 ```Golang
-func CreateTeams(c *fiber.Ctx) error {
-
-	// if !utils.VerifyToken(c) {
-	// 	return c.SendString("Unauthorized")
-	// }
-
-	clusterConfig := g.ClusterConfig
-	client, err := utils.GetKubeClient()
-	if err != nil {
-		log.Println(err)
-	}
-	noOfTeams, err := strconv.Atoi(c.Params("number"))
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for i := 0; i < noOfTeams; i++ {
+		// Create a directory named katana-team-i in the teams directory
+		if _, err := os.Stat("teams/katana-team-" + strconv.Itoa(i)); os.IsNotExist(err) {
+			errDir := os.Mkdir("teams/katana-team-"+strconv.Itoa(i), 0755)
+			if errDir != nil {
+				log.Fatal(err)
+			}
+		}
+
 		log.Println("Creating Team: " + strconv.Itoa(i))
+		namespace := "katana-team-" + strconv.Itoa(i) + "-ns"
 		nsName := &coreV1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: "katana-team-ns-" + strconv.Itoa(i),
+				Name: namespace,
 			},
 		}
 		_, err = client.CoreV1().Namespaces().Create(c.Context(), nsName, metav1.CreateOptions{})
@@ -62,10 +55,8 @@ func CreateTeams(c *fiber.Ctx) error {
 		if err != nil {
 			log.Fatal(err)
 		}
-		if err = deployment.ApplyManifest(config, client, manifest.Bytes(), "katana-team-ns-"+strconv.Itoa(i)); err != nil {
+		if err = deployment.ApplyManifest(config, client, manifest.Bytes(), namespace); err != nil {
 			return err
 		}
 	}
-	return c.SendString("Successfully created teams")
-}
 ```
