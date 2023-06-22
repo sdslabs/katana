@@ -81,6 +81,15 @@ func DeployChallenge(ChallengeName, TeamName string, FirstPatch bool, replicas i
 		},
 	}
 
+	//Check if deployment already exists
+	deps, err := deploymentsClient.Get(context.TODO(), ChallengeName, metav1.GetOptions{})
+	if deps.Name == ChallengeName {
+		fmt.Println("Deployment already exists for the challenge " + ChallengeName + " in namespace " + TeamNamespace)
+		return nil
+	}
+
+	// Create Deployment
+	fmt.Println("Creating deployment...")
 	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
 
 	if err != nil {
