@@ -74,7 +74,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	}
 	if len(FirstPatch) <= 3 {
 		log.Println("First Patch for", teamName)
-		utils.DeployChallenge(challengeName, teamName, true)
+		utils.DeployChallenge(challengeName, teamName, true, 1)
 	} else {
 		log.Println("Not remaking", teamName)
 		labelSelector := metav1.LabelSelector{

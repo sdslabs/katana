@@ -76,13 +76,6 @@ func Deploy(c *fiber.Ctx) error {
 	fmt.Println("Starting")
 	if form, err := c.MultipartForm(); err == nil {
 
-		//sort this
-		if token := form.Value["token"]; len(token) > 0 {
-			// Get key value:
-			fmt.Println(token[0])
-			c.SendString("Test a")
-		}
-
 		files := form.File["challenge"]
 
 		// Loops through all challenges, if multiple uploaded :
@@ -127,7 +120,7 @@ func Deploy(c *fiber.Ctx) error {
 			for i := 0; i < int(numberOfTeams); i++ {
 				fmt.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
 				team_name := "katana-team-" + strconv.Itoa(i)
-				utils.DeployChallenge(foldername, team_name, false)
+				utils.DeployChallenge(foldername, team_name, false, 1)
 				url, err := deployer.CreateService(foldername, team_name)
 				if err != nil {
 					res = append(res, []string{team_name, err.Error()})

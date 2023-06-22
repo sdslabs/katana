@@ -11,7 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func DeployChallenge(ChallengeName, TeamName string, FirstPatch bool) error {
+func DeployChallenge(ChallengeName, TeamName string, FirstPatch bool, replicas int32) error {
 
 	TeamNamespace := TeamName + "-ns"
 	kubeclient, err := GetClient(g.KatanaConfig.KubeConfig)
@@ -49,7 +49,7 @@ func DeployChallenge(ChallengeName, TeamName string, FirstPatch bool) error {
 			Name:      ChallengeName,
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: int32Ptr(1),
+			Replicas: &replicas,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
 					"app": ChallengeName,
