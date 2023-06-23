@@ -19,7 +19,7 @@ func DeleteChallenge(chall_name string) error {
 		team_name := "team-" + strconv.Itoa(i)
 
 		team_namespace := "katana-" + team_name + "-ns"
-		kubeclient, err := utils.GetClient(g.KatanaConfig.KubeConfig)
+		kubeclient, err := utils.GetKubeClient(g.KatanaConfig.KubeConfig)
 		if err != nil {
 			return err
 		}

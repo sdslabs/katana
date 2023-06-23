@@ -5,7 +5,7 @@ rootdirectory = "/opt/katana"
 kubenamespace = "default"
 verbosity = 3
 timeout = 20
-
+numberofdeployements = 1
 [cluster]
 deploymentlabel = "katana"
 broadcastcount = 2

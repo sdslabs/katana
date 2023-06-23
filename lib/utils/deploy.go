@@ -11,26 +11,26 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func DeployChallenge(ChallengeName, TeamName string, FirstPatch bool, replicas int32) error {
+func DeployChallenge(challengeName, teamName string, firstPatch bool, replicas int32) error {
 
-	TeamNamespace := TeamName + "-ns"
-	kubeclient, err := GetClient(g.KatanaConfig.KubeConfig)
+	teamNamespace := teamName + "-ns"
+	kubeclient, err := GetKubeClient(g.KatanaConfig.KubeConfig)
 	if err != nil {
 		return err
 	}
 
-	deploymentsClient := kubeclient.AppsV1().Deployments(TeamNamespace)
-	imageName := ChallengeName + ":latest"
-	if FirstPatch {
+	deploymentsClient := kubeclient.AppsV1().Deployments(teamNamespace)
+	imageName := challengeName + ":latest"
+	if firstPatch {
 		/// Retrieve the existing deployment
-		existingDeployment, err := deploymentsClient.Get(context.TODO(), ChallengeName, metav1.GetOptions{})
+		existingDeployment, err := deploymentsClient.Get(context.TODO(), challengeName, metav1.GetOptions{})
 		if err != nil {
 			fmt.Println("Error in retrieving existing deployment.")
 			log.Println(err)
 			return err
 		}
 
-		existingDeployment.Spec.Template.Spec.Containers[0].Image = TeamName + "/" + ChallengeName
+		existingDeployment.Spec.Template.Spec.Containers[0].Image = teamName + "/" + challengeName
 
 		_, err = deploymentsClient.Update(context.TODO(), existingDeployment, metav1.UpdateOptions{})
 		if err != nil {
@@ -43,28 +43,28 @@ func DeployChallenge(ChallengeName, TeamName string, FirstPatch bool, replicas i
 		return nil
 	}
 
-	deployment := &appsv1.Deployment{
+	manifest := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: TeamNamespace,
-			Name:      ChallengeName,
+			Namespace: teamNamespace,
+			Name:      challengeName,
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: &replicas,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					"app": ChallengeName,
+					"app": challengeName,
 				},
 			},
 			Template: v1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"app": ChallengeName,
+						"app": challengeName,
 					},
 				},
 				Spec: v1.PodSpec{
 					Containers: []v1.Container{
 						{
-							Name:            ChallengeName + "-" + TeamName,
+							Name:            challengeName + "-" + teamName,
 							Image:           imageName,
 							ImagePullPolicy: v1.PullPolicy("Never"),
 							Ports: []v1.ContainerPort{
@@ -82,22 +82,22 @@ func DeployChallenge(ChallengeName, TeamName string, FirstPatch bool, replicas i
 	}
 
 	//Check if deployment already exists
-	deps, err := deploymentsClient.Get(context.TODO(), ChallengeName, metav1.GetOptions{})
-	if deps.Name == ChallengeName {
-		fmt.Println("Deployment already exists for the challenge " + ChallengeName + " in namespace " + TeamNamespace)
+	deployment, err := deploymentsClient.Get(context.TODO(), challengeName, metav1.GetOptions{})
+	if deployment.Name == challengeName {
+		fmt.Println("Deployment already exists for the challenge " + challengeName + " in namespace " + teamNamespace)
 		return nil
 	}
 
 	// Create Deployment
 	fmt.Println("Creating deployment...")
-	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
+	result, err := deploymentsClient.Create(context.TODO(), manifest, metav1.CreateOptions{})
 
 	if err != nil {
 		fmt.Println("Unable to create deployement")
 		panic(err)
 	}
 
-	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName()+" in namespace "+TeamNamespace)
+	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName()+" in namespace "+teamNamespace)
 	return nil
 
 }

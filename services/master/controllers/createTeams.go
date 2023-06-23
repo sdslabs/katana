@@ -26,7 +26,7 @@ func CreateTeams(c *fiber.Ctx) error {
 	// }
 
 	clusterConfig := g.ClusterConfig
-	client, err := utils.GetClient("")
+	client, err := utils.GetKubeClient("")
 	if err != nil {
 		log.Println(err)
 	}

@@ -101,7 +101,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	kubeClientset, err = utils.GetClient("")
+	kubeClientset, err = utils.GetKubeClient("")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -26,7 +26,9 @@ type GogsRequest struct {
 }
 
 func ChallengeUpdate(c *fiber.Ctx) error {
-	client, err := utils.GetClient("")
+	replicas := g.KatanaConfig.TeamDeployement
+	client, err := utils.GetKubeClient("")
+	patch := true
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -74,9 +76,9 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	}
 	if len(FirstPatch) <= 3 {
 		log.Println("First Patch for", teamName)
-		utils.DeployChallenge(challengeName, teamName, true, 1)
+		utils.DeployChallenge(challengeName, teamName, patch, replicas)
 	} else {
-		log.Println("Not remaking", teamName)
+		log.Println("Not the first patch for", teamName, ". Simply deploying the image...")
 		labelSelector := metav1.LabelSelector{
 			MatchLabels: map[string]string{
 				"app": challengeName,
