@@ -8,6 +8,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/sdslabs/katana/configs"
+	g "github.com/sdslabs/katana/configs"
 )
 
 var db *sql.DB
@@ -23,7 +24,7 @@ func setup() {
 	if err != nil {
 		log.Println("MySQL connection was not established")
 		log.Println("Error: ", err)
-		time.Sleep(5 * time.Second)
+		time.Sleep(time.Duration(g.KatanaConfig.TimeOut) * time.Second)
 		setup()
 	} else {
 		log.Println("MySQL Connection Established")

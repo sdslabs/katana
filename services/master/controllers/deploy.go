@@ -8,8 +8,9 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/mholt/archiver/v3"
+	archiver "github.com/mholt/archiver/v3"
 	g "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/lib/utils"
 	deployer "github.com/sdslabs/katana/services/challengedeployerservice"
 )
 
@@ -18,17 +19,17 @@ func challcopy(dirPath, challengename, challengetype string) {
 	localFilePath := dirPath + "/" + challengename + ".tar.gz"
 	pathInPod := "/opt/katana/katana_" + challengetype + "_" + challengename + ".tar.gz"
 	fmt.Println("Testing" + localFilePath + "....and..." + pathInPod)
-	//deployer.CopyInPod(localFilePath, pathInPod)
+	deployer.CopyInPod(localFilePath, pathInPod)
 
 }
 
-func buildimage(foldername string) {
+func buildimage(folderName string) {
 	// Build the challenge with Dockerfile
 	dirPath, _ := os.Getwd()
 	fmt.Println("Dockerfile for the image is at :")
-	fmt.Println(dirPath + "/chall/" + foldername + "/" + foldername)
-	cmd := exec.Command("docker", "build", "-t", foldername, dirPath+"/chall/"+foldername+"/"+foldername)
-	cmd2 := exec.Command("minikube", "image", "load", foldername)
+	fmt.Println(dirPath + "/challenges/" + folderName + "/" + folderName)
+	cmd := exec.Command("docker", "build", "-t", folderName, dirPath+"/chall/"+folderName+"/"+folderName)
+	cmd2 := exec.Command("minikube", "image", "load", folderName)
 	cmd.Run()
 	cmd2.Run()
 }
@@ -36,13 +37,13 @@ func buildimage(foldername string) {
 func createfolder(challengename string) (message int, newDirPath string) {
 
 	basePath, _ := os.Getwd()
-	dirPath := basePath + "/chall" //basepath is .../katana
+	dirPath := basePath + "/challenges" //basepath is .../katana
 
-	// Open the chall directory to check if it exists , create if not
+	// Open the challenges directory to check if it exists , create if not
 	dir, err := os.Open(dirPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			fmt.Println("Chall directory does not exist ,creating directory")
+			fmt.Println("Challenges directory does not exist ,creating directory")
 			os.Mkdir(dirPath, 0777)
 		} else if os.IsPermission(err) {
 			fmt.Println("Error opening challenge directory. Permission Issue", err)
@@ -71,7 +72,9 @@ func createfolder(challengename string) (message int, newDirPath string) {
 func Deploy(c *fiber.Ctx) error {
 
 	challengetype := "web"
-	foldername := ""
+	folderName := ""
+	patch := false
+	replicas := g.KatanaConfig.TeamDeployement
 	fmt.Println("Starting")
 	if form, err := c.MultipartForm(); err == nil {
 
@@ -84,9 +87,9 @@ func Deploy(c *fiber.Ctx) error {
 			pattern := `([^/]+)\.tar\.gz$`
 			regex := regexp.MustCompile(pattern)
 			match := regex.FindStringSubmatch(file.Filename)
-			foldername = match[1]
+			folderName = match[1]
 
-			response, newDirPath := createfolder(foldername)
+			response, newDirPath := createfolder(folderName)
 			if response == 1 {
 				fmt.Println("Directory already exists with same name")
 				return c.SendString("Directory already exists with same name")
@@ -96,19 +99,19 @@ func Deploy(c *fiber.Ctx) error {
 			}
 
 			//save to disk in that directory
-			if err := c.SaveFile(file, fmt.Sprintf("./chall/%s/%s", foldername, file.Filename)); err != nil {
+			if err := c.SaveFile(file, fmt.Sprintf("./challenges/%s/%s", folderName, file.Filename)); err != nil {
 				return err
 			}
 
 			//extract the tar.gz file
-			err := archiver.Unarchive("./chall/"+foldername+"/"+file.Filename, "./chall/"+foldername)
+			err := archiver.Unarchive("./challenges/"+folderName+"/"+file.Filename, "./chall/"+folderName)
 			if err != nil {
 				fmt.Println("Error in unarchiving", err)
 				return c.SendString("Error in unarchiving")
 			}
 
-			fmt.Println("Building docker image with tag", foldername)
-			buildimage(foldername)
+			fmt.Println("Building docker image with tag", folderName)
+			buildimage(folderName)
 			fmt.Println("Docker image built successfully")
 
 			//Get no.of teams and DEPLOY CHALLENGE to each namespace (assuming they exist and /createTeams has been called)
@@ -118,34 +121,23 @@ func Deploy(c *fiber.Ctx) error {
 			res := make([][]string, 0)
 			for i := 0; i < int(numberOfTeams); i++ {
 				fmt.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
-				team_name := "team-" + strconv.Itoa(i)
-				deployer.DeployChallenge(foldername, team_name, 1)
-				url, err := deployer.CreateService(foldername, team_name)
+				teamName := "katana-team-" + strconv.Itoa(i)
+				utils.DeployChallenge(folderName, teamName, patch, replicas)
+				url, err := deployer.CreateService(folderName, teamName)
 				if err != nil {
-					res = append(res, []string{team_name, err.Error()})
+					res = append(res, []string{teamName, err.Error()})
 				} else {
-					res = append(res, []string{team_name, url})
+					res = append(res, []string{teamName, url})
 				}
 			}
 
 			//Copy challenge in pods and etc.
-			challcopy(newDirPath, foldername, challengetype)
+			challcopy(newDirPath, folderName, challengetype)
 
 			return c.JSON(res)
 		}
 	}
 	fmt.Println("Ending")
-
-	//In case only want to test the deployer wih empty post request
-	// foldername = "notekeeper"
-	// clusterConfig := g.ClusterConfig
-	// numberOfTeams := clusterConfig.TeamCount
-	// for i := 0; i < int(numberOfTeams); i++ {
-	// 	deployer.DeployChallenge(foldername, "team-"+strconv.Itoa(i))
-	//  deployer.CreateService(foldername, "team-"+strconv.Itoa(i))
-	// }
-
-	//deployer.CreateService("notekeeper", "team-0")
 
 	return c.SendString("Wrong file")
 }

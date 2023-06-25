@@ -20,7 +20,9 @@ func Server() error {
 
 	app := fiber.New(fiberConfig)
 
-	app.Use(cors.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+	}))
 
 	corsConfig := cors.Config{
 		AllowOrigins:     "*",

@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/go-git/go-git/v5"
+	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/gofiber/fiber/v2"
 	g "github.com/sdslabs/katana/configs"
@@ -26,7 +26,9 @@ type GogsRequest struct {
 }
 
 func ChallengeUpdate(c *fiber.Ctx) error {
+	replicas := g.KatanaConfig.TeamDeployement
 	client, err := utils.GetKubeClient()
+	patch := true
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -64,25 +66,34 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	}
 
 	log.Println("Pull successful for", teamName, ". Building image...")
-
-	// Build the challenge with Dockerfile
+	firstPatch, err := exec.Command("docker", "inspect", dir).Output()
 	cmd := exec.Command("docker", "build", "-t", dir, "./teams/"+dir)
 	cmd.Run()
-
-	// Create a labelSelector to get the challenge pod
-
-	labelSelector := metav1.LabelSelector{
-		MatchLabels: map[string]string{
-			"app": teamName + "_" + challengeName,
-		},
-	}
-	// Delete the challenge pod
-	err = client.CoreV1().Pods(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{
-		LabelSelector: metav1.FormatLabelSelector(&labelSelector),
-	})
+	cmd = exec.Command("minikube", "image", "load", dir)
+	cmd.Run()
 	if err != nil {
 		log.Println(err)
 	}
+	if len(firstPatch) <= 3 {
+		log.Println("First Patch for", teamName)
+		utils.DeployChallenge(challengeName, teamName, patch, replicas)
+	} else {
+		log.Println("Not the first patch for", teamName, ". Simply deploying the image...")
+		labelSelector := metav1.LabelSelector{
+			MatchLabels: map[string]string{
+				"app": challengeName,
+			},
+		}
+		// Delete the challenge pod
+		err = client.CoreV1().Pods(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{
+			LabelSelector: metav1.FormatLabelSelector(&labelSelector),
+		})
+		if err != nil {
+			log.Println("Error")
+			log.Println(err)
+		}
+	}
+	log.Println("Image built for", teamName)
 	return c.SendString("Challenge updated")
 
 }

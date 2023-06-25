@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/sdslabs/katana/configs"
+	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,7 +14,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
+var ctx, _ = context.WithTimeout(context.Background(), time.Duration(g.KatanaConfig.TimeOut)*time.Second)
 var client, err = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+configs.MongoConfig.Username+":"+configs.MongoConfig.Password+"@"+configs.ServicesConfig.ChallengeDeployer.Host+":"+configs.MongoConfig.Port+"/?directConnection=true&appName=mongosh+"+configs.MongoConfig.Version))
 var link = client.Database(projectDatabase)
 
@@ -37,13 +38,13 @@ func setupAdmin() {
 }
 
 func setup() {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(g.KatanaConfig.TimeOut)*time.Second)
 	defer cancel()
 	err = client.Ping(ctx, nil)
 	if err != nil {
 		log.Println("MongoDB connection was not established")
 		log.Println("Error: ", err)
-		time.Sleep(5 * time.Second)
+		time.Sleep(time.Duration(g.KatanaConfig.TimeOut) * time.Second)
 		setup()
 	} else {
 		log.Println("MongoDB Connection Established")

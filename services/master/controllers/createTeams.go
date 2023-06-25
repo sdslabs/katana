@@ -18,7 +18,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-
 func CreateTeams(c *fiber.Ctx) error {
 
 	// if !utils.VerifyToken(c) {

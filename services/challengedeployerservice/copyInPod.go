@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"regexp"
 
-	"github.com/go-git/go-git/v5"
+	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
@@ -15,10 +14,6 @@ import (
 )
 
 func CopyInPod(localFilePath string, pathInPod string) error {
-
-	if err := GetClient(g.KatanaConfig.KubeConfig); err != nil {
-		return err
-	}
 
 	//regex to find challenge name since localFilePath[12:22] is hardcoded
 	regexPattern := `\/([^\/]+)\.tar\.gz$`
@@ -48,11 +43,7 @@ func CopyInPod(localFilePath string, pathInPod string) error {
 		if err != nil {
 			log.Println(err)
 		}
-		err = exec.Command("touch teams/" + path + "/challenge.yaml").Run()
-		if err != nil {
-			log.Println(err)
-		}
-		podsInTeam, err := getPods(map[string]string{
+		podsInTeam, err := utils.GetPods(map[string]string{
 			"app": g.ClusterConfig.TeamLabel,
 		}, "katana-team-"+fmt.Sprint(i)+"-ns")
 		if err != nil {

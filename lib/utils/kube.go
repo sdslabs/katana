@@ -35,29 +35,43 @@ func GetKubeConfig() (*rest.Config, error) {
 }
 
 // GetKubeClient returns a kubernetes clientset
-func GetKubeClient() (*kubernetes.Clientset, error) {
-	config, err := GetKubeConfig()
+func GetKubeClient(pathToCfg ...string) (*kubernetes.Clientset, error) {
+	var tmpPathToCfg string
+	if len(pathToCfg) == 0 {
+		tmpPathToCfg = filepath.Join(
+			os.Getenv("HOME"), ".kube", "config",
+		)
+	} else {
+		tmpPathToCfg = pathToCfg[0]
+	}
+	config, err := clientcmd.BuildConfigFromFlags("", tmpPathToCfg)
 	if err != nil {
 		return nil, err
 	}
 
-	return kubernetes.NewForConfig(config)
+	client, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
 }
 
-func GetPodByName(clientset *kubernetes.Clientset, podName string) (*v1.Pod, error) {
-	client := clientset.CoreV1()
-	podsInterface := client.Pods(g.KatanaConfig.KubeNameSpace)
-	return podsInterface.Get(context.Background(), podName, metav1.GetOptions{})
-}
-
-func GetPods(clientset *kubernetes.Clientset, lbls map[string]string) ([]v1.Pod, error) {
-	client := clientset.CoreV1()
-	podsInterface := client.Pods(g.KatanaConfig.KubeNameSpace)
-	filter := metav1.ListOptions{
-		LabelSelector: labels.Set(lbls).AsSelector().String(),
+func GetPods(lbls map[string]string, ns ...string) ([]v1.Pod, error) {
+	var namespace string
+	if len(ns) == 0 {
+		namespace = g.KatanaConfig.KubeNameSpace
+	} else {
+		namespace = ns[0]
 	}
 
-	pods, err := podsInterface.List(context.Background(), filter)
+	selector := labels.SelectorFromSet(lbls)
+	kubeclient, err := GetKubeClient(g.KatanaConfig.KubeConfig)
+	if err != nil {
+		return nil, err
+	}
+	pods, err := kubeclient.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: selector.String(),
+	})
 	if err != nil {
 		return nil, err
 	}
