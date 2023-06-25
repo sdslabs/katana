@@ -35,13 +35,16 @@ func GetKubeConfig() (*rest.Config, error) {
 }
 
 // GetKubeClient returns a kubernetes clientset
-func GetKubeClient(pathToCfg string) (*kubernetes.Clientset, error) {
-	if pathToCfg == "" {
-		pathToCfg = filepath.Join(
+func GetKubeClient(pathToCfg ...string) (*kubernetes.Clientset, error) {
+	var tmpPathToCfg string
+	if len(pathToCfg) == 0 {
+		tmpPathToCfg = filepath.Join(
 			os.Getenv("HOME"), ".kube", "config",
 		)
+	} else {
+		tmpPathToCfg = pathToCfg[0]
 	}
-	config, err := clientcmd.BuildConfigFromFlags("", pathToCfg)
+	config, err := clientcmd.BuildConfigFromFlags("", tmpPathToCfg)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +88,7 @@ func GetTeamNumber() int {
 }
 
 func GetMongoIP() string {
-	client, err := GetKubeClient("")
+	client, err := GetKubeClient()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -105,7 +108,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 		return err
 	}
 
-	client, err := GetKubeClient("")
+	client, err := GetKubeClient()
 	if err != nil {
 		return err
 	}
@@ -180,7 +183,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 }
 
 func GetGogsIp() string {
-	client, err := GetKubeClient("")
+	client, err := GetKubeClient()
 	if err != nil {
 		log.Fatal(err)
 	}

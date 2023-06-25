@@ -16,7 +16,7 @@ import (
 )
 
 func DB(c *fiber.Ctx) error {
-	client, err := utils.GetKubeClient("")
+	client, err := utils.GetKubeClient()
 	if err != nil {
 		log.Println(err)
 	}

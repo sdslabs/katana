@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/go-git/go-git/v5"
+	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/gofiber/fiber/v2"
 	g "github.com/sdslabs/katana/configs"
@@ -27,7 +27,7 @@ type GogsRequest struct {
 
 func ChallengeUpdate(c *fiber.Ctx) error {
 	replicas := g.KatanaConfig.TeamDeployement
-	client, err := utils.GetKubeClient("")
+	client, err := utils.GetKubeClient()
 	patch := true
 	if err != nil {
 		fmt.Println(err)

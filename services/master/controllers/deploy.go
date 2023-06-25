@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/mholt/archiver/v3"
+	archiver "github.com/mholt/archiver/v3"
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
 	deployer "github.com/sdslabs/katana/services/challengedeployerservice"

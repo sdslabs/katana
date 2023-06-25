@@ -18,7 +18,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-
 func CreateTeams(c *fiber.Ctx) error {
 
 	// if !utils.VerifyToken(c) {
@@ -26,7 +25,7 @@ func CreateTeams(c *fiber.Ctx) error {
 	// }
 
 	clusterConfig := g.ClusterConfig
-	client, err := utils.GetKubeClient("")
+	client, err := utils.GetKubeClient()
 	if err != nil {
 		log.Println(err)
 	}
