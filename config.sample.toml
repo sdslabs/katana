@@ -6,6 +6,7 @@ kubenamespace = "default"
 verbosity = 3
 timeout = 20
 numberofdeployements = 1
+cronjobschedule = "*/1 * * * *"
 [cluster]
 deploymentlabel = "katana"
 broadcastcount = 2
