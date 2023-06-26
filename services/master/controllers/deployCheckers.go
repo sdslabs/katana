@@ -10,7 +10,7 @@ import (
 )
 
 func DeployCheckers(c *fiber.Ctx) error {
-	foldername := ""
+	folderName := ""
 	fmt.Println("Starting")
 	if form, err := c.MultipartForm(); err == nil {
 		checkerFiles := form.File["challengeChecker"]
@@ -20,9 +20,9 @@ func DeployCheckers(c *fiber.Ctx) error {
 			pattern := `([^/]+)\.tar\.gz$`
 			regex := regexp.MustCompile(pattern)
 			match := regex.FindStringSubmatch(file.Filename)
-			foldername = match[1]
+			folderName = match[1]
 
-			response, _ := createfolder(foldername + "-checker")
+			response, _ := createfolder(folderName + "-checker")
 			if response == 1 {
 				fmt.Println("Directory for challenge checker already exists with same name")
 				return c.SendString("Directory for challenge checker already exists with same name")
@@ -31,22 +31,21 @@ func DeployCheckers(c *fiber.Ctx) error {
 				return c.SendString("Issue with creating challenge checkor directory.Check permissions")
 			}
 
-			if err := c.SaveFile(file, fmt.Sprintf("./challenges/%s/%s", foldername+"-checker", file.Filename)); err != nil {
+			if err := c.SaveFile(file, fmt.Sprintf("./challenges/%s/%s", folderName+"-checker", file.Filename)); err != nil {
 				return err
 			}
 
-			err = archiver.Unarchive("./challenges/"+foldername+"-checker/"+file.Filename, "./chall/"+foldername+"-checker")
+			err = archiver.Unarchive("./challenges/"+folderName+"-checker/"+file.Filename, "./chall/"+folderName+"-checker")
 			if err != nil {
 				fmt.Println("Error in unarchiving", err)
 				return c.SendString("Error in unarchiving")
 			}
 
-			fmt.Println("Building docker image with tag", foldername+"-checker")
-			buildimage(foldername + "-checker")
+			fmt.Println("Building docker image with tag", folderName+"-checker")
+			buildimage(folderName + "-checker")
 			fmt.Println("Docker images built successfully")
 
-			checker.DeployChallChecker(foldername, "5000", "katana-team-0-ns")
-			// url, err := checker.CreateService(foldername, "katana-team-0")
+			checker.DeployChallChecker(folderName, "5000", "katana-team-0-ns")
 			if err != nil {
 				return c.SendString(err.Error())
 			} else {
