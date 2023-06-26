@@ -77,5 +77,6 @@ type KatanaCfg struct {
 	AdminConfig     AdminCfg            `toml:"admin"`
 	MySQL           MySQLCfg            `toml:"mysql"`
 	TimeOut         int                 `toml:"timeout"`
+	CronJobSchedule string              `toml:"cronjobschedule"`
 	TeamDeployement int32               `toml:"numberofdeployements"`
 }
