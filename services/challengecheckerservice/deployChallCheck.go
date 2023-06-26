@@ -14,10 +14,8 @@ import (
 
 func DeployChallChecker(chall_name, port, team_namespace string) error {
 	namespace := "katana"
+	kubeclient, _ := utils.GetKubeClient(g.KatanaConfig.KubeConfig)
 
-	if err := GetClient(g.KatanaConfig.KubeConfig); err != nil {
-		return err
-	}
 	cronJobSpec := &batchv1.CronJob{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      chall_name + "-checker",
@@ -50,7 +48,6 @@ func DeployChallChecker(chall_name, port, team_namespace string) error {
 			},
 		},
 	}
-	kubeclient, _ := utils.GetClient(g.KatanaConfig.KubeConfig)
 	cronJob, _ := kubeclient.BatchV1().CronJobs(namespace).Get(context.TODO(), chall_name+"-checker", metav1.GetOptions{})
 	if cronJob.Name == chall_name+"-checker" {
 		fmt.Println("Challenge checker already exists for the challenge " + chall_name + " in namespace " + namespace)
