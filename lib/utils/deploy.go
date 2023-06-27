@@ -14,7 +14,7 @@ import (
 func DeployChallenge(challengeName, teamName string, firstPatch bool, replicas int32) error {
 
 	teamNamespace := teamName + "-ns"
-	kubeclient, err := GetKubeClient(g.KatanaConfig.KubeConfig)
+	kubeclient, err := GetKubeClient()
 	if err != nil {
 		return err
 	}

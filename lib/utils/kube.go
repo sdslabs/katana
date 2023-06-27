@@ -35,25 +35,13 @@ func GetKubeConfig() (*rest.Config, error) {
 }
 
 // GetKubeClient returns a kubernetes clientset
-func GetKubeClient(pathToCfg ...string) (*kubernetes.Clientset, error) {
-	var tmpPathToCfg string
-	if len(pathToCfg) == 0 {
-		tmpPathToCfg = filepath.Join(
-			os.Getenv("HOME"), ".kube", "config",
-		)
-	} else {
-		tmpPathToCfg = pathToCfg[0]
-	}
-	config, err := clientcmd.BuildConfigFromFlags("", tmpPathToCfg)
+func GetKubeClient() (*kubernetes.Clientset, error) {
+	config, err := GetKubeConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	client, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return nil, err
-	}
-	return client, nil
+	return kubernetes.NewForConfig(config)
 }
 
 func GetPods(lbls map[string]string, ns ...string) ([]v1.Pod, error) {
@@ -65,7 +53,7 @@ func GetPods(lbls map[string]string, ns ...string) ([]v1.Pod, error) {
 	}
 
 	selector := labels.SelectorFromSet(lbls)
-	kubeclient, err := GetKubeClient(g.KatanaConfig.KubeConfig)
+	kubeclient, err := GetKubeClient()
 	if err != nil {
 		return nil, err
 	}
