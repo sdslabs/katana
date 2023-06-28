@@ -31,7 +31,7 @@ func deleteFolder(folderName string) (message string) {
 	return "Challenge folder deleted"
 }
 
-func DeployCheckers(c *fiber.Ctx) error {
+func DeployChecker(c *fiber.Ctx) error {
 	folderName := ""
 	fmt.Println("Starting")
 	if form, err := c.MultipartForm(); err == nil {

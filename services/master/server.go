@@ -45,7 +45,7 @@ func Server() error {
 	admin.Post("/challengeUpdate", c.ChallengeUpdate)
 	admin.Post("/logs", c.Logs)
 	admin.Post("/deploy", c.Deploy)
-	admin.Post("/deployCheckers", c.DeployCheckers)
+	admin.Post("/deployCheckers", c.DeployChecker)
 	admin.Post("/updateChecker", c.UpdateChecker)
 	admin.Get("/gitServer", c.GitServer)
 	admin.Get("/cluster/:id", c.ClusterInfo)
