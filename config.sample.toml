@@ -4,9 +4,9 @@ backendurl = "http://192.168.49.1:3000"
 rootdirectory = "/opt/katana"
 kubenamespace = "default"
 verbosity = 3
-timeout = 20
+timeout = 20 # in seconds
 numberofdeployements = 1
-cronjobschedule = "*/1 * * * *"
+cronjobschedule = "*/1 * * * *" # Cronjob expression for running the cronjob every minute. Refer to the manual to create custom cronjob expressions.
 [cluster]
 deploymentlabel = "katana"
 broadcastcount = 2
