@@ -8,6 +8,15 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+var namespace string = "katana"
+var podName string = "kashira-0"
+var containerName string = "kashira"
+
+func SendFlagCheckerAndUpdaterToKashira(localFilePath string) {
+	pathInPod := "/opt/kashira/tmp"
+	utils.CopyIntoPod(podName, containerName, pathInPod, localFilePath, namespace)
+}
+
 func Server() {
 	// Get the ticker
 	ticker := utils.GetTicker()
@@ -17,10 +26,6 @@ func Server() {
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	// Define the pod name and namespace
-	podName := "kashira"
-	namespace := "katana"
 
 	go func() {
 		for range ticker.C {

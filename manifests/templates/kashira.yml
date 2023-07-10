@@ -45,19 +45,19 @@ spec:
     spec:
       serviceAccountName: cluster-admin
       containers:
-      - name: kashira-container
-        image: core.harbor.domain/katana/kashira:latest
-        ports:
-        - containerPort: 80
+        - name: kashira
+          image: core.harbor.domain/katana/kashira:latest
+          ports:
+            - containerPort: 80
   volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: standard
-      resources:
-        requests:
-          storage: 1Gi
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 1Gi
 
 ---
 apiVersion: v1

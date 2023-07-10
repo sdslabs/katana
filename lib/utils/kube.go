@@ -150,7 +150,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 		TTY:       false,
 	}, scheme.ParameterCodec)
 
-	exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
+	exec, err := remotecommand.NewSPDYExecutor(config, http.MethodPost, req.URL())
 	if err != nil {
 		log.Printf("Error creating executor: %s\n", err)
 		return err
