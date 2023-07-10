@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: gogs-pv
+  namespace: katana
+  labels:
+    type: local
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 2Gi
+  hostPath:
+    path: /mnt/data/gogs
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gogs-pv-claim
+  namespace: katana
+  labels:
+    app: gogs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gogs
+  namespace: katana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gogs
+  template:
+    metadata:
+      labels:
+        app: gogs
+        version: v1
+    spec:
+      containers:
+      - name: gogs
+        image: gogs/gogs:0.13
+        ports:
+        - containerPort: 22
+          name: ssh
+        - containerPort: 3000
+          name: http
+        env:
+        - name: SOCAT_LINK
+          value: "false"
+        volumeMounts:
+        - name: gogs-persistent-storage
+          mountPath: /data
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - nohup sh -c "if [ ! -f /data/gogs/conf/app.ini ]; then while [ ! -f /data/gogs/conf/app.ini ]; do sleep 1; done; sleep 10; echo 'LOCAL_NETWORK_ALLOWLIST = *' >> /data/gogs/conf/app.ini; kill 1; fi" &
+      volumes:
+      - name: gogs-persistent-storage
+        persistentVolumeClaim:
+          claimName: gogs-pv-claim
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gogs-svc
+  namespace: katana
+spec:
+  selector:
+    app: gogs
+  ports:
+  - name: ssh
+    protocol: TCP
+    port: 10022
+    targetPort: 22
+  - name: http
+    protocol: TCP
+    port: 18080
+    targetPort: 3000
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gogs-ingress
+  namespace: katana
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: gogs.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gogs-svc
+            port:
+              number: 18080
