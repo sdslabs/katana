@@ -8,12 +8,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	cfg "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/lib/utils"
 	challengeDeployerService "github.com/sdslabs/katana/services/challengedeployerservice"
 	infraSetService "github.com/sdslabs/katana/services/infrasetservice"
 	c "github.com/sdslabs/katana/services/master/controllers"
 )
 
 func Server() error {
+
+	utils.InitTicker(5 * time.Minute)
+
 	fiberConfig := fiber.Config{
 		ReadTimeout:           5 * time.Second,
 		WriteTimeout:          30 * time.Second,
