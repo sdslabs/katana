@@ -24,8 +24,8 @@ type ManifestConfig struct {
 	ChallengeDeployerHost string
 	ChallengeArtifact     string
 	HarborKey             string
-	HarborCert            string
-	HarborCaCert          string
+	HarborCrt             string
+	HarborCaCrt           string
 	HarborHostname        string
 }
 
