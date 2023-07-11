@@ -67,5 +67,5 @@ password = "sdslabs"
 
 [harbor]
 username = "admin"
-password = "Harbor12345"
+password = "YWRtaW4=" # base64 encoded ("admin")
 hostname = "harbor.katana.local"

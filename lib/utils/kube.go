@@ -200,6 +200,8 @@ func DeploymentConfig() types.ManifestConfig {
 		DaemonPort:            g.TeamVmConfig.DaemonPort,
 		ChallengeDeployerHost: g.ServicesConfig.ChallengeDeployer.Host,
 		ChallengeArtifact:     g.ServicesConfig.ChallengeDeployer.ArtifactLabel,
+		HarborPassword:        g.KatanaConfig.Harbor.Password,
+		HarborHostname:        g.KatanaConfig.Harbor.Hostname,
 	}
 	return config
 }
