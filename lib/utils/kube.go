@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 
 	g "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -206,7 +208,24 @@ func DeploymentConfig() types.ManifestConfig {
 	}
 
 	// Add Harbor key and cert
+	config = PopulateHarborCerts(config)
 
+	return config
+}
+
+func PopulateHarborCerts(config types.ManifestConfig) types.ManifestConfig {
+	// Read the harbor key and cert
+	basePath, _ := os.Getwd()
+	harborKey, err := ioutil.ReadFile(basePath + "/lib/harbor/certs/" + g.KatanaConfig.Harbor.Hostname + ".key")
+	if err != nil {
+		log.Fatal(err)
+	}
+	harborCert, err := ioutil.ReadFile(basePath + "/lib/harbor/certs/" + g.KatanaConfig.Harbor.Hostname + ".crt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	config.HarborKey = utils.Base64Encode(harborKey)
+	config.HarborCert = utils.Base64Encode(harborCert)
 	return config
 }
 

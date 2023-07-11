@@ -24,8 +24,8 @@ func Base64Encode(str string) string {
 	return base64.StdEncoding.EncodeToString([]byte(str))
 }
 
-// Generating certificate from domain name
-func GenerateCert(domain string, basePath string) error {
+// Generating certificates from domain name
+func GenerateCerts(domain string, basePath string) error {
 	// Generate ca.key in harbor directory
 	cmd := "openssl genrsa -out " + basePath + "/ca.key 4096"
 	out := exec.Command("bash", "-c", cmd)
