@@ -8,10 +8,55 @@ import (
 	"os"
 
 	config "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/lib/utils"
 )
 
+var baseURL string = "https://" + config.KatanaConfig.Harbor.Hostname + "/api/v2.0"
+
+func setAdminPassword() error {
+	url := baseURL + "/users/1/password"
+
+	// Make a GET request and read the "X-Harbor-CSRF-Token" header
+	// from the response
+	resp, err := http.Get(baseURL + "/login")
+	if err != nil {
+		return err
+	}
+
+	csrfToken := resp.Header.Get("X-Harbor-Csrf-Token")
+
+	payload := map[string]interface{}{
+		"new_password": config.KatanaConfig.Harbor.Password,
+		"old_password": "Harbor12345",
+	}
+
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(jsonPayload))
+	if err != nil {
+		return err
+	}
+
+	auth := "Basic " + utils.Base64Encode("admin:Harbor12345") // Harbor12345 is the default admin password
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Harbor-Csrf-Token", csrfToken)
+	req.Header.Set("Authorization", auth)
+
+	client := &http.Client{}
+	resp, _ = client.Do(req)
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("error changing admin password")
+	}
+
+	return nil
+}
+
 func createHarborProject(projectName string) error {
-	url := "https://" + config.KatanaConfig.Harbor.Hostname + "/api/v2.0/projects"
+	url := baseURL + "/projects"
 
 	payload := map[string]interface{}{
 		"name": projectName,
@@ -43,7 +88,7 @@ func createHarborProject(projectName string) error {
 }
 
 func getHarborCertificate() error {
-	url := "https://" + config.KatanaConfig.Harbor.Hostname + "/api/v2.0/systeminfo/getcert"
+	url := baseURL + "/systeminfo/getcert"
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

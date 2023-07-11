@@ -7,6 +7,10 @@ func SetupHarbor() error {
 		}
 	}
 
+	if err := setAdminPassword(); err != nil {
+		return err
+	}
+
 	if err := createHarborProject("katana"); err != nil {
 		return err
 	}
