@@ -200,8 +200,13 @@ func DeploymentConfig() types.ManifestConfig {
 		DaemonPort:            g.TeamVmConfig.DaemonPort,
 		ChallengeDeployerHost: g.ServicesConfig.ChallengeDeployer.Host,
 		ChallengeArtifact:     g.ServicesConfig.ChallengeDeployer.ArtifactLabel,
+		HarborKey:             "",
+		HarborCert:            "",
 		HarborHostname:        g.KatanaConfig.Harbor.Hostname,
 	}
+
+	// Add Harbor key and cert
+
 	return config
 }
 

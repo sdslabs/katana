@@ -23,6 +23,8 @@ type ManifestConfig struct {
 	DaemonPort            uint
 	ChallengeDeployerHost string
 	ChallengeArtifact     string
+	HarborKey             string
+	HarborCert            string
 	HarborHostname        string
 }
 
