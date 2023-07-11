@@ -25,6 +25,7 @@ type ManifestConfig struct {
 	ChallengeArtifact     string
 	HarborKey             string
 	HarborCert            string
+	HarborCaCert          string
 	HarborHostname        string
 }
 

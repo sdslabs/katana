@@ -203,6 +203,7 @@ func DeploymentConfig() types.ManifestConfig {
 		ChallengeArtifact:     g.ServicesConfig.ChallengeDeployer.ArtifactLabel,
 		HarborKey:             "",
 		HarborCert:            "",
+		HarborCaCert:          "",
 		HarborHostname:        g.KatanaConfig.Harbor.Hostname,
 	}
 
@@ -215,6 +216,7 @@ func DeploymentConfig() types.ManifestConfig {
 func PopulateHarborCerts(config types.ManifestConfig) types.ManifestConfig {
 	// Read the harbor key and cert
 	basePath, _ := os.Getwd()
+
 	harborKey, err := ioutil.ReadFile(basePath + "/lib/harbor/certs/" + g.KatanaConfig.Harbor.Hostname + ".key")
 	if err != nil {
 		log.Fatal(err)
@@ -223,8 +225,14 @@ func PopulateHarborCerts(config types.ManifestConfig) types.ManifestConfig {
 	if err != nil {
 		log.Fatal(err)
 	}
+	harborCaCert, err := ioutil.ReadFile(basePath + "/lib/harbor/certs/ca.crt")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	config.HarborKey = Base64Encode(string(harborKey))
 	config.HarborCert = Base64Encode(string(harborCert))
+	config.HarborCaCert = Base64Encode(string(harborCaCert))
 	return config
 }
 
