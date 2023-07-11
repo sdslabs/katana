@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 
 	g "github.com/sdslabs/katana/configs"
-	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -224,8 +223,8 @@ func PopulateHarborCerts(config types.ManifestConfig) types.ManifestConfig {
 	if err != nil {
 		log.Fatal(err)
 	}
-	config.HarborKey = utils.Base64Encode(harborKey)
-	config.HarborCert = utils.Base64Encode(harborCert)
+	config.HarborKey = Base64Encode(string(harborKey))
+	config.HarborCert = Base64Encode(string(harborCert))
 	return config
 }
 
