@@ -41,6 +41,7 @@ func CreateTeams(teamnumber int) error {
 			Name:     podNamespace,
 			PodName:  podName,
 			Password: hashed,
+			Challenges: []types.Challenge{},
 		}
 		mysql.CreateGogsUser(team.Name, pwd)
 		mysql.CreateAccessToken(team.Name, pwd)
