@@ -1,0 +1,1446 @@
+# Source: harbor/templates/core/core-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: katana-release-harbor-core
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+type: Opaque
+data:
+  secretKey: "bm90LWEtc2VjdXJlLWtleQ=="
+  secret: "b1I3aElNSEhsYjIxa1czNg=="
+  tls.key: "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcEFJQkFBS0NBUUVBMUJaN2pJZGZYeTY4Ujg2ZnVGLzJxY1lmQ1JYNUZiSHZiWDN0ZXNPZW1Xd2dJTTBoClpQbXEwRzVxcVJOSENiSkdwbktvaVNkZC8rWDZZWUQyaFFYQytaa0RHcTBmZUVacEV0RldSNmtWSzM5MDB6VUUKNlA5YmZva2pObXFlK1FxVk81a21hRFRvWXpZM0xPcEJUV3RFMzdaZ2E3NFBLMFpzdWgvMDNOY2pYQ0p6d2NMUQpZK2xrWlpBVnpXUUd4UlQwVU1jRFA0L3NkN1J2TXhPdXFOVWQ4RmtwTE1FQXUrTmRQc2YrMVJjamp3a0tYb3VnCnhsTVNaalJmdExiUDV4LzhZUFE5TjI5VkJCZTRSSzJMNHk4eXNXRkpyckx1OXM4dWU4N2RHTTV4OXJydmVQaEMKdzdhUmhQS1ZMVXQwSDM0WGcxazZzcVJ3aS9ybENIT3o4VGhOSndJREFRQUJBb0lCQUh2bVBuc1VRb1VLZW5mQQpuOUpJVFlOVStLQ0lNNkdXOTNhUmtJQ2RjelBSMU5zVXV5T1FMMWZnaVhNSWpnRitJb1B1aThMRU9zZmFCSEdkCnMyWjJ2VGF2U3Y3MGtHUGxUbER0OW1lYXdZRk56bVBzbjFlMmhpN2YwckJoalVtVUF5WjBDOW5vdnJIbTVFamEKK1JkUFNVY2Y5aWc3T2dWZitQaXEzcE45STIwWXF2WXVRY3M4dU43aDdWMTFKWllCZms2UWs1RU0vSkhJMWxsRApTT1BOY2pFejVIOFhtWThrdWpGUkVMS3RUcFd2aDAwRFh5emNuQVpRWlV2K3BPZkR4SmxJNThPNklhb0xIOUJmCm8zdlpxei9BbkZSeE1hNWtaQVNBUFgyQmxUTzg5RGFxSjV6ZGpnUWE1aWxJSE54WS9uMFl4T3FNWHJrdEYvUzcKR0VvQjFZRUNnWUVBOFl5dk41UnNCNlVEWGR1OGZUUDE3eUlHOGl6cVAremsvdFl0Rmw5R3c2aWRjQ3lXSng5UwpZdmwxY1ljS3pJc3ppeGVvNHJiWUVHTjBZYXRCUVdWRUJxU3NuMkdLZm1pV1h3UU5ZL3I5VXF0MkVMWlNWdWVBClVCWGR3dkVxNHdWR242MUY5ZWxYd3REVzBSaGFDQWFNdU5wQVdwVW1wNlUvWUZHdWJaQ0JYK0VDZ1lFQTRNYVkKQU9WdWIvSHh3QW5zVHRNbVptcmxjWVdMYVhIT2crbmh1ZCtFM3dldEJ4ZTBDaWFXWmV4bGtYNExRdm04a0RDdQpsaG1zRkxvUWtVVjl2Q1dOMVF0emtSTExudTh3UGZ6NW4xaFI3RU5vczRBVG9aL1JEWEJIQmlNWkovWkVnT0NWCkxBQ0VDNklrY1hteGxCUnBEWWFXR2JlcEZBSGVHMXpEVjZYOGJnY0NnWUVBaEVwdHFENEVrSWRDZWNRZnpsNkgKNGlrN3JxVUV3bkFHMXI4TVFJVjc1eXJRMXgvRU9MY0IweTBXc2srb2pXL3JrZEVxY01oOU96U05CL1RZTDIyNwp2UHV4Z3pUVHVmbWo2WFA1dFhsQUJtZmJxTG1DRFJDTENOR0EvQVJEWGNTRThtemV0UmpRTk9WVjBYekp5ajEwCkVzV05tMDYydGZoZDVtMjEzMUhXV1dFQ2dZQktvYVhXcGxjRTFGQndjdHNEVVJodTZROUZvaEduOFNHZ3F3ZEgKcis5dUhoNVZQSW1LMVVVYWttTW02N0xSaWhvUnhoZ3h2bFJraldMeTJSL21XSkcvS3c0MEhRbCt1K3hJcUxZNQpNaG9CV0dCck9SdExqc1Rhc1d6am5NTzlnUWM5dzFQRVNHZVBkVWFrWnNPUFp6ZDZSaldRVkdyUE9jK0ZSa2VWCjBvYitBUUtCZ1FDK3A1NDJpT3I5V2xzbUI3Yk5kMHdNbkJKazduWkUzWUtYOGJoYTFJZFJsZ3B3OGlqbk9QMUcKcGFPQmVhSFY5Y21YZ08wUkFhQ3dZV0lISTg4dHphV3hnL0JZdmZoUWJkYzhLbEI4eHRLNnBSYURHZ29BY3lYawpVamNxQjEwdGk3VkNBOFVEK3MxMmJTSjA5b0xsSzI0SEg2dFo1U0FlTTRTWmlUWHNvamUwTUE9PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo="
+  tls.crt: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURJRENDQWdpZ0F3SUJBZ0lSQVAyWDhHaThoN2RkRW9jbWxzbHJJeGN3RFFZSktvWklodmNOQVFFTEJRQXcKR2pFWU1CWUdBMVVFQXhNUGFHRnlZbTl5TFhSdmEyVnVMV05oTUI0WERUSXpNRGN4TVRFMU1qZ3hNbG9YRFRJMApNRGN4TURFMU1qZ3hNbG93R2pFWU1CWUdBMVVFQXhNUGFHRnlZbTl5TFhSdmEyVnVMV05oTUlJQklqQU5CZ2txCmhraUc5dzBCQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBMUJaN2pJZGZYeTY4Ujg2ZnVGLzJxY1lmQ1JYNUZiSHYKYlgzdGVzT2VtV3dnSU0waFpQbXEwRzVxcVJOSENiSkdwbktvaVNkZC8rWDZZWUQyaFFYQytaa0RHcTBmZUVacApFdEZXUjZrVkszOTAwelVFNlA5YmZva2pObXFlK1FxVk81a21hRFRvWXpZM0xPcEJUV3RFMzdaZ2E3NFBLMFpzCnVoLzAzTmNqWENKendjTFFZK2xrWlpBVnpXUUd4UlQwVU1jRFA0L3NkN1J2TXhPdXFOVWQ4RmtwTE1FQXUrTmQKUHNmKzFSY2pqd2tLWG91Z3hsTVNaalJmdExiUDV4LzhZUFE5TjI5VkJCZTRSSzJMNHk4eXNXRkpyckx1OXM4dQplODdkR001eDlycnZlUGhDdzdhUmhQS1ZMVXQwSDM0WGcxazZzcVJ3aS9ybENIT3o4VGhOSndJREFRQUJvMkV3Clh6QU9CZ05WSFE4QkFmOEVCQU1DQXFRd0hRWURWUjBsQkJZd0ZBWUlLd1lCQlFVSEF3RUdDQ3NHQVFVRkJ3TUMKTUE4R0ExVWRFd0VCL3dRRk1BTUJBZjh3SFFZRFZSME9CQllFRkRISGFvQ0tIOC92alcxZXA1dUdIYjZsa25oYwpNQTBHQ1NxR1NJYjNEUUVCQ3dVQUE0SUJBUUFmUUxnY1JyNmRQNzlrbjFIT0padWhQWGJuZjdlZVJWenAycVNyCjdrRWtObjZrTklmNGp5a2lCTkpGaElrdjdwVXNWaTBRZEhPaFdCeCtyZVVZbkRiNlF2dEtTUHk0eVhMK3VGTmwKdFpqSzdjWWR5ZFROREk5Zk1KVSswYmk4WXQvemd3THZKRzRCeW1QdENWRFUxWDc5QXRxU3IzdmdVaDRQK0dXNApUd24rcldNaGRsa3Vwck5HNzRHMDloNDhnYy9tUk00dk9NUlZZV0U2NlNYWWJuaTQ4ejNNbEsweld2cmsyRkRmCjgzUlh5dUpqWW92YU1icXBmSnl1eEJiOVJEN1dubStMM2VxZmVmQTJzdWRvQTVNV0lvaDM5b0xWMi9uOENEZC8KV1lOOUJoSDR3RWZYbTZhWG50cGNMUTdqUDVPbVlNMzZwdXplSW5ySzVnZEVXdm96Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K"
+  HARBOR_ADMIN_PASSWORD: {{.HarborPassword}}
+  POSTGRESQL_PASSWORD: "Y2hhbmdlaXQ="
+  REGISTRY_CREDENTIAL_PASSWORD: "aGFyYm9yX3JlZ2lzdHJ5X3Bhc3N3b3Jk"
+  CSRF_KEY: "c1FCZFpiZjllMEx0N1F0eVI3aUdkVjRCU2ltbTRuUUk="
+---
+# Source: harbor/templates/database/database-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "katana-release-harbor-database"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+type: Opaque
+data:
+  POSTGRES_PASSWORD: "Y2hhbmdlaXQ="
+---
+# Source: harbor/templates/jobservice/jobservice-secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "katana-release-harbor-jobservice"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+type: Opaque
+data:
+  JOBSERVICE_SECRET: "STFTa3RuaXpHRUFReERSaQ=="
+  REGISTRY_CREDENTIAL_PASSWORD: "aGFyYm9yX3JlZ2lzdHJ5X3Bhc3N3b3Jk"
+---
+# Source: harbor/templates/nginx/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: katana-release-harbor-nginx
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+type: Opaque
+data:
+  tls.crt: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURPekNDQWlPZ0F3SUJBZ0lSQUplbThOTXpGYzRtTEtQWVRpWkVKLzB3RFFZSktvWklodmNOQVFFTEJRQXcKRkRFU01CQUdBMVVFQXhNSmFHRnlZbTl5TFdOaE1CNFhEVEl6TURjeE1URTFNamd4TWxvWERUSTBNRGN4TURFMQpNamd4TWxvd0hURWJNQmtHQTFVRUF4TVNZMjl5WlM1b1lYSmliM0l1Wkc5dFlXbHVNSUlCSWpBTkJna3Foa2lHCjl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUE0ZzQ4UkF5T3ovV0swOU1mcG9RVGRjMGlKMlN0SGw0RUJvQU4KelRyRThvTllxWnJoa2ZmSXkrcDVFaXkxL3BNeFRJVTN0dzR3bWdzNXRRRjhQeHpDd3BPTjl4WURrNEJHMndvbAp1WWZEQTcyVFVXNmh1a3Qyd1hqKzh5YW9ReHBvWFArVXpyeXlkeGpzNE16THpwOFg0bllYOS85SndvbHdtY2lzCmNiMHE2cEYvdnF6bGh0cFc5d21vUCtwaDFubUZXczRVT09Od2gxODAxSjc0alNvTTBzQ1pibXFxQzFORjZOZUsKYXdsL3MzU24ySG5UZHlucjNPQ2Z4bGtjZGpoN3Zuc2ZkNVdyNzN1a3RWZ0dOb01xSDZKUU0vaS9KK2xpd2hWaAovZ3plNmZ2MUNyUVI4WnExYjIrUU1qb3QrRWlVSHdFZzhPZlVoQVdKVTJQZmJoR0tRUUlEQVFBQm8zOHdmVEFPCkJnTlZIUThCQWY4RUJBTUNCYUF3SFFZRFZSMGxCQll3RkFZSUt3WUJCUVVIQXdFR0NDc0dBUVVGQndNQ01Bd0cKQTFVZEV3RUIvd1FDTUFBd0h3WURWUjBqQkJnd0ZvQVU2MmlsZS9DWUIyL05jK1NBWEVNVW1JU0F5VXN3SFFZRApWUjBSQkJZd0ZJSVNZMjl5WlM1b1lYSmliM0l1Wkc5dFlXbHVNQTBHQ1NxR1NJYjNEUUVCQ3dVQUE0SUJBUUM0CnhOeVVzK3lVYkRoZ3hQZzhLMDBQcC9LYmw5WEFPeXZEdTR3Sk5oU0F0a2F4YTdLZjU2a3poT2JsUEhmWkVRL2IKTFJHZjdFakFtWEI2WmFRMXltTzNROFNwSFJUNU94cVVZSHZVSHVYa1BlQWNVaFhMY084dG1VUjJIVkRTNkgvagpldTJwTnV3Y0JQcmU5OVdkZU9IR1RXN1I3dzdHVmJrZjJDNTZPY3RadTBMdEhXNTRzMXo4bld1UzlmVmJSWmpPCjBxWWJTYjRLZC8xYXB2N0FsMXFFc1dZNlpEK21WRWd4RUNua28xcStJZEQySWpKaU53cWxXaWc5cU4rdm5uNXcKN0dTVkhNZ09rT0E3b3FOR3pMdVpQNjdreTdadjZOU3ljcGJvSThjTmM5aDAycm5xd0huOFZUOHlwTnpkRFVFOApSNk5PWGtxMi92aEZqSTFLNDRhcwotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
+  tls.key: "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcFFJQkFBS0NBUUVBNGc0OFJBeU96L1dLMDlNZnBvUVRkYzBpSjJTdEhsNEVCb0FOelRyRThvTllxWnJoCmtmZkl5K3A1RWl5MS9wTXhUSVUzdHc0d21nczV0UUY4UHh6Q3dwT045eFlEazRCRzJ3b2x1WWZEQTcyVFVXNmgKdWt0MndYais4eWFvUXhwb1hQK1V6cnl5ZHhqczRNekx6cDhYNG5ZWDkvOUp3b2x3bWNpc2NiMHE2cEYvdnF6bApodHBXOXdtb1ArcGgxbm1GV3M0VU9PTndoMTgwMUo3NGpTb00wc0NaYm1xcUMxTkY2TmVLYXdsL3MzU24ySG5UCmR5bnIzT0NmeGxrY2RqaDd2bnNmZDVXcjczdWt0VmdHTm9NcUg2SlFNL2kvSitsaXdoVmgvZ3plNmZ2MUNyUVIKOFpxMWIyK1FNam90K0VpVUh3RWc4T2ZVaEFXSlUyUGZiaEdLUVFJREFRQUJBb0lCQVFDT0R3WWVlWW5SOUd1ZQovSUZhWW92Y0x1SjB3UmJ1QzRVYUZLVVh3UVA5cHo4enJxcHMwYnQxTWsrTmRWMlZzeWg2L3dqcFY5aUJKZWJJCjhqc0RhbTZXV3FZUGpkMEhkOGlQWkV3YTBNOWo3V0hEL2ZOU29KUHJ0Nzc0VE9YVzdhU0NOUGR1Q0RWYkZPWGYKeTdPVWtIUXhFNmV5YU5NUWx0Q1ZRLy9pcGs5dkFueGEwWW5pZ3pod0h0bGZsMlFhaXg4MFVsUTBSL2N2RDV4cgpZOUZxWGEzZTEyVndDWjF1YkxwZURWLzlZV01VR2ZhV1pEYVpocjdIeUFRaVlWMVczZHBzd1BZV2VYZURKR0p6Cmp5WGlzY2ZlbzFJcHFZSDFWU0RWc1VjdzU4WlUvS25uUEFoQ25YTWxJV2xXT2EzbkpkSEQrZDJ2ZDNOUmVoUWQKdFJtc1JmMVZBb0dCQU8vYlVSbUVuZ1F0ZWZYT3lNNVpZb2IrQndYSnlxNk9kbjZUbnZsUFdRNTE2aUljby8wawpCNFZUaGsyMFQ5NVNvNmthUEMwZzBYei9WL1hPY0lxMTNjbEdDRVMyRkxUT1RLN3BQNTB3SDh1ZFlQc3Iya29nCkNxV2MyYS94WFlZaG1hY2NuWGtFMzk2YWRLRjg1bVBaMmg2L2w2M3dtUi8rS092aVdUR1NCSERqQW9HQkFQRkYKSU9EdjdFNlc2MERtZm9MaThRRDlMS1VpTXdYa2phcFJ5QVNzU0xKempoZlk4SVNETzJsK2lhN2VsY1pFS1RtUgpXZVVJTXBPY09BbmgvcFp2eTZ5NndETUxEWE14dmp6MmdqVWl6eUxiM2pXSzAvbVVJVnYrSkJhaUpUa0tOQ2NCCnlXWks1VWhVY2Y2SHFNaktMV0tlNkw3dW1QNEFQOTlQOUJCQkZmV0xBb0dBTzZKRmlaaWxTTmlkcC9XZmkxNUIKMXRvMW1NVFE5WkZKK0xKdkpnRUtYVVFIMEM5YXZrZEU3MnNTeXlMM2NJa1BVNjNJSkZneWZXZG0wU0JnYnJ4RQp4aFA1WGt2KzNlMGt0NkFhUnRSK016dVByeUw2Qk0vdWxicG5qUXp2ZWJmRTRmMkZVVjlhNFpkNVErVXZ5c2VSCktXL3RJRHZmZGtyVWxjRVM5L1liMEkwQ2dZRUE3WnB6bDdJUUdSRmRteXVqZVlpL2FZYnJHYkZGYUU4K0NIYkQKc1g1dGxYaGhmakRDSk80TWE0Y1hWcVNVQVk2TXZzbmJLc2ZZN3krUXJJTG9zd1JrSTdaQ284SUZ1K1ZJQVVlTwowWDkzV0ZBSlZOZGtqRXlLVWN0RmhSaW42YldYeUxaa3ZoMlNFWnBBTFRjeVRKTjNBTUdZV3JnazZUZ2Jydk5SClcxU05xS01DZ1lFQXRRWHNWNk9YVk1ZSHVTQUw0N3VkV2RiVmFKd1pBSFJBWkVaVEw2MC9DNU11d3pIUUs2dEwKdkFYMm9YRmNGQjkyRkpyL2t0UE05ZEV0Z0ZIUThjN1lXYml4dkQyZld4ZzM3c0puZUlodnd6NnFUdlBWOWFvNgphRUNRQkF5RHB5SDBJbVRPTElVOWt3TTVUbFpqOU1XMWZpQmIrK1VUVndyMmZ3TDdlaVZjQnhrPQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo="
+  ca.crt: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURFekNDQWZ1Z0F3SUJBZ0lRS0ZWR0dqRVpOYW8yRjdKdy9PWGI5ekFOQmdrcWhraUc5dzBCQVFzRkFEQVUKTVJJd0VBWURWUVFERXdsb1lYSmliM0l0WTJFd0hoY05Nak13TnpFeE1UVXlPREV5V2hjTk1qUXdOekV3TVRVeQpPREV5V2pBVU1SSXdFQVlEVlFRREV3bG9ZWEppYjNJdFkyRXdnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCCkR3QXdnZ0VLQW9JQkFRRGlybHVzVDkzUTl1dktrYnhPdUlZZFF5OGViRjVDQlBQKzY3ajR5Zk9ZMlZlOTRicEMKS1M5MFl2M0xTR2lSMmxTU0drbjlZelRIbG5qV2p4RnNFRFlYbzBYOUVCd2xMdXQ1VjVMNEpZTTJTWGtwbHpqcQpQVE9LVk9CMTlrWkU2MzErSHBqTXc5bGdwMzVIcCtoYVlkNTVJelQwTms4UjBqc0h4VUd3QVlBTkd4cGpIL1JiCnU5aUVXbWFpUC83RFlFNkZwbTE1cGJnYkJXRkRvMWxyS0RZMVNiaGkyYnVNNkQ3T2FYOG1QVzVUMTlvRFRrM1kKQnJHVGEwYjlVb0lpcnNBaHZZNG5VdjhrS3pEK1A2RldHbGlOREE0VmhXL0k5akFsSVZzcGJwazdOYjI3NU9FYwpRd01VRGg4VXpRSSt0OXZLclNGVitsWHhYYnlYYkc0bFQ0MkZBZ01CQUFHallUQmZNQTRHQTFVZER3RUIvd1FFCkF3SUNwREFkQmdOVkhTVUVGakFVQmdnckJnRUZCUWNEQVFZSUt3WUJCUVVIQXdJd0R3WURWUjBUQVFIL0JBVXcKQXdFQi96QWRCZ05WSFE0RUZnUVU2MmlsZS9DWUIyL05jK1NBWEVNVW1JU0F5VXN3RFFZSktvWklodmNOQVFFTApCUUFEZ2dFQkFERSs2b01JRmNPU2VyUWtOT25iYWd4N2FWdzgwWFl0T3BSTzQ5SDZSb1RIRExqUUhpSmxzSUQvCktsQk1OUm94eUgzZHNpdnF1S2U2akt2bHM2My9XRlFzUGNEOFdtV0Mvd2tTc3plRzltY3B1em9tbjFmM1d4cm4KdjBBSlgrUDVQZ1VBRE5ITVhJeFl4aGNNbnd2aUJVVGdkRHVqdjhWWlF4RnozaEZhckV4R1ZMa21CeDRkUmx6TworYkpVMFA5bDZaNDJ2eXRYc2tBVjZkQ1Jqci9BWkduUlRXOVczQytDMmlaQ0duS1JYaE1xQjhKSmRZL0tDK3pVCjhGaE9YSStFZzl5ZWNLZG9DcjFtdG51cEZHdlFIRm5YZXhXTUJPcDVwaTJVQ1VjaXRPb3JGdVdUMkI5dVhkU3gKU1pvL00rMmE3bW05OVpvOFphSkZPZEI4a2E3aEdBbz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo="
+---
+# Source: harbor/templates/registry/registry-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "katana-release-harbor-registry"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+type: Opaque
+data:
+  REGISTRY_HTTP_SECRET: "cUdDSklCSDl0cDhmOTd3MQ=="
+  REGISTRY_REDIS_PASSWORD: ""
+---
+# Source: harbor/templates/registry/registry-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "katana-release-harbor-registry-htpasswd"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+type: Opaque
+data:
+  REGISTRY_HTPASSWD: "aGFyYm9yX3JlZ2lzdHJ5X3VzZXI6JDJhJDEwJHNNZjk2MEpSamtCRGJjLzJ2M2YwQ3Vmcy94dktVc0RqbFlkdnc2MERwcXEya2ZDRkVCMjNT"
+---
+# Source: harbor/templates/registry/registryctl-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "katana-release-harbor-registryctl"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+type: Opaque
+data:
+---
+# Source: harbor/templates/core/core-cm.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: katana-release-harbor-core
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+data:
+  app.conf: |+
+    appname = Harbor
+    runmode = prod
+    enablegzip = true
+
+    [prod]
+    httpport = 8080
+  PORT: "8080"
+  DATABASE_TYPE: "postgresql"
+  POSTGRESQL_HOST: "katana-release-harbor-database"
+  POSTGRESQL_PORT: "5432"
+  POSTGRESQL_USERNAME: "postgres"
+  POSTGRESQL_DATABASE: "registry"
+  POSTGRESQL_SSLMODE: "disable"
+  POSTGRESQL_MAX_IDLE_CONNS: "100"
+  POSTGRESQL_MAX_OPEN_CONNS: "900"
+  EXT_ENDPOINT: {{ printf "https://%s" .HarborHostname }}
+  CORE_URL: "http://katana-release-harbor-core:80"
+  JOBSERVICE_URL: "http://katana-release-harbor-jobservice"
+  REGISTRY_URL: "http://katana-release-harbor-registry:5000"
+  TOKEN_SERVICE_URL: "http://katana-release-harbor-core:80/service/token"
+  CORE_LOCAL_URL: "http://127.0.0.1:8080"
+  REGISTRY_STORAGE_PROVIDER_NAME: "filesystem"
+  LOG_LEVEL: "info"
+  CONFIG_PATH: "/etc/core/app.conf"
+  CHART_CACHE_DRIVER: "redis"
+  _REDIS_URL_CORE: "redis://katana-release-harbor-redis:6379/0?idle_timeout_seconds=30"
+  _REDIS_URL_REG: "redis://katana-release-harbor-redis:6379/2?idle_timeout_seconds=30"
+  PORTAL_URL: "http://katana-release-harbor-portal"
+  REGISTRY_CONTROLLER_URL: "http://katana-release-harbor-registry:8080"
+  REGISTRY_CREDENTIAL_USERNAME: "harbor_registry_user"
+  HTTP_PROXY: ""
+  HTTPS_PROXY: ""
+  NO_PROXY: "katana-release-harbor-core,katana-release-harbor-jobservice,katana-release-harbor-database,katana-release-harbor-registry,katana-release-harbor-portal,katana-release-harbor-exporter,127.0.0.1,localhost,.local,.internal"
+  PERMITTED_REGISTRY_TYPES_FOR_PROXY_CACHE: "docker-hub,harbor,azure-acr,aws-ecr,google-gcr,quay,docker-registry,github-ghcr,jfrog-artifactory"
+---
+# Source: harbor/templates/jobservice/jobservice-cm-env.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "katana-release-harbor-jobservice-env"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+data:
+  CORE_URL: "http://katana-release-harbor-core:80"
+  TOKEN_SERVICE_URL: "http://katana-release-harbor-core:80/service/token"
+  REGISTRY_URL: "http://katana-release-harbor-registry:5000"
+  REGISTRY_CONTROLLER_URL: "http://katana-release-harbor-registry:8080"
+  REGISTRY_CREDENTIAL_USERNAME: "harbor_registry_user"
+
+  JOBSERVICE_WEBHOOK_JOB_MAX_RETRY: "3"
+  JOBSERVICE_WEBHOOK_JOB_HTTP_CLIENT_TIMEOUT: "3"
+  HTTP_PROXY: ""
+  HTTPS_PROXY: ""
+  NO_PROXY: "katana-release-harbor-core,katana-release-harbor-jobservice,katana-release-harbor-database,katana-release-harbor-registry,katana-release-harbor-portal,katana-release-harbor-exporter,127.0.0.1,localhost,.local,.internal"
+---
+# Source: harbor/templates/jobservice/jobservice-cm.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "katana-release-harbor-jobservice"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+data:
+  config.yml: |+
+    #Server listening port
+    protocol: "http"
+    port: 8080
+    worker_pool:
+      workers: 10
+      backend: "redis"
+      redis_pool:
+        redis_url: "redis://katana-release-harbor-redis:6379/1"
+        namespace: "harbor_job_service_namespace"
+        idle_timeout_second: 3600
+    job_loggers:
+      - name: "FILE"
+        level: INFO
+        settings: # Customized settings of logger
+          base_dir: "/var/log/jobs"
+        sweeper:
+          duration: 14 #days
+          settings: # Customized settings of sweeper
+            work_dir: "/var/log/jobs"
+    metric:
+      enabled: false
+      path: /metrics
+      port: 8001
+    #Loggers for the job service
+    loggers:
+      - name: "STD_OUTPUT"
+        level: INFO
+    reaper:
+      # the max time to wait for a task to finish, if unfinished after max_update_hours, the task will be mark as error, but the task will continue to run, default value is 24
+      max_update_hours: 24
+      # the max time for execution in running state without new task created
+      max_dangling_hours: 168
+---
+# Source: harbor/templates/nginx/configmap-https.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: katana-release-harbor-nginx
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+data:
+  nginx.conf: |+
+    worker_processes auto;
+    pid /tmp/nginx.pid;
+
+    events {
+      worker_connections 3096;
+      use epoll;
+      multi_accept on;
+    }
+
+    http {
+      client_body_temp_path /tmp/client_body_temp;
+      proxy_temp_path /tmp/proxy_temp;
+      fastcgi_temp_path /tmp/fastcgi_temp;
+      uwsgi_temp_path /tmp/uwsgi_temp;
+      scgi_temp_path /tmp/scgi_temp;
+      tcp_nodelay on;
+
+      # this is necessary for us to be able to disable request buffering in all cases
+      proxy_http_version 1.1;
+
+      upstream core {
+        server "katana-release-harbor-core:80";
+      }
+
+      upstream portal {
+        server "katana-release-harbor-portal:80";
+      }
+
+      log_format timed_combined '[$time_local]:$remote_addr - '
+        '"$request" $status $body_bytes_sent '
+        '"$http_referer" "$http_user_agent" '
+        '$request_time $upstream_response_time $pipe';
+
+      access_log /dev/stdout timed_combined;
+
+      map $http_x_forwarded_proto $x_forwarded_proto {
+        default $http_x_forwarded_proto;
+        ""      $scheme;
+      }
+      server {
+        listen 4443 ssl;
+        listen [::]:4443 ssl;
+        server_tokens off;
+        # ssl
+        ssl_certificate /etc/nginx/cert/tls.crt;
+        ssl_certificate_key /etc/nginx/cert/tls.key;
+
+        # recommendations from https://raymii.org/s/tutorials/strong_ssl_security_on_nginx.html
+        ssl_protocols tlsv1.2;
+        ssl_ciphers '!aNULL:kECDH+AESGCM:ECDH+AESGCM:RSA+AESGCM:kECDH+AES:ECDH+AES:RSA+AES:';
+        ssl_prefer_server_ciphers on;
+        ssl_session_cache shared:ssl:10m;
+
+        # disable any limits to avoid http 413 for large image uploads
+        client_max_body_size 0;
+
+        # required to avoid http 411: see issue #1486 (https://github.com/docker/docker/issues/1486)
+        chunked_transfer_encoding on;
+
+        location /v2/ {
+          proxy_set_header Host $http_host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $x_forwarded_proto;
+
+          proxy_buffering off;
+          proxy_request_buffering off;
+
+          proxy_send_timeout 900;
+          proxy_read_timeout 900;
+        }
+      }
+
+      server {
+        listen 8443 ssl;
+        listen [::]:8443 ssl;
+    #    server_name harbordomain.com;
+        server_tokens off;
+        # SSL
+        ssl_certificate /etc/nginx/cert/tls.crt;
+        ssl_certificate_key /etc/nginx/cert/tls.key;
+
+        # Recommendations from https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
+        ssl_protocols TLSv1.2;
+        ssl_ciphers '!aNULL:kECDH+AESGCM:ECDH+AESGCM:RSA+AESGCM:kECDH+AES:ECDH+AES:RSA+AES:';
+        ssl_prefer_server_ciphers on;
+        ssl_session_cache shared:SSL:10m;
+
+        # disable any limits to avoid HTTP 413 for large image uploads
+        client_max_body_size 0;
+
+        # required to avoid HTTP 411: see Issue #1486 (https://github.com/docker/docker/issues/1486)
+        chunked_transfer_encoding on;
+
+        # Add extra headers
+        add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";
+        add_header X-Frame-Options DENY;
+        add_header Content-Security-Policy "frame-ancestors 'none'";
+
+        location / {
+          proxy_pass http://portal/;
+          proxy_set_header Host $http_host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $x_forwarded_proto;
+
+          proxy_cookie_path / "/; HttpOnly; Secure";
+
+          proxy_buffering off;
+          proxy_request_buffering off;
+        }
+
+        location /api/ {
+          proxy_pass http://core/api/;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $x_forwarded_proto;
+
+          proxy_cookie_path / "/; Secure";
+
+          proxy_buffering off;
+          proxy_request_buffering off;
+        }
+
+        location /chartrepo/ {
+          proxy_pass http://core/chartrepo/;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $x_forwarded_proto;
+
+          proxy_cookie_path / "/; Secure";
+
+          proxy_buffering off;
+          proxy_request_buffering off;
+        }
+
+        location /c/ {
+          proxy_pass http://core/c/;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $x_forwarded_proto;
+
+          proxy_cookie_path / "/; Secure";
+
+          proxy_buffering off;
+          proxy_request_buffering off;
+        }
+
+        location /v1/ {
+          return 404;
+        }
+
+        location /v2/ {
+          proxy_pass http://core/v2/;
+          proxy_set_header Host $http_host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $x_forwarded_proto;
+          proxy_buffering off;
+          proxy_request_buffering off;
+        }
+
+        location /service/ {
+          proxy_pass http://core/service/;
+          proxy_set_header Host $http_host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $x_forwarded_proto;
+
+          proxy_cookie_path / "/; Secure";
+
+          proxy_buffering off;
+          proxy_request_buffering off;
+        }
+
+      location /service/notifications {
+          return 404;
+        }
+      }
+        server {
+          listen 8080;
+          listen [::]:8080;
+          #server_name harbordomain.com;
+          return 301 https://$host$request_uri;
+      }
+    }
+---
+# Source: harbor/templates/portal/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "katana-release-harbor-portal"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+data:
+  nginx.conf: |+
+    worker_processes auto;
+    pid /tmp/nginx.pid;
+    events {
+        worker_connections  1024;
+    }
+    http {
+        client_body_temp_path /tmp/client_body_temp;
+        proxy_temp_path /tmp/proxy_temp;
+        fastcgi_temp_path /tmp/fastcgi_temp;
+        uwsgi_temp_path /tmp/uwsgi_temp;
+        scgi_temp_path /tmp/scgi_temp;
+        server {
+            listen 8080;
+            listen [::]:8080;
+            server_name  localhost;
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+            include /etc/nginx/mime.types;
+            gzip on;
+            gzip_min_length 1000;
+            gzip_proxied expired no-cache no-store private auth;
+            gzip_types text/plain text/css application/json application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+            location /devcenter-api-2.0 {
+                try_files $uri $uri/ /swagger-ui-index.html;
+            }
+            location / {
+                try_files $uri $uri/ /index.html;
+            }
+            location = /index.html {
+                add_header Cache-Control "no-store, no-cache, must-revalidate";
+            }
+        }
+    }
+---
+# Source: harbor/templates/registry/registry-cm.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "katana-release-harbor-registry"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+data:
+  config.yml: |+
+    version: 0.1
+    log:
+      level: info
+      fields:
+        service: registry
+    storage:
+      filesystem:
+        rootdirectory: /storage
+      cache:
+        layerinfo: redis
+      maintenance:
+        uploadpurging:
+          enabled: true
+          age: 168h
+          interval: 24h
+          dryrun: false
+      delete:
+        enabled: true
+      redirect:
+        disable: false
+    redis:
+      addr: katana-release-harbor-redis:6379
+      db: 2
+      readtimeout: 10s
+      writetimeout: 10s
+      dialtimeout: 10s
+      pool:
+        maxidle: 100
+        maxactive: 500
+        idletimeout: 60s
+    http:
+      addr: :5000
+      relativeurls: false
+      # set via environment variable
+      # secret: placeholder
+      debug:
+        addr: localhost:5001
+    auth:
+      htpasswd:
+        realm: harbor-registry-basic-realm
+        path: /etc/registry/passwd
+    validation:
+      disabled: true
+    compatibility:
+      schema1:
+        enabled: true
+  ctl-config.yml: |+
+    ---
+    protocol: "http"
+    port: 8080
+    log_level: info
+    registry_config: "/etc/registry/config.yml"
+---
+# Source: harbor/templates/registry/registryctl-cm.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "katana-release-harbor-registryctl"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+data:
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: katana-release-jobservice-pv
+  namespace: katana
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: katana-release-jobservice-storage-class
+  hostPath:
+    path: /data/my-pv
+---
+# Source: harbor/templates/jobservice/jobservice-pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: katana-release-harbor-jobservice
+  namespace: katana
+  annotations:
+    helm.sh/resource-policy: keep
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+    component: jobservice
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: katana-release-jobservice-storage-class
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: katana-release-registry-pv
+  namespace: katana
+spec:
+  capacity:
+    storage: 9Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: katana-release-registry-storage-class
+  hostPath:
+    path: /data/my-pv
+---
+# Source: harbor/templates/registry/registry-pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: katana-release-harbor-registry
+  namespace: katana
+  annotations:
+    helm.sh/resource-policy: keep
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+    component: registry
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: katana-release-registry-storage-class
+  resources:
+    requests:
+      storage: 9Gi
+---
+# Source: harbor/templates/core/core-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: katana-release-harbor-core
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+spec:
+  ports:
+    - name: http-web
+      port: 80
+      targetPort: 8080
+  selector:
+    release: katana-release
+    app: "harbor"
+    component: core
+---
+# Source: harbor/templates/database/database-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "katana-release-harbor-database"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+spec:
+  ports:
+    - port: 5432
+  selector:
+    release: katana-release
+    app: "harbor"
+    component: database
+---
+# Source: harbor/templates/jobservice/jobservice-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "katana-release-harbor-jobservice"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+spec:
+  ports:
+    - name: http-jobservice
+      port: 80
+      targetPort: 8080
+  selector:
+    release: katana-release
+    app: "harbor"
+    component: jobservice
+---
+# Source: harbor/templates/nginx/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: harbor
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+    - name: https
+      port: 443
+      targetPort: 8443
+  selector:
+    release: katana-release
+    app: "harbor"
+    component: nginx
+---
+# Source: harbor/templates/portal/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "katana-release-harbor-portal"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    release: katana-release
+    app: "harbor"
+    component: portal
+---
+# Source: harbor/templates/redis/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: katana-release-harbor-redis
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+spec:
+  ports:
+    - port: 6379
+  selector:
+    release: katana-release
+    app: "harbor"
+    component: redis
+---
+# Source: harbor/templates/registry/registry-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "katana-release-harbor-registry"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+spec:
+  ports:
+    - name: http-registry
+      port: 5000
+
+    - name: http-controller
+      port: 8080
+  selector:
+    release: katana-release
+    app: "harbor"
+    component: registry
+---
+# Source: harbor/templates/core/core-dpl.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: katana-release-harbor-core
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+    component: core
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      release: katana-release
+      app: "harbor"
+      component: core
+  template:
+    metadata:
+      labels:
+        release: katana-release
+        app: "harbor"
+        component: core
+      annotations:
+        checksum/configmap: 0334571c84ddf6b51cd2667ed16660c7537986c69499dfe04e6b6087173aeaba
+        checksum/secret: 7faa2b9337d9cf228bfb4aa0350a926ba1e12874e93df49c2ca0911ee775821b
+        checksum/secret-jobservice: d5129e6aaef2cc6ce1c27798e421f3db91ec5476d6954d43fc6d5c8038581780
+    spec:
+      securityContext:
+        runAsUser: 10000
+        fsGroup: 10000
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 120
+      containers:
+        - name: core
+          image: goharbor/harbor-core:v2.8.2
+          imagePullPolicy: IfNotPresent
+          startupProbe:
+            httpGet:
+              path: /api/v2.0/ping
+              scheme: HTTP
+              port: 8080
+            failureThreshold: 360
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/v2.0/ping
+              scheme: HTTP
+              port: 8080
+            failureThreshold: 2
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/v2.0/ping
+              scheme: HTTP
+              port: 8080
+            failureThreshold: 2
+            periodSeconds: 10
+          envFrom:
+            - configMapRef:
+                name: "katana-release-harbor-core"
+            - secretRef:
+                name: "katana-release-harbor-core"
+          env:
+            - name: CORE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: katana-release-harbor-core
+                  key: secret
+            - name: JOBSERVICE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: "katana-release-harbor-jobservice"
+                  key: JOBSERVICE_SECRET
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /etc/core/app.conf
+              subPath: app.conf
+            - name: secret-key
+              mountPath: /etc/core/key
+              subPath: key
+            - name: token-service-private-key
+              mountPath: /etc/core/private_key.pem
+              subPath: tls.key
+            - name: ca-download
+              mountPath: /etc/core/ca
+            - name: psc
+              mountPath: /etc/core/token
+      volumes:
+        - name: config
+          configMap:
+            name: katana-release-harbor-core
+            items:
+              - key: app.conf
+                path: app.conf
+        - name: secret-key
+          secret:
+            secretName: katana-release-harbor-core
+            items:
+              - key: secretKey
+                path: key
+        - name: token-service-private-key
+          secret:
+            secretName: katana-release-harbor-core
+        - name: ca-download
+          secret:
+            secretName: katana-release-harbor-nginx
+        - name: psc
+          emptyDir: {}
+---
+# Source: harbor/templates/jobservice/jobservice-dpl.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "katana-release-harbor-jobservice"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+    component: jobservice
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      release: katana-release
+      app: "harbor"
+      component: jobservice
+  template:
+    metadata:
+      labels:
+        heritage: Helm
+        release: katana-release
+        chart: harbor
+        app: "harbor"
+        component: jobservice
+      annotations:
+        checksum/configmap: 4f7dbbc49083e08019aef002eb306672953036d7f85e00f568404bde6c98d976
+        checksum/configmap-env: 953157a19522b446dbae0f74c73b050c8d1ca3ef3b8bceafa45c10535d84b028
+        checksum/secret: 862dc4207957cbdfd7bb5413ade26c3db089553df5b9b3fbfc4f16a31c6ce031
+        checksum/secret-core: 31e4aea33c72f5e8c3ba358533fdb48daa2a9a7b02d332013bd9306558dc4c1b
+    spec:
+      securityContext:
+        runAsUser: 10000
+        fsGroup: 10000
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 120
+      containers:
+        - name: jobservice
+          image: goharbor/harbor-jobservice:v2.8.2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /api/v1/stats
+              scheme: HTTP
+              port: 8080
+            initialDelaySeconds: 300
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/v1/stats
+              scheme: HTTP
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          env:
+            - name: CORE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: katana-release-harbor-core
+                  key: secret
+          envFrom:
+            - configMapRef:
+                name: "katana-release-harbor-jobservice-env"
+            - secretRef:
+                name: "katana-release-harbor-jobservice"
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: jobservice-config
+              mountPath: /etc/jobservice/config.yml
+              subPath: config.yml
+            - name: job-logs
+              mountPath: /var/log/jobs
+              subPath:
+      volumes:
+        - name: jobservice-config
+          configMap:
+            name: "katana-release-harbor-jobservice"
+        - name: job-logs
+          persistentVolumeClaim:
+            claimName: katana-release-harbor-jobservice
+---
+# Source: harbor/templates/nginx/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: katana-release-harbor-nginx
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+    component: nginx
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      release: katana-release
+      app: "harbor"
+      component: nginx
+  template:
+    metadata:
+      labels:
+        heritage: Helm
+        release: katana-release
+        chart: harbor
+        app: "harbor"
+        component: nginx
+      annotations:
+        checksum/configmap: a92b78facde57026cc240c7a2a4a1958dffc2516e9870759473d1851a0a4f92c
+        checksum/secret: 62478d316942054099cad3304fda9a647d7564eacaae9dd9989203c52667e4ac
+    spec:
+      securityContext:
+        runAsUser: 10000
+        fsGroup: 10000
+      automountServiceAccountToken: false
+      containers:
+        - name: nginx
+          image: "goharbor/nginx-photon:v2.8.2"
+          imagePullPolicy: "IfNotPresent"
+          livenessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /
+              port: 8443
+            initialDelaySeconds: 300
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /
+              port: 8443
+            initialDelaySeconds: 1
+            periodSeconds: 10
+          ports:
+            - containerPort: 8080
+            - containerPort: 8443
+            - containerPort: 4443
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: certificate
+              mountPath: /etc/nginx/cert
+      volumes:
+        - name: config
+          configMap:
+            name: katana-release-harbor-nginx
+        - name: certificate
+          secret:
+            secretName: katana-release-harbor-nginx
+---
+# Source: harbor/templates/portal/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "katana-release-harbor-portal"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+    component: portal
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      release: katana-release
+      app: "harbor"
+      component: portal
+  template:
+    metadata:
+      labels:
+        release: katana-release
+        app: "harbor"
+        component: portal
+      annotations:
+        checksum/configmap: 4f57228da5b996ce2e1d73f0b48047e3c9bcad7981c56b409a4049c270489dc2
+    spec:
+      securityContext:
+        runAsUser: 10000
+        fsGroup: 10000
+      automountServiceAccountToken: false
+      containers:
+        - name: portal
+          image: goharbor/harbor-portal:v2.8.2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /
+              scheme: HTTP
+              port: 8080
+            initialDelaySeconds: 300
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              scheme: HTTP
+              port: 8080
+            initialDelaySeconds: 1
+            periodSeconds: 10
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: portal-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+      volumes:
+        - name: portal-config
+          configMap:
+            name: "katana-release-harbor-portal"
+---
+# Source: harbor/templates/registry/registry-dpl.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "katana-release-harbor-registry"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+    component: registry
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      release: katana-release
+      app: "harbor"
+      component: registry
+  template:
+    metadata:
+      labels:
+        heritage: Helm
+        release: katana-release
+        chart: harbor
+        app: "harbor"
+        component: registry
+      annotations:
+        checksum/configmap: b75e637804ef6ab7e2215cc2ab72b2231972ce38099b82e0ce84c84464a961e7
+        checksum/secret: f7ed066f6376d849856c0480dce82476c465e6807fc1253187725a7323d4a1ea
+        checksum/secret-jobservice: 1c01e2de95a6034acb4d380eb5a71257a9a71311e935b014efef1b7383e88031
+        checksum/secret-core: a854c765adff010b41ee779d188bcc6bcfd1e312f21b94d6bd59580f5a8d066a
+    spec:
+      securityContext:
+        runAsUser: 10000
+        fsGroup: 10000
+        fsGroupChangePolicy: OnRootMismatch
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 120
+      containers:
+        - name: registry
+          image: goharbor/registry-photon:v2.8.2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /
+              scheme: HTTP
+              port: 5000
+            initialDelaySeconds: 300
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              scheme: HTTP
+              port: 5000
+            initialDelaySeconds: 1
+            periodSeconds: 10
+          args: ["serve", "/etc/registry/config.yml"]
+          envFrom:
+            - secretRef:
+                name: "katana-release-harbor-registry"
+          env:
+          ports:
+            - containerPort: 5000
+            - containerPort: 5001
+          volumeMounts:
+            - name: registry-data
+              mountPath: /storage
+              subPath:
+            - name: registry-htpasswd
+              mountPath: /etc/registry/passwd
+              subPath: passwd
+            - name: registry-config
+              mountPath: /etc/registry/config.yml
+              subPath: config.yml
+        - name: registryctl
+          image: goharbor/harbor-registryctl:v2.8.2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              scheme: HTTP
+              port: 8080
+            initialDelaySeconds: 300
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              scheme: HTTP
+              port: 8080
+            initialDelaySeconds: 1
+            periodSeconds: 10
+          envFrom:
+            - configMapRef:
+                name: "katana-release-harbor-registryctl"
+            - secretRef:
+                name: "katana-release-harbor-registry"
+            - secretRef:
+                name: "katana-release-harbor-registryctl"
+          env:
+            - name: CORE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: katana-release-harbor-core
+                  key: secret
+            - name: JOBSERVICE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: katana-release-harbor-jobservice
+                  key: JOBSERVICE_SECRET
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: registry-data
+              mountPath: /storage
+              subPath:
+            - name: registry-config
+              mountPath: /etc/registry/config.yml
+              subPath: config.yml
+            - name: registry-config
+              mountPath: /etc/registryctl/config.yml
+              subPath: ctl-config.yml
+      volumes:
+        - name: registry-htpasswd
+          secret:
+            secretName: katana-release-harbor-registry-htpasswd
+
+            items:
+              - key: REGISTRY_HTPASSWD
+                path: passwd
+        - name: registry-config
+          configMap:
+            name: "katana-release-harbor-registry"
+        - name: registry-data
+          persistentVolumeClaim:
+            claimName: katana-release-harbor-registry
+---
+# Source: harbor/templates/database/database-ss.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "katana-release-harbor-database"
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+    component: database
+spec:
+  replicas: 1
+  serviceName: "katana-release-harbor-database"
+  selector:
+    matchLabels:
+      release: katana-release
+      app: "harbor"
+      component: database
+  template:
+    metadata:
+      labels:
+        heritage: Helm
+        release: katana-release
+        chart: harbor
+        app: "harbor"
+        component: database
+      annotations:
+        checksum/secret: ed9edd1f8c192111d15a20b2a392275408e9802a66f04db8f24eb48610f87df2
+    spec:
+      securityContext:
+        runAsUser: 999
+        fsGroup: 999
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 120
+      initContainers:
+        # as we change the data directory to a sub folder to support psp, the init container here
+        # is used to migrate the existing data. See https://github.com/goharbor/harbor-helm/issues/756
+        # for more detail.
+        # we may remove it after several releases
+        - name: "data-migrator"
+          image: goharbor/harbor-db:v2.8.2
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh"]
+          args:
+            [
+              "-c",
+              "[ -e /var/lib/postgresql/data/postgresql.conf ] && [ ! -d /var/lib/postgresql/data/pgdata ] && mkdir -m 0700 /var/lib/postgresql/data/pgdata && mv /var/lib/postgresql/data/* /var/lib/postgresql/data/pgdata/ || true",
+            ]
+          volumeMounts:
+            - name: database-data
+              mountPath: /var/lib/postgresql/data
+              subPath:
+        # with "fsGroup" set, each time a volume is mounted, Kubernetes must recursively chown() and chmod() all the files and directories inside the volume
+        # this causes the postgresql reports the "data directory /var/lib/postgresql/data/pgdata has group or world access" issue when using some CSIs e.g. Ceph
+        # use this init container to correct the permission
+        # as "fsGroup" applied before the init container running, the container has enough permission to execute the command
+        - name: "data-permissions-ensurer"
+          image: goharbor/harbor-db:v2.8.2
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh"]
+          args: ["-c", "chmod -R 700 /var/lib/postgresql/data/pgdata || true"]
+          volumeMounts:
+            - name: database-data
+              mountPath: /var/lib/postgresql/data
+              subPath:
+      containers:
+        - name: database
+          image: goharbor/harbor-db:v2.8.2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+                - /docker-healthcheck.sh
+            initialDelaySeconds: 300
+            periodSeconds: 10
+            timeoutSeconds: 1
+          readinessProbe:
+            exec:
+              command:
+                - /docker-healthcheck.sh
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 1
+          envFrom:
+            - secretRef:
+                name: "katana-release-harbor-database"
+          env:
+            # put the data into a sub directory to avoid the permission issue in k8s with restricted psp enabled
+            # more detail refer to https://github.com/goharbor/harbor-helm/issues/756
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/pgdata"
+          volumeMounts:
+            - name: database-data
+              mountPath: /var/lib/postgresql/data
+              subPath:
+            - name: shm-volume
+              mountPath: /dev/shm
+      volumes:
+        - name: shm-volume
+          emptyDir:
+            medium: Memory
+            sizeLimit: 512Mi
+  volumeClaimTemplates:
+    - metadata:
+        name: "database-data"
+        labels:
+          heritage: Helm
+          release: katana-release
+          chart: harbor
+          app: "harbor"
+        annotations:
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: "1Gi"
+---
+# Source: harbor/templates/redis/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: katana-release-harbor-redis
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+    component: redis
+spec:
+  replicas: 1
+  serviceName: katana-release-harbor-redis
+  selector:
+    matchLabels:
+      release: katana-release
+      app: "harbor"
+      component: redis
+  template:
+    metadata:
+      labels:
+        heritage: Helm
+        release: katana-release
+        chart: harbor
+        app: "harbor"
+        component: redis
+    spec:
+      securityContext:
+        runAsUser: 999
+        fsGroup: 999
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 120
+      containers:
+        - name: redis
+          image: goharbor/redis-photon:v2.8.2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 300
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 1
+            periodSeconds: 10
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/redis
+              subPath:
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          heritage: Helm
+          release: katana-release
+          chart: harbor
+          app: "harbor"
+        annotations:
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: "1Gi"
