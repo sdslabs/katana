@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strconv"
 
-	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
