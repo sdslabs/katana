@@ -38,4 +38,6 @@ var (
 	MongoConfig = KatanaConfig.Mongo
 
 	MySQLConfig = KatanaConfig.MySQL
+
+	HarborConfig = KatanaConfig.Harbor
 )

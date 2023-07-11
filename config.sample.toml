@@ -64,3 +64,8 @@ port = "32001"
 [admin]
 username = "sdslabs"
 password = "sdslabs"
+
+[harbor]
+username = "admin"
+password = "Harbor12345"
+hostname = "harbor.katana.local"

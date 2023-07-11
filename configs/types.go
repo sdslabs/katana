@@ -76,6 +76,13 @@ type KatanaCfg struct {
 	TeamVmConfig    TeamChallengeConfig `toml:"teamvm"`
 	AdminConfig     AdminCfg            `toml:"admin"`
 	MySQL           MySQLCfg            `toml:"mysql"`
+	Harbor          HarborCfg           `toml:"harbor"`
 	TimeOut         int                 `toml:"timeout"`
 	TeamDeployement int32               `toml:"numberofdeployements"`
+}
+
+type HarborCfg struct {
+	Username string `toml:"username"`
+	Password string `toml:"password"`
+	Hostname string `toml:"hostname"`
 }
