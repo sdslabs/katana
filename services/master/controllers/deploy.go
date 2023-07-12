@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	archiver "github.com/mholt/archiver/v3"
 	g "github.com/sdslabs/katana/configs"
+
 	"github.com/sdslabs/katana/lib/utils"
 	deployer "github.com/sdslabs/katana/services/challengedeployerservice"
 )
@@ -28,8 +29,8 @@ func buildimage(folderName string) {
 	dirPath, _ := os.Getwd()
 	fmt.Println("Dockerfile for the image is at :")
 	fmt.Println(dirPath + "/challenges/" + folderName + "/" + folderName)
-	cmd := exec.Command("docker", "build", "-t", folderName, dirPath+"/chall/"+folderName+"/"+folderName)
-	cmd2 := exec.Command("minikube", "image", "load", folderName)
+	cmd := exec.Command("docker", "build", "-t", g.HarborConfig.Hostname+"/katana/"+folderName, dirPath+"/chall/"+folderName+"/"+folderName)
+	cmd2 := exec.Command("docker", "push", g.HarborConfig.Hostname+"/katana/"+folderName)
 	cmd.Run()
 	cmd2.Run()
 }

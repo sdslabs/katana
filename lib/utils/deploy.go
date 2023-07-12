@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	g "github.com/sdslabs/katana/configs"
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -19,7 +20,7 @@ func DeployChallenge(challengeName, teamName string, firstPatch bool, replicas i
 	}
 
 	deploymentsClient := kubeclient.AppsV1().Deployments(teamNamespace)
-	imageName := challengeName + ":latest"
+	imageName := g.HarborConfig.Hostname + "/katana/" + challengeName + ":latest"
 	if firstPatch {
 		/// Retrieve the existing deployment
 		existingDeployment, err := deploymentsClient.Get(context.TODO(), challengeName, metav1.GetOptions{})
