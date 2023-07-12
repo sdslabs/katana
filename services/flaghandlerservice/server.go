@@ -9,7 +9,7 @@ import (
 )
 
 var namespace string = "katana"
-var podName string = "kashira-0"
+var podName string = "kashira"
 var containerName string = "kashira"
 
 func SendFlagCheckerAndUpdaterToKashira(localFilePath string) {
@@ -29,20 +29,18 @@ func Server() {
 
 	go func() {
 		for range ticker.C {
-			// Get the pod
-			pod, err := client.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
+			pod, err := client.AppsV1().StatefulSets(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
 			if err != nil {
 				fmt.Println(err)
+				return
 			}
-
-			// Modify annotations
 			pod.Annotations["tick"] = "true"
-
-			// Update the pod
-			_, err = client.CoreV1().Pods(namespace).Update(context.TODO(), pod, metav1.UpdateOptions{})
+			_, err = client.AppsV1().StatefulSets(namespace).Update(context.TODO(), pod, metav1.UpdateOptions{})
 			if err != nil {
 				fmt.Println(err)
+				return
 			}
+
 		}
 	}()
 }

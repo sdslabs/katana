@@ -33,16 +33,16 @@ func CreateTeams(teamnumber int) error {
 		if err != nil {
 			return err
 		}
-		podNamespace := "katana-team-" + fmt.Sprint(i) + "-ns"
-		// start watching for container events
-		go envVariables(gogs, pwd, podNamespace)
+		podNamespace := "katana-team-" + fmt.Sprint(i)
 		team := types.CTFTeam{
-			Index:    i,
-			Name:     podNamespace,
-			PodName:  podName,
-			Password: hashed,
+			Index:      i,
+			Name:       podNamespace,
+			PodName:    podName,
+			Password:   hashed,
 			Challenges: []types.Challenge{},
 		}
+		podNamespace = "katana-team-" + fmt.Sprint(i) + "-ns"
+		go envVariables(gogs, pwd, podNamespace)
 		mysql.CreateGogsUser(team.Name, pwd)
 		mysql.CreateAccessToken(team.Name, pwd)
 		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s\n", i, team.Name, pwd)

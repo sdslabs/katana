@@ -16,7 +16,7 @@ import (
 
 func Server() error {
 
-	utils.InitTicker(5 * time.Minute)
+	utils.InitTicker(10 * time.Second)
 
 	fiberConfig := fiber.Config{
 		ReadTimeout:           5 * time.Second,
@@ -54,5 +54,6 @@ func Server() error {
 	admin.Get("/gitServer", infraSetService.GitServer)
 	admin.Get("/deleteChallenge/:chall_name", challengeDeployerService.DeleteChallenge)
 	log.Printf("Listening on %s:%d\n", cfg.APIConfig.Host, cfg.APIConfig.Port)
+	admin.Get("/startTicker", c.StartTicker)
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port))
 }

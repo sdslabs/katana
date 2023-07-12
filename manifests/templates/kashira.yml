@@ -2,6 +2,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: kashira-pv
+  namespace: katana
 spec:
   capacity:
     storage: 1Gi
@@ -17,6 +18,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: kashira-pvc
+  namespace: katana
 spec:
   accessModes:
     - ReadWriteOnce
@@ -30,6 +32,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: kashira
+  namespace: katana
   annotations:
     tick: "false"
 spec:
@@ -40,18 +43,20 @@ spec:
   replicas: 1
   template:
     metadata:
+      namespace: katana
       labels:
         app: kashira
     spec:
       serviceAccountName: cluster-admin
       containers:
         - name: kashira
-          image: core.harbor.domain/katana/kashira:latest
+          image: percy477/kashira:latest
           ports:
             - containerPort: 80
   volumeClaimTemplates:
     - metadata:
         name: data
+        namespace: katana
       spec:
         accessModes: ["ReadWriteOnce"]
         storageClassName: standard
@@ -64,10 +69,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kashira-svc
+  namespace: katana
 spec:
-  clusterIP: None
   selector:
-    app: example-app
+    app: kashira
   ports:
     - protocol: TCP
       port: 80
