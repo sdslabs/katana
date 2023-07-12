@@ -26,6 +26,7 @@ type ManifestConfig struct {
 	HarborKey             string
 	HarborCrt             string
 	HarborCaCrt           string
+	HarborIP              string
 	HarborHostname        string
 }
 

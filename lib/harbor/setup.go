@@ -23,5 +23,9 @@ func SetupHarbor() error {
 		return err
 	}
 
+	if err := setHostsInCluster(); err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -204,6 +204,7 @@ func DeploymentConfig() types.ManifestConfig {
 		HarborKey:             "",
 		HarborCrt:             "",
 		HarborCaCrt:           "",
+		HarborIP:              "",
 		HarborHostname:        g.KatanaConfig.Harbor.Hostname,
 	}
 
