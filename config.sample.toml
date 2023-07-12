@@ -13,15 +13,9 @@ broadcastlabel = "broadcast"
 teamcount = 1
 teamlabel = "ctfteam"
 manifest_dir = "manifests/templates"
+manifest_runtime_dir = "manifests/templates/runtime"
 manifests = [
-    "broadcast.yml",
-    "broadcast-service.yml",
-    "ingress.yml",
-    "openvpn.yml",
-    "mysql.yml",
-    "logs.yml",
-    "mongo.yml",
-    "gogs.yml",
+    "harbor.yml",
 ]
 
 [services.api]

@@ -15,7 +15,6 @@ import (
 	ssh "github.com/sdslabs/katana/services/sshproviderservice"
 	coreV1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 func CreateTeams(c *fiber.Ctx) error {
@@ -24,10 +23,13 @@ func CreateTeams(c *fiber.Ctx) error {
 	// 	return c.SendString("Unauthorized")
 	// }
 
-	clusterConfig := g.ClusterConfig
+	config, err := utils.GetKubeConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
 	client, err := utils.GetKubeClient()
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 	noOfTeams, err := strconv.Atoi(c.Params("number"))
 
@@ -78,7 +80,7 @@ func CreateTeams(c *fiber.Ctx) error {
 			log.Fatal(err)
 		}
 		manifest := &bytes.Buffer{}
-		tmpl, err := template.ParseFiles(filepath.Join(clusterConfig.ManifestDir, "teams.yml"))
+		tmpl, err := template.ParseFiles(filepath.Join(g.ClusterConfig.ManifestRuntimeDir, "teams.yml"))
 		if err != nil {
 			return err
 		}
@@ -87,13 +89,7 @@ func CreateTeams(c *fiber.Ctx) error {
 		if err = tmpl.Execute(manifest, deploymentConfig); err != nil {
 			return err
 		}
-		pathToCfg := filepath.Join(
-			os.Getenv("HOME"), ".kube", "config",
-		)
-		config, err := clientcmd.BuildConfigFromFlags("", pathToCfg)
-		if err != nil {
-			log.Fatal(err)
-		}
+
 		if err = deployment.ApplyManifest(config, client, manifest.Bytes(), namespace); err != nil {
 			return err
 		}

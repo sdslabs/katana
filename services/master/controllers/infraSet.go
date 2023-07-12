@@ -4,14 +4,11 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/gofiber/fiber/v2"
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	utils "github.com/sdslabs/katana/lib/utils"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 func InfraSet(c *fiber.Ctx) error {
@@ -20,18 +17,12 @@ func InfraSet(c *fiber.Ctx) error {
 	// 	return c.SendString("Unauthorized")
 	// }
 
-	pathToCfg := filepath.Join(
-		os.Getenv("HOME"), ".kube", "config",
-	)
-
-	fmt.Println(g.KatanaConfig.KubeNameSpace)
-
-	config, err := clientcmd.BuildConfigFromFlags("", pathToCfg)
+	config, err := utils.GetKubeConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	kubeclient, err := kubernetes.NewForConfig(config)
+	kubeclient, err := utils.GetKubeClient()
 	if err != nil {
 		log.Fatal(err)
 	}
