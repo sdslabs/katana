@@ -48,6 +48,7 @@ func Server() error {
 	admin.Get("/gitServer", c.GitServer)
 	admin.Get("/cluster/:id", c.ClusterInfo)
 	admin.Get("/deleteChallenge/:chall_name", c.DeleteChallenge)
+	admin.Get("test", c.Test)
 	fmt.Printf("Listening on %s:%d\n", cfg.APIConfig.Host, cfg.APIConfig.Port)
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port))
 }

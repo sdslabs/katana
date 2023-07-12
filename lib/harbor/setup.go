@@ -15,15 +15,11 @@ func SetupHarbor() error {
 		return err
 	}
 
-	if err := getHarborCertificate(); err != nil {
+	if err := setCertificateToDocker(); err != nil {
 		return err
 	}
 
-	if err := addCertificateToDocker(); err != nil {
-		return err
-	}
-
-	if err := setupDockerCredentials(); err != nil {
+	if err := dockerLogin(); err != nil {
 		return err
 	}
 

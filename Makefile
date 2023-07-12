@@ -95,6 +95,11 @@ set-env: build
 	cp config.sample.toml config.toml && \
 	./bin/katana run
 
+set-env-prod: build
+	kubectl apply -f $(CONTROLLER_MANIFEST) && \
+	cp config.sample.toml config.toml && \
+	sudo ./bin/katana run
+
 build:
 	cd cmd && go build -o ../bin/katana
 
