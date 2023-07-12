@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"regexp"
@@ -131,7 +132,11 @@ func Deploy(c *fiber.Ctx) error {
 					Defenses:0,      
 					Flag:"flag{test}",
 				}
-				mongo.AddChallenge(challenge,teamName)
+				err := mongo.AddChallenge(challenge,teamName)
+				if err != nil {
+					fmt.Println("Error in adding challenge to mongo")
+					log.Println(err)
+				}	
 				utils.DeployChallenge(folderName, teamName, patch, replicas)
 				url, err := deployer.CreateService(folderName, teamName)
 				if err != nil {

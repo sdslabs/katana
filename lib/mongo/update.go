@@ -22,8 +22,11 @@ func AddAdmin(ctx context.Context, admin types.AdminUser) error {
 }
 
 func AddChallenge(challenge types.Challenge, teamName string) error {
-	filter := bson.M{"name": teamName}
+	teamFilter := bson.M{"username": teamName}
 	update := bson.M{"$push": bson.M{"challenges": challenge}}
-	_, err := link.Collection(TeamsCollection).UpdateMany(context.Background(), filter, update)
-	return err
+	_, err := link.Collection(TeamsCollection).UpdateOne(context.TODO(), teamFilter, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
