@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"regexp"
 	"strconv"
 
@@ -22,17 +21,6 @@ func challcopy(dirPath, challengename, challengetype string) {
 	fmt.Println("Testing" + localFilePath + "....and..." + pathInPod)
 	deployer.CopyInPod(localFilePath, pathInPod)
 
-}
-
-func buildimage(folderName string) {
-	// Build the challenge with Dockerfile
-	dirPath, _ := os.Getwd()
-	fmt.Println("Dockerfile for the image is at :")
-	fmt.Println(dirPath + "/challenges/" + folderName + "/" + folderName)
-	cmd := exec.Command("docker", "build", "-t", g.HarborConfig.Hostname+"/katana/"+folderName, dirPath+"/chall/"+folderName+"/"+folderName)
-	cmd2 := exec.Command("docker", "push", g.HarborConfig.Hostname+"/katana/"+folderName)
-	cmd.Run()
-	cmd2.Run()
 }
 
 func createfolder(challengename string) (message int, newDirPath string) {
@@ -112,7 +100,7 @@ func Deploy(c *fiber.Ctx) error {
 			}
 
 			fmt.Println("Building docker image with tag", folderName)
-			buildimage(folderName)
+			utils.BuildDockerImage(folderName)
 			fmt.Println("Docker image built successfully")
 
 			//Get no.of teams and DEPLOY CHALLENGE to each namespace (assuming they exist and /createTeams has been called)

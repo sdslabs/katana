@@ -1,5 +1,10 @@
 package harbor
 
+import (
+	"github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/lib/utils"
+)
+
 func SetupHarbor() error {
 	if !checkHarborHostsEntryExists() {
 		if err := addHarborHostsEntry(); err != nil {
@@ -19,7 +24,7 @@ func SetupHarbor() error {
 		return err
 	}
 
-	if err := dockerLogin(); err != nil {
+	if err := utils.DockerLogin(configs.KatanaConfig.Harbor.Username, configs.KatanaConfig.Harbor.Password); err != nil {
 		return err
 	}
 

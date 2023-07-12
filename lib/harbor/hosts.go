@@ -161,7 +161,7 @@ func deployHarborClusterDaemonSet() error {
 
 	manifest := &bytes.Buffer{}
 
-	tmpl, err := template.ParseFiles(filepath.Join(configs.ClusterConfig.ManifestDir, "harbor-daemonset.yml"))
+	tmpl, err := template.ParseFiles(filepath.Join(configs.ClusterConfig.ManifestRuntimeDir, "harbor-daemonset.yml"))
 	if err != nil {
 		return err
 	}

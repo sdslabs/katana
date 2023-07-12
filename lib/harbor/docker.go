@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/exec"
 
-	config "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/configs"
 )
 
 func setCertificateToDocker() error {
@@ -19,7 +19,7 @@ func setCertificateToDocker() error {
 		}
 	}
 
-	path = path + config.KatanaConfig.Harbor.Hostname
+	path = path + configs.KatanaConfig.Harbor.Hostname
 
 	// Make the directory if it doesn't exist
 	if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -30,20 +30,7 @@ func setCertificateToDocker() error {
 	}
 
 	basePath, _ := os.Getwd()
-	cmd := fmt.Sprintf("sudo cp %s/lib/harbor/certs/ca.crt /etc/docker/certs.d/"+config.KatanaConfig.Harbor.Hostname+"/ca.crt", basePath)
-	out := exec.Command("bash", "-c", cmd)
-	if err := out.Run(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func dockerLogin() error {
-	username := config.KatanaConfig.Harbor.Username
-	password := config.KatanaConfig.Harbor.Password
-
-	cmd := fmt.Sprintf("sudo docker login -u %s -p %s %s", username, password, config.KatanaConfig.Harbor.Hostname)
+	cmd := fmt.Sprintf("sudo cp %s/lib/harbor/certs/ca.crt /etc/docker/certs.d/"+configs.KatanaConfig.Harbor.Hostname+"/ca.crt", basePath)
 	out := exec.Command("bash", "-c", cmd)
 	if err := out.Run(); err != nil {
 		return err

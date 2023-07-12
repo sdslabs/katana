@@ -1,13 +1,14 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/sdslabs/katana/configs"
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
+	"github.com/sdslabs/katana/lib/harbor"
 	utils "github.com/sdslabs/katana/lib/utils"
 )
 
@@ -27,14 +28,21 @@ func InfraSet(c *fiber.Ctx) error {
 		log.Fatal(err)
 	}
 
-	// Generate the certificates
-	generateCertsforHarbor()
+	for _, manifests := range configs.ClusterConfig.Manifests {
+		if manifests == "harbor.yml" {
+			generateCertsforHarbor()
+		}
+	}
 
 	if err = deployment.DeployCluster(config, kubeclient); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(kubeclient)
+	for _, manifests := range configs.ClusterConfig.Manifests {
+		if manifests == "harbor.yml" {
+			harbor.SetupHarbor()
+		}
+	}
 
 	return c.SendString("Infrastructure setup completed")
 }
