@@ -13,6 +13,7 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 	fmt.Println("foldername :", _ChallengeName)
 
 	// Build the docker image
+	fmt.Println("Building docker image, Please wait...")
 	cmd := exec.Command("docker", "build", "-t", configs.HarborConfig.Hostname+"/katana/"+_ChallengeName, _DockerfilePath)
 	fmt.Println("docker build -t", configs.HarborConfig.Hostname+"/katana/"+_ChallengeName, _DockerfilePath)
 	if err := cmd.Run(); err != nil {
@@ -21,6 +22,7 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 	fmt.Println("Docker image built successfully")
 
 	// Push the docker image to Harbor
+	fmt.Println("Pushing docker image, Please wait...")
 	cmd = exec.Command("docker", "push", configs.HarborConfig.Hostname+"/katana/"+_ChallengeName)
 	if err := cmd.Run(); err != nil {
 		fmt.Printf("Error: %s\n", err)
@@ -29,9 +31,10 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 }
 
 func DockerLogin(username string, password string) {
-	cmd := fmt.Sprintf("docker login -u %s -p %s %s", username, password, configs.KatanaConfig.Harbor.Hostname)
-	out := exec.Command("sh", "-c", cmd)
-	if err := out.Run(); err != nil {
+	fmt.Println("Logging into Harbor, Please wait...")
+	cmd := exec.Command("docker", "login", "-u", username, "-p", password, configs.KatanaConfig.Harbor.Hostname)
+	if err := cmd.Run(); err != nil {
 		fmt.Printf("Docker login error: %s\n", err)
 	}
+	fmt.Println("Logged into Harbor successfully")
 }

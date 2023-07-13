@@ -120,8 +120,8 @@ func Deploy(c *fiber.Ctx) error {
 			//Update challenge path to get dockerfile
 			challengePath = challengePath + "/" + folderName
 
-			fmt.Println("Building docker image with tag", folderName)
-			utils.BuildDockerImage(folderName, challengePath)
+			utils.DockerLogin(g.HarborConfig.Username, g.HarborConfig.Password)
+			//utils.BuildDockerImage(folderName, challengePath)
 			c.SendString("Doclly")
 
 			//Get no.of teams and DEPLOY CHALLENGE to each namespace (assuming they exist and /createTeams has been called)
