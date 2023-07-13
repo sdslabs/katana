@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	config "github.com/sdslabs/katana/configs"
@@ -27,7 +26,6 @@ func setAdminPassword() error {
 
 	// Make a GET request and read the "X-Harbor-CSRF-Token" header
 	// from the response
-	log.Printf("Making GET request to %s\n", baseURL)
 	resp, err := httpClient.Get(baseURL)
 	if err != nil {
 		return err
