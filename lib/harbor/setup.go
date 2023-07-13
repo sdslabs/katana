@@ -6,10 +6,8 @@ import (
 )
 
 func SetupHarbor() error {
-	if !checkHarborHostsEntryExists() {
-		if err := addHarborHostsEntry(); err != nil {
-			return err
-		}
+	if err := addHarborHostsEntry(); err != nil {
+		return err
 	}
 
 	if err := setAdminPassword(); err != nil {
@@ -24,13 +22,11 @@ func SetupHarbor() error {
 		return err
 	}
 
-	if err := utils.DockerLogin(configs.KatanaConfig.Harbor.Username, configs.KatanaConfig.Harbor.Password); err != nil {
+	if err := deployHarborClusterDaemonSet(); err != nil {
 		return err
 	}
 
-	if err := setHostsInCluster(); err != nil {
-		return err
-	}
+	utils.DockerLogin(configs.KatanaConfig.Harbor.Username, configs.KatanaConfig.Harbor.Password)
 
 	return nil
 }

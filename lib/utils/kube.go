@@ -8,12 +8,15 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/types"
+	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -263,4 +266,73 @@ func Podexecutor(command []string, kubeClientset *kubernetes.Clientset, kubeConf
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func DeleteDaemonSetAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *rest.Config, daemonSetName string, daemonSetNamespace string) {
+	listOptions := metav1.ListOptions{
+		FieldSelector:   "metadata.name=" + daemonSetName,
+		Watch:           true,
+		ResourceVersion: "0",
+	}
+
+	watcher, err := kubeClientset.AppsV1().DaemonSets(daemonSetNamespace).Watch(context.Background(), listOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = kubeClientset.AppsV1().DaemonSets(daemonSetNamespace).Delete(context.TODO(), daemonSetName, metav1.DeleteOptions{})
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			return
+		}
+		log.Fatal(err)
+	}
+
+	for event := range watcher.ResultChan() {
+		// Check if DaemonSet exists
+		daemonSetName := event.Object.(*appsv1.DaemonSet).Name
+		if daemonSetName == "" {
+			break
+		}
+		if event.Type == watch.Deleted {
+			break
+		}
+	}
+
+	watcher.Stop()
+}
+
+func DeleteConfigMapAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *rest.Config, configMapName string, configMapNamespace string) {
+	// Wait for the configmap to be deleted
+	listOptions := metav1.ListOptions{
+		FieldSelector:   "metadata.name=" + configMapName,
+		Watch:           true,
+		ResourceVersion: "0",
+	}
+
+	watcher, err := kubeClientset.CoreV1().ConfigMaps(configMapNamespace).Watch(context.Background(), listOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = kubeClientset.CoreV1().ConfigMaps(configMapNamespace).Delete(context.TODO(), configMapName, metav1.DeleteOptions{})
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			return
+		}
+		log.Fatal(err)
+	}
+
+	for event := range watcher.ResultChan() {
+		// Check if ConfigMap exists
+		configMapName := event.Object.(*v1.ConfigMap).Name
+		if configMapName == "" {
+			break
+		}
+		if event.Type == watch.Deleted {
+			break
+		}
+	}
+
+	watcher.Stop()
 }

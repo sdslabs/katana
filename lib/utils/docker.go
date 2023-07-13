@@ -16,22 +16,20 @@ func BuildDockerImage(_DockerfilePath string) {
 	// Build the docker image
 	cmd := exec.Command("docker", "build", "-t", configs.HarborConfig.Hostname+"/katana/"+folderName, folderPath)
 	if err := cmd.Run(); err != nil {
-		fmt.Errorf("Error building docker image: %s", err.Error())
+		fmt.Printf("Error: %s\n", err)
 	}
 
 	// Push the docker image to Harbor
 	cmd = exec.Command("docker", "push", configs.HarborConfig.Hostname+"/katana/"+folderName)
 	if err := cmd.Run(); err != nil {
-		fmt.Errorf("Error pushing docker image: %s", err.Error())
+		fmt.Printf("Error: %s\n", err)
 	}
 }
 
-func DockerLogin(username string, password string) error {
-	cmd := fmt.Sprintf("sudo docker login -u %s -p %s %s", username, password, configs.KatanaConfig.Harbor.Hostname)
-	out := exec.Command("bash", "-c", cmd)
+func DockerLogin(username string, password string) {
+	cmd := fmt.Sprintf("docker login -u %s -p %s %s", username, password, configs.KatanaConfig.Harbor.Hostname)
+	out := exec.Command("sh", "-c", cmd)
 	if err := out.Run(); err != nil {
-		return err
+		fmt.Printf("Docker login error: %s\n", err)
 	}
-
-	return nil
 }

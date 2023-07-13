@@ -68,28 +68,6 @@ data:
   tls.key: {{ .HarborKey }}
   ca.crt: {{ .HarborCaCrt }}
 ---
-# Source: harbor/templates/notary/notary-secret.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: katana-release-harbor-notary-server
-  namespace: katana
-  labels:
-    heritage: Helm
-    release: katana-release
-    chart: harbor
-    app: "harbor"
-    component: notary
-type: Opaque
-data:
-  ca.crt: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURJVENDQWdtZ0F3SUJBZ0lRZnNuZTNhK0tIdFNUM3o5dlhjV0JtakFOQmdrcWhraUc5dzBCQVFzRkFEQWIKTVJrd0Z3WURWUVFERXhCb1lYSmliM0l0Ym05MFlYSjVMV05oTUI0WERUSXpNRGN4TVRJeU5UUXhPVm9YRFRJMApNRGN4TURJeU5UUXhPVm93R3pFWk1CY0dBMVVFQXhNUWFHRnlZbTl5TFc1dmRHRnllUzFqWVRDQ0FTSXdEUVlKCktvWklodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0NnZ0VCQU1uaE40WG1OaGxaRnliSWJGY1gwTk1PN1VMUkdXWnQKRDVOZlBvRmxLd1AzR3FjcnBJaGVEaTRUZFpRYmNpTGxtZEhpYzVHS1J5cEtHNUpjMHdVREhaMEx1WkJTbEREQwpMbnM0MVdDeW9OSnVuazlCWndLakJLc3dMYzI4R2MzOHEwc2lXQVlyK0krd0xMY2xDM0Z1S0d6dk8yK3dob2czCnZXTnJ5cmN5dndrNHh5dDM1ajU0YkR4NENPVTdmaTFqelhkejdMbWtpY1JCUWlDNUI4RThMUm96eEl0em1GRVAKdWpwT0RYWk80NTdMaHpSR0dJTDdmVzM2Nmd5L2dVaG9DVXhBdlgyTU45dTV4WjN4SzFVeG05eEJJTkVKZFFFSQpaanVTd1d0V2NZUkg2NGxRSXBEd29hTnBUY2ZuaHBkQXJMVUxaYy8xTGtGWFlWSmxVS0lPR0hFQ0F3RUFBYU5oCk1GOHdEZ1lEVlIwUEFRSC9CQVFEQWdLa01CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUJCZ2dyQmdFRkJRY0QKQWpBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJRdTZRbzhkaTVmUEFNbjdNSEF1SmorWE5oSwo0ekFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBWml0T3Z0dU8yZFFhMjNUQmg0L3pVd2lXNVBZaWtWRS90RjQ3CnZZc3dSZlNKQUJNeEgvMHY5VExMdmxUaDJpRU54LzRkbzllMEhUc0JOZHpoZTQ4b3BxWHZoeGVlN1V5cVFUVTQKMFowenloRS9OTnVudjdIbkIzRmIzbkdGM3IySXpUaFVFYVFaSi95MmxhSWxEdFlnMjZqem5DSVhIQzhyQ0duSwpORUNkUlpkM3gyOWRqd01IaEkrUitOK2hGT1FESjA2WEgxN0N4a09Xd2pOallVWTBPc1NQNUhJL1YrMmxpTERFClR3SHRNL3VTOVVkdmNua0pOaE9lOWtKS1k2QkxSUnIxbzdjNlZnUkhpdW1xWW5UTkkwZUkzODcvc2FoeHMrSEoKZGFJZ2V3d0xCL241WEFLQlNreEt5b0taZGQxRDBXVS9ZNitkUTdYY2ZEaGhQZmZhdHc9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
-  tls.crt: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURaakNDQWs2Z0F3SUJBZ0lSQUxTOFgzTnh3cysrbEFlZVlZRWhFaU13RFFZSktvWklodmNOQVFFTEJRQXcKR3pFWk1CY0dBMVVFQXhNUWFHRnlZbTl5TFc1dmRHRnllUzFqWVRBZUZ3MHlNekEzTVRFeU1qVTBNVGxhRncweQpOREEzTVRBeU1qVTBNVGxhTUM0eExEQXFCZ05WQkFNVEkydGhkR0Z1WVMxeVpXeGxZWE5sTFdoaGNtSnZjaTF1CmIzUmhjbmt0YzJsbmJtVnlNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQTZBbFkKREd1UEtnSVBLSnlnYk5tSkRyWk5GcHJGWmN1RDhlR1d5b2pjc09pSnV0bHBwVDhmck1KNG9wWmhBNGU3Nk1GYQoyM293a3JsNTNHalZwdnlmZWNETVkyd2FMOUlNa0hoZ3JuOHJFaUo4d2JlY2xTbzlZL3lZaTJNUXRXWE84WGZVCkVXY3B0dk1wdzdjT3dCcjJvQmorbXd2aWZ4aG9oR1NHMlhNWktGdUdwMUZ2ekZNSHdXZ3FYYjNybTBlOHJ5KzcKT25xWnVnVy9IRDdJS0R5YnBsNHhhREpMeDJBTGNVOVlIRnJYcjBWSXNHekYvMkQ5R3pVRlRGalpYUW9tY252NgpJYlEvWFFYQ0tzemtqYmI0ZFd2RWMvMmZpWGtVeGJiUVpoUGJ5SlRhbUhPSFhuQmtqOTE0RXVQK0VSR05wQjZICkkzQVZWUjRJQ1JrK0V2cUpzd0lEQVFBQm80R1JNSUdPTUE0R0ExVWREd0VCL3dRRUF3SUZvREFkQmdOVkhTVUUKRmpBVUJnZ3JCZ0VGQlFjREFRWUlLd1lCQlFVSEF3SXdEQVlEVlIwVEFRSC9CQUl3QURBZkJnTlZIU01FR0RBVwpnQlF1NlFvOGRpNWZQQU1uN01IQXVKaitYTmhLNHpBdUJnTlZIUkVFSnpBbGdpTnJZWFJoYm1FdGNtVnNaV0Z6ClpTMW9ZWEppYjNJdGJtOTBZWEo1TFhOcFoyNWxjakFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBQXR4cUZhUzMKTFAvWW9XT2lSdWpLR2p1ZTFqbG14R2pPcEJGWWJmdjg3UDB0UHkxVk8wcktCcUkrcnRZZDE0SGxqMTh2alFsUApBK3htTmNkVUxnWEllbGpVZEdhVDVYTUpTNmFxV0pvb2xwdyt5M3VQVTQ5UC9uTkJBWk85dTNMSkJNWGovTXRMCi9TUjFqeVBmVElZRzRXVjdSNDN2bVd4dEFoSzBMZUNVWWtLSHRudU5ZVng3eTZ6OWIxR1hha3dvdDc5c05halAKN21vRzdKaGZhYStIQ3VxQ1JHMDZ4WTB6akpacXJyT1RlTmlJUXRzVTZEMkV1MzVvV3dLNVdKOEVHdjVPWGdWUwoyMFJSU0dQM2FsY3plNzFoYnBVVWFrUkNFclZQNzZuWUZyR0RrdjVJNjd5VDdkTVhIbWNKSVc1NHdnZHRNbGJFClIyc0g2dUFJa2V1cmZBPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo="
-  tls.key: "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcEFJQkFBS0NBUUVBNkFsWURHdVBLZ0lQS0p5Z2JObUpEclpORnByRlpjdUQ4ZUdXeW9qY3NPaUp1dGxwCnBUOGZyTUo0b3BaaEE0ZTc2TUZhMjNvd2tybDUzR2pWcHZ5ZmVjRE1ZMndhTDlJTWtIaGdybjhyRWlKOHdiZWMKbFNvOVkveVlpMk1RdFdYTzhYZlVFV2NwdHZNcHc3Y093QnIyb0JqK213dmlmeGhvaEdTRzJYTVpLRnVHcDFGdgp6Rk1Id1dncVhiM3JtMGU4cnkrN09ucVp1Z1cvSEQ3SUtEeWJwbDR4YURKTHgyQUxjVTlZSEZyWHIwVklzR3pGCi8yRDlHelVGVEZqWlhRb21jbnY2SWJRL1hRWENLc3pramJiNGRXdkVjLzJmaVhrVXhiYlFaaFBieUpUYW1IT0gKWG5Ca2o5MTRFdVArRVJHTnBCNkhJM0FWVlI0SUNSaytFdnFKc3dJREFRQUJBb0lCQUZtVk1lOHBuNDRpV1dQZQpoSGxCeXc1cEIzNFFwdUZVSDA3RlA0aFdLbzRLV1JKUVdkODRiYXd2TUkvazZ2T0g5ZDQ0dURGQURYeTRLdm9UCloxa2U4eHI0ZW5Cd0RmUWtia0ZnbUVNR1NjU29sKzNhUzVPelNSeFBLejIxTTRBMUhCNVJtd2hWQWQvbUpWdXcKVXZ1TDdXZUYvdFl4VW5Lckk3N3BhTDZQRjBsaXdFV3VrNm9aOFE2YzMxdkVFSUFObmJUaEZVSFlmSVFmKzduYgpjdHdsSEVhOVR6L3FHa2cvcHNoWkYrTUJRNnZGREVoV0dNNU9tZG9IdXJPTGxkaVBqYWloZDcvMTViMjdWRm55Cnh1UzJ5c2NyUWJPbHEwWGVqYk9RTDNEamFjRG1Sc1dOazNQMlUydnZGQjZob3ZaRm9FaG9UbVV4SkRlZHl5TDEKbjZWMjhYRUNnWUVBNkpOTmhJR2ZjcTU4THhsSm5kK20xTXc3NDlQcXBpaDBNTXpqOVRidmhDNktHZkdhcUdRVgpjcEdiVXNhTUNFODZIOXd5YnZacVIwM1hnRlNKOWJKK1ZwQ1krMG03ejd1SCtmUlN5d0NMSTR2YmJIQjV6L25OCkFTN2E1aWo3TzZtZGhuS25lbzA5aytsUzlIdUpNeEhoUWVYVjdHVlo2eTducHhEY1VnZnU0aTBDZ1lFQS8yZ2wKYW1KcjZwL05iUlgvMHpuR20ybFBBRTY2T0VoS1k1TDRXYnhZVVhISVFRUERHaXJCQVZSc1V1clV3S0lhKzdDUgpxa0ovMkV3bE1rcjVNQkw4NkFXQ2x1WTlkbW5hVytFQ3d5RnJpZEdRYW5yS0kraGR5aHpoV1NPTTMwc1BJUWpMCnh0NFhQWDYyWWxqZXB1WEVVRGNMSHVmd09wMEQ1MWlzUmF6MjUxOENnWUJlbTBVR0tNQldvem1xNHd0NkovY3kKU3QzMTRFZHNUYnB0KzNxalRqU0NQWGc1ODNqcEZNVlF0SUJOWEt5cjJLYVpQVFphd3V3YWswU2RWRVpHWnRSVApuRUJPd0FDaEVQVFFMWjNjTEIxdFdUL3B6WnNQaWRybHAweXVJVytKSm9jSW9PMFZ3Z3lSZFhFa09IaG9DTmJyCnVuV1owdVNQOGFXVDVSenFWWVhNQlFLQmdRQ3VWNmt5dFh4MDdDQ09GalpMT1dVWk1RbDhiRUV4cWljZFVYVzEKeTV0OS9PMTFjOXY2UUxUKzgySCtOODZDc0NVN0tZeEZiSjlZUnFJZGNwQW5BTThpa3FCUjRWaVRQQzZTQ1VhWgpiSGE3M1JGM25kbmVLUC9jdDFvY1B1Z3FoRklQZXJHZlRuc092ekJBY2VtS2c4MDk5RlRqQS9BNEVuWlh0Vy9qCkgrNXFnUUtCZ1FEWmc1TnVLdTI3dmt0UVJLNmRPNy9mTUxIYXFvcE8vWjV3QUxNL3EwcSs4enROSDRWYjQ4cWQKZmdPV1B3dFNsbnI0eFFoZThlNVkzTFBzaHpIQTFpaWIxbEZhT3p2SVp0dFprQ1haNG9qMS93dHdOdjc2NTNmcAozSXg3TWZrbllkSDJqeUdzODdBVkphdGdyeG5iNVo2aWtSVmpkSlNnRWRoaXNoUitiM1pHcFE9PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo="
-  server.json: ewogICJzZXJ2ZXIiOiB7CiAgICAiaHR0cF9hZGRyIjogIjo0NDQzIgogIH0sCiAgInRydXN0X3NlcnZpY2UiOiB7CiAgICAidHlwZSI6ICJyZW1vdGUiLAogICAgImhvc3RuYW1lIjogImthdGFuYS1yZWxlYXNlLWhhcmJvci1ub3Rhcnktc2lnbmVyIiwKICAgICJwb3J0IjogIjc4OTkiLAogICAgInRsc19jYV9maWxlIjogIi9ldGMvc3NsL25vdGFyeS9jYS5jcnQiLAogICAgImtleV9hbGdvcml0aG0iOiAiZWNkc2EiCiAgfSwKICAibG9nZ2luZyI6IHsKICAgICJsZXZlbCI6ICJpbmZvIgogIH0sCiAgInN0b3JhZ2UiOiB7CiAgICAiYmFja2VuZCI6ICJwb3N0Z3JlcyIsCiAgICAiZGJfdXJsIjogInBvc3RncmVzOi8vcG9zdGdyZXM6Y2hhbmdlaXRAa2F0YW5hLXJlbGVhc2UtaGFyYm9yLWRhdGFiYXNlOjU0MzIvbm90YXJ5c2VydmVyP3NzbG1vZGU9ZGlzYWJsZSIKICB9LAogICJhdXRoIjogewogICAgInR5cGUiOiAidG9rZW4iLAogICAgIm9wdGlvbnMiOiB7CiAgICAgICJyZWFsbSI6ICJodHRwczovL2hhcmJvci5rYXRhbmEubG9jYWwvc2VydmljZS90b2tlbiIsCiAgICAgICJzZXJ2aWNlIjogImhhcmJvci1ub3RhcnkiLAogICAgICAiaXNzdWVyIjogImhhcmJvci10b2tlbi1pc3N1ZXIiLAogICAgICAicm9vdGNlcnRidW5kbGUiOiAiL3Jvb3QuY3J0IgogICAgfQogIH0KfQ==
-  signer.json: ewogICJzZXJ2ZXIiOiB7CiAgICAiZ3JwY19hZGRyIjogIjo3ODk5IiwKICAgICJ0bHNfY2VydF9maWxlIjogIi9ldGMvc3NsL25vdGFyeS90bHMuY3J0IiwKICAgICJ0bHNfa2V5X2ZpbGUiOiAiL2V0Yy9zc2wvbm90YXJ5L3Rscy5rZXkiCiAgfSwKICAibG9nZ2luZyI6IHsKICAgICJsZXZlbCI6ICJpbmZvIgogIH0sCiAgInN0b3JhZ2UiOiB7CiAgICAiYmFja2VuZCI6ICJwb3N0Z3JlcyIsCiAgICAiZGJfdXJsIjogInBvc3RncmVzOi8vcG9zdGdyZXM6Y2hhbmdlaXRAa2F0YW5hLXJlbGVhc2UtaGFyYm9yLWRhdGFiYXNlOjU0MzIvbm90YXJ5c2lnbmVyP3NzbG1vZGU9ZGlzYWJsZSIsCiAgICAiZGVmYXVsdF9hbGlhcyI6ICJkZWZhdWx0YWxpYXMiCiAgfQp9
-  NOTARY_SERVER_DB_URL: cG9zdGdyZXM6Ly9wb3N0Z3JlczpjaGFuZ2VpdEBrYXRhbmEtcmVsZWFzZS1oYXJib3ItZGF0YWJhc2U6NTQzMi9ub3RhcnlzZXJ2ZXI/c3NsbW9kZT1kaXNhYmxl
-  NOTARY_SIGNER_DB_URL: cG9zdGdyZXM6Ly9wb3N0Z3JlczpjaGFuZ2VpdEBrYXRhbmEtcmVsZWFzZS1oYXJib3ItZGF0YWJhc2U6NTQzMi9ub3RhcnlzaWduZXI/c3NsbW9kZT1kaXNhYmxl
----
 # Source: harbor/templates/registry/registry-secret.yaml
 apiVersion: v1
 kind: Secret
@@ -135,22 +113,6 @@ metadata:
 type: Opaque
 data:
 ---
-# Source: harbor/templates/trivy/trivy-secret.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: katana-release-harbor-trivy
-  namespace: katana
-  labels:
-    heritage: Helm
-    release: katana-release
-    chart: harbor
-    app: "harbor"
-type: Opaque
-data:
-  redisURL: cmVkaXM6Ly9rYXRhbmEtcmVsZWFzZS1oYXJib3ItcmVkaXM6NjM3OS81P2lkbGVfdGltZW91dF9zZWNvbmRzPTMw
-  gitHubToken: ""
----
 # Source: harbor/templates/core/core-cm.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -184,11 +146,7 @@ data:
   JOBSERVICE_URL: "http://katana-release-harbor-jobservice"
   REGISTRY_URL: "http://katana-release-harbor-registry:5000"
   TOKEN_SERVICE_URL: "http://katana-release-harbor-core:80/service/token"
-  WITH_NOTARY: "true"
-  NOTARY_URL: "http://katana-release-harbor-notary-server:4443"
   CORE_LOCAL_URL: "http://127.0.0.1:8080"
-  WITH_TRIVY: "true"
-  TRIVY_ADAPTER_URL: "http://katana-release-harbor-trivy:8080"
   REGISTRY_STORAGE_PROVIDER_NAME: "filesystem"
   LOG_LEVEL: "info"
   CONFIG_PATH: "/etc/core/app.conf"
@@ -200,7 +158,7 @@ data:
   REGISTRY_CREDENTIAL_USERNAME: "harbor_registry_user"
   HTTP_PROXY: ""
   HTTPS_PROXY: ""
-  NO_PROXY: "katana-release-harbor-core,katana-release-harbor-jobservice,katana-release-harbor-database,katana-release-harbor-notary-server,katana-release-harbor-notary-signer,katana-release-harbor-registry,katana-release-harbor-portal,katana-release-harbor-trivy,katana-release-harbor-exporter,127.0.0.1,localhost,.local,.internal"
+  NO_PROXY: "katana-release-harbor-core,katana-release-harbor-jobservice,katana-release-harbor-database,katana-release-harbor-registry,katana-release-harbor-portal,katana-release-harbor-exporter,127.0.0.1,localhost,.local,.internal"
   PERMITTED_REGISTRY_TYPES_FOR_PROXY_CACHE: "docker-hub,harbor,azure-acr,aws-ecr,google-gcr,quay,docker-registry,github-ghcr,jfrog-artifactory"
 ---
 # Source: harbor/templates/jobservice/jobservice-cm-env.yaml
@@ -225,7 +183,7 @@ data:
   JOBSERVICE_WEBHOOK_JOB_HTTP_CLIENT_TIMEOUT: "3"
   HTTP_PROXY: ""
   HTTPS_PROXY: ""
-  NO_PROXY: "katana-release-harbor-core,katana-release-harbor-jobservice,katana-release-harbor-database,katana-release-harbor-notary-server,katana-release-harbor-notary-signer,katana-release-harbor-registry,katana-release-harbor-portal,katana-release-harbor-trivy,katana-release-harbor-exporter,127.0.0.1,localhost,.local,.internal"
+  NO_PROXY: "katana-release-harbor-core,katana-release-harbor-jobservice,katana-release-harbor-database,katana-release-harbor-registry,katana-release-harbor-portal,katana-release-harbor-exporter,127.0.0.1,localhost,.local,.internal"
 ---
 # Source: harbor/templates/jobservice/jobservice-cm.yaml
 apiVersion: v1
@@ -313,9 +271,6 @@ data:
       upstream portal {
         server "katana-release-harbor-portal:80";
       }
-      upstream notary-server {
-        server katana-release-harbor-notary-server:4443;
-      }
 
       log_format timed_combined '[$time_local]:$remote_addr - '
         '"$request" $status $body_bytes_sent '
@@ -328,41 +283,6 @@ data:
         default $http_x_forwarded_proto;
         ""      $scheme;
       }
-      server {
-        listen 4443 ssl;
-        listen [::]:4443 ssl;
-        server_tokens off;
-        # ssl
-        ssl_certificate /etc/nginx/cert/tls.crt;
-        ssl_certificate_key /etc/nginx/cert/tls.key;
-
-        # recommendations from https://raymii.org/s/tutorials/strong_ssl_security_on_nginx.html
-        ssl_protocols tlsv1.2;
-        ssl_ciphers '!aNULL:kECDH+AESGCM:ECDH+AESGCM:RSA+AESGCM:kECDH+AES:ECDH+AES:RSA+AES:';
-        ssl_prefer_server_ciphers on;
-        ssl_session_cache shared:ssl:10m;
-
-        # disable any limits to avoid http 413 for large image uploads
-        client_max_body_size 0;
-
-        # required to avoid http 411: see issue #1486 (https://github.com/docker/docker/issues/1486)
-        chunked_transfer_encoding on;
-
-        location /v2/ {
-          proxy_pass http://notary-server/v2/;
-          proxy_set_header Host $http_host;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $x_forwarded_proto;
-
-          proxy_buffering off;
-          proxy_request_buffering off;
-
-          proxy_send_timeout 900;
-          proxy_read_timeout 900;
-        }
-      }
-
       server {
         listen 8443 ssl;
         listen [::]:8443 ssl;
@@ -729,51 +649,10 @@ spec:
     - name: https
       port: 443
       targetPort: 8443
-    - name: notary
-      port: 4443
-      targetPort: 4443
   selector:
     release: katana-release
     app: "harbor"
     component: nginx
----
-# Source: harbor/templates/notary/notary-svc.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: katana-release-harbor-notary-server
-  namespace: katana
-  labels:
-    heritage: Helm
-    release: katana-release
-    chart: harbor
-    app: "harbor"
-spec:
-  ports:
-    - port: 4443
-  selector:
-    release: katana-release
-    app: "harbor"
-    component: notary-server
----
-# Source: harbor/templates/notary/notary-svc.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: katana-release-harbor-notary-signer
-  namespace: katana
-  labels:
-    heritage: Helm
-    release: katana-release
-    chart: harbor
-    app: "harbor"
-spec:
-  ports:
-    - port: 7899
-  selector:
-    release: katana-release
-    app: "harbor"
-    component: notary-signer
 ---
 # Source: harbor/templates/portal/service.yaml
 apiVersion: v1
@@ -836,27 +715,6 @@ spec:
     release: katana-release
     app: "harbor"
     component: registry
----
-# Source: harbor/templates/trivy/trivy-svc.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: "katana-release-harbor-trivy"
-  namespace: katana
-  labels:
-    heritage: Helm
-    release: katana-release
-    chart: harbor
-    app: "harbor"
-spec:
-  ports:
-    - name: http-trivy
-      protocol: TCP
-      port: 8080
-  selector:
-    release: katana-release
-    app: "harbor"
-    component: trivy
 ---
 # Source: harbor/templates/core/core-dpl.yaml
 apiVersion: apps/v1
@@ -1132,168 +990,6 @@ spec:
         - name: certificate
           secret:
             secretName: katana-release-harbor-nginx
----
-# Source: harbor/templates/notary/notary-server.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: katana-release-harbor-notary-server
-  namespace: katana
-  labels:
-    heritage: Helm
-    release: katana-release
-    chart: harbor
-    app: "harbor"
-    component: notary-server
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      release: katana-release
-      app: "harbor"
-      component: notary-server
-  template:
-    metadata:
-      labels:
-        heritage: Helm
-        release: katana-release
-        chart: harbor
-        app: "harbor"
-        component: notary-server
-      annotations:
-        checksum/secret: 4b245f61401573152f8232d7f714f813baf222453f716ddfc7ef58e97f8247e0
-        checksum/secret-core: 56a8e54c07df3ba30b69f7ccbc320ef2cdbb840220233ad1c66739e732dec1cf
-    spec:
-      securityContext:
-        runAsUser: 10000
-        fsGroup: 10000
-      automountServiceAccountToken: false
-      containers:
-        - name: notary-server
-          image: goharbor/notary-server-photon:v2.8.2
-          imagePullPolicy: IfNotPresent
-          livenessProbe:
-            httpGet:
-              path: /_notary_server/health
-              scheme: "HTTP"
-              port: 4443
-            initialDelaySeconds: 300
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /_notary_server/health
-              scheme: "HTTP"
-              port: 4443
-            initialDelaySeconds: 20
-            periodSeconds: 10
-          env:
-            - name: MIGRATIONS_PATH
-              value: migrations/server/postgresql
-            - name: DB_URL
-              valueFrom:
-                secretKeyRef:
-                  name: katana-release-harbor-notary-server
-                  key: NOTARY_SERVER_DB_URL
-          volumeMounts:
-            - name: config
-              mountPath: /etc/notary/server-config.postgres.json
-              subPath: server.json
-            - name: token-service-certificate
-              mountPath: /root.crt
-              subPath: tls.crt
-            - name: signer-certificate
-              mountPath: /etc/ssl/notary/ca.crt
-              subPath: ca.crt
-      volumes:
-        - name: config
-          secret:
-            secretName: "katana-release-harbor-notary-server"
-        - name: token-service-certificate
-          secret:
-            secretName: katana-release-harbor-core
-        - name: signer-certificate
-          secret:
-            secretName: katana-release-harbor-notary-server
----
-# Source: harbor/templates/notary/notary-signer.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: katana-release-harbor-notary-signer
-  namespace: katana
-  labels:
-    heritage: Helm
-    release: katana-release
-    chart: harbor
-    app: "harbor"
-    component: notary-signer
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      release: katana-release
-      app: "harbor"
-      component: notary-signer
-  template:
-    metadata:
-      labels:
-        heritage: Helm
-        release: katana-release
-        chart: harbor
-        app: "harbor"
-        component: notary-signer
-      annotations:
-        checksum/secret: 5dde37889b3a66de777dfdc34a310d08e0b43751f00280a5f6062bfba51e84c0
-    spec:
-      securityContext:
-        runAsUser: 10000
-        fsGroup: 10000
-      automountServiceAccountToken: false
-      containers:
-        - name: notary-signer
-          image: goharbor/notary-signer-photon:v2.8.2
-          imagePullPolicy: IfNotPresent
-          livenessProbe:
-            httpGet:
-              path: /
-              scheme: "HTTPS"
-              port: 7899
-            initialDelaySeconds: 300
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /
-              scheme: "HTTPS"
-              port: 7899
-            initialDelaySeconds: 20
-            periodSeconds: 10
-          env:
-            - name: MIGRATIONS_PATH
-              value: migrations/signer/postgresql
-            - name: DB_URL
-              valueFrom:
-                secretKeyRef:
-                  name: katana-release-harbor-notary-server
-                  key: NOTARY_SIGNER_DB_URL
-            - name: NOTARY_SIGNER_DEFAULTALIAS
-              value: defaultalias
-          volumeMounts:
-            - name: config
-              mountPath: /etc/notary/signer-config.postgres.json
-              subPath: signer.json
-            - name: signer-certificate
-              mountPath: /etc/ssl/notary/tls.crt
-              subPath: tls.crt
-            - name: signer-certificate
-              mountPath: /etc/ssl/notary/tls.key
-              subPath: tls.key
-      volumes:
-        - name: config
-          secret:
-            secretName: "katana-release-harbor-notary-server"
-        - name: signer-certificate
-          secret:
-            secretName: katana-release-harbor-notary-server
 ---
 # Source: harbor/templates/portal/deployment.yaml
 apiVersion: apps/v1
@@ -1682,146 +1378,3 @@ spec:
         resources:
           requests:
             storage: "1Gi"
----
-# Source: harbor/templates/trivy/trivy-sts.yaml
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: katana-release-harbor-trivy
-  namespace: katana
-  labels:
-    heritage: Helm
-    release: katana-release
-    chart: harbor
-    app: "harbor"
-    component: trivy
-spec:
-  replicas: 1
-  serviceName: katana-release-harbor-trivy
-  selector:
-    matchLabels:
-      release: katana-release
-      app: "harbor"
-      component: trivy
-  template:
-    metadata:
-      labels:
-        heritage: Helm
-        release: katana-release
-        chart: harbor
-        app: "harbor"
-        component: trivy
-      annotations:
-        checksum/secret: 14244bc2afe8577cf14af43bc2bab2417c596daa09fa1baae0c3c07d138f7a3f
-    spec:
-      securityContext:
-        runAsUser: 10000
-        fsGroup: 10000
-      automountServiceAccountToken: false
-      containers:
-        - name: trivy
-          image: goharbor/trivy-adapter-photon:v2.8.2
-          imagePullPolicy: IfNotPresent
-          securityContext:
-            privileged: false
-            allowPrivilegeEscalation: false
-          env:
-            - name: HTTP_PROXY
-              value: ""
-            - name: HTTPS_PROXY
-              value: ""
-            - name: NO_PROXY
-              value: "katana-release-harbor-core,katana-release-harbor-jobservice,katana-release-harbor-database,katana-release-harbor-notary-server,katana-release-harbor-notary-signer,katana-release-harbor-registry,katana-release-harbor-portal,katana-release-harbor-trivy,katana-release-harbor-exporter,127.0.0.1,localhost,.local,.internal"
-            - name: "SCANNER_LOG_LEVEL"
-              value: "info"
-            - name: "SCANNER_TRIVY_CACHE_DIR"
-              value: "/home/scanner/.cache/trivy"
-            - name: "SCANNER_TRIVY_REPORTS_DIR"
-              value: "/home/scanner/.cache/reports"
-            - name: "SCANNER_TRIVY_DEBUG_MODE"
-              value: "false"
-            - name: "SCANNER_TRIVY_VULN_TYPE"
-              value: "os,library"
-            - name: "SCANNER_TRIVY_TIMEOUT"
-              value: "5m0s"
-            - name: "SCANNER_TRIVY_GITHUB_TOKEN"
-              valueFrom:
-                secretKeyRef:
-                  name: katana-release-harbor-trivy
-                  key: gitHubToken
-            - name: "SCANNER_TRIVY_SEVERITY"
-              value: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
-            - name: "SCANNER_TRIVY_IGNORE_UNFIXED"
-              value: "false"
-            - name: "SCANNER_TRIVY_SKIP_UPDATE"
-              value: "false"
-            - name: "SCANNER_TRIVY_OFFLINE_SCAN"
-              value: "false"
-            - name: "SCANNER_TRIVY_SECURITY_CHECKS"
-              value: "vuln"
-            - name: "SCANNER_TRIVY_INSECURE"
-              value: "false"
-            - name: SCANNER_API_SERVER_ADDR
-              value: ":8080"
-            - name: "SCANNER_REDIS_URL"
-              valueFrom:
-                secretKeyRef:
-                  name: katana-release-harbor-trivy
-                  key: redisURL
-            - name: "SCANNER_STORE_REDIS_URL"
-              valueFrom:
-                secretKeyRef:
-                  name: katana-release-harbor-trivy
-                  key: redisURL
-            - name: "SCANNER_JOB_QUEUE_REDIS_URL"
-              valueFrom:
-                secretKeyRef:
-                  name: katana-release-harbor-trivy
-                  key: redisURL
-          ports:
-            - name: api-server
-              containerPort: 8080
-          volumeMounts:
-            - name: data
-              mountPath: /home/scanner/.cache
-              subPath:
-              readOnly: false
-          livenessProbe:
-            httpGet:
-              scheme: HTTP
-              path: /probe/healthy
-              port: api-server
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            successThreshold: 1
-            failureThreshold: 10
-          readinessProbe:
-            httpGet:
-              scheme: HTTP
-              path: /probe/ready
-              port: api-server
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            successThreshold: 1
-            failureThreshold: 3
-          resources:
-            limits:
-              cpu: 1
-              memory: 1Gi
-            requests:
-              cpu: 200m
-              memory: 512Mi
-  volumeClaimTemplates:
-    - metadata:
-        name: data
-        labels:
-          heritage: Helm
-          release: katana-release
-          chart: harbor
-          app: "harbor"
-        annotations:
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: "5Gi"
