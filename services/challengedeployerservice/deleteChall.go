@@ -3,6 +3,7 @@ package challengedeployerservice
 import (
 	"context"
 	"fmt"
+	"os"
 	"strconv"
 
 	"github.com/sdslabs/katana/lib/utils"
@@ -10,6 +11,16 @@ import (
 )
 
 func DeleteChallenge(chall_name string) error {
+
+	//Delete Challenge Folder
+	dirPath, _ := os.Getwd()
+	challengePath := dirPath + "/challenges/" + chall_name
+	fmt.Println("Deleting challenge folder :", challengePath)
+	err := os.RemoveAll(challengePath)
+	if err != nil {
+		fmt.Println("Error in deleting challenge folder")
+		return err
+	}
 
 	totalteams := utils.GetTeamNumber()
 
