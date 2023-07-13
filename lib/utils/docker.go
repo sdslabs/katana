@@ -3,27 +3,29 @@ package utils
 import (
 	"fmt"
 	"os/exec"
-	"strings"
 
 	"github.com/sdslabs/katana/configs"
 )
 
-func BuildDockerImage(_DockerfilePath string) {
-	// Remove Dockerfile from the path
-	folderPath := _DockerfilePath[:len(_DockerfilePath)-11]
-	folderName := folderPath[strings.LastIndex(folderPath, "/")+1:]
+func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
+
+	fmt.Println("folderpath :", _DockerfilePath)
+	fmt.Println("foldername :", _ChallengeName)
 
 	// Build the docker image
-	cmd := exec.Command("docker", "build", "-t", configs.HarborConfig.Hostname+"/katana/"+folderName, folderPath)
+	cmd := exec.Command("docker", "build", "-t", configs.HarborConfig.Hostname+"/katana/"+_ChallengeName, _DockerfilePath)
+	fmt.Println("docker build -t", configs.HarborConfig.Hostname+"/katana/"+_ChallengeName, _DockerfilePath)
 	if err := cmd.Run(); err != nil {
 		fmt.Printf("Error: %s\n", err)
 	}
+	fmt.Println("Docker image built successfully")
 
 	// Push the docker image to Harbor
-	cmd = exec.Command("docker", "push", configs.HarborConfig.Hostname+"/katana/"+folderName)
+	cmd = exec.Command("docker", "push", configs.HarborConfig.Hostname+"/katana/"+_ChallengeName)
 	if err := cmd.Run(); err != nil {
 		fmt.Printf("Error: %s\n", err)
 	}
+	fmt.Println("Docker image pushed successfully")
 }
 
 func DockerLogin(username string, password string) {

@@ -66,7 +66,7 @@ func DeployChallenge(challengeName, teamName string, firstPatch bool, replicas i
 						{
 							Name:            challengeName + "-" + teamName,
 							Image:           imageName,
-							ImagePullPolicy: v1.PullPolicy("Never"),
+							ImagePullPolicy: v1.PullPolicy("IfNotPresent"),
 							Ports: []v1.ContainerPort{
 								{
 									Name:          "challenge-port",
