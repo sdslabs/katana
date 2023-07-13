@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	archiver "github.com/mholt/archiver/v3"
@@ -71,10 +72,10 @@ func buildimage(folderName string) {
 
 func Deploy(c *fiber.Ctx) error {
 
-	//challengetype := "web"
+	challengetype := "web"
 	folderName := ""
-	//patch := false
-	//replicas := g.KatanaConfig.TeamDeployement
+	patch := false
+	replicas := g.KatanaConfig.TeamDeployement
 	fmt.Println("Starting")
 	if form, err := c.MultipartForm(); err == nil {
 
@@ -120,31 +121,28 @@ func Deploy(c *fiber.Ctx) error {
 			//Update challenge path to get dockerfile
 			challengePath = challengePath + "/" + folderName
 
-			utils.DockerLogin(g.HarborConfig.Username, g.HarborConfig.Password)
-			//utils.BuildDockerImage(folderName, challengePath)
-			c.SendString("Doclly")
+			utils.BuildDockerImage(folderName, challengePath)
 
 			//Get no.of teams and DEPLOY CHALLENGE to each namespace (assuming they exist and /createTeams has been called)
-			//For only testing this and not the /createTeams route, create 3 namespaces (katana-team-0-ns) (katana-team-1-ns) (katana-team-2-ns) manually
-			// clusterConfig := g.ClusterConfig
-			// numberOfTeams := clusterConfig.TeamCount
-			// res := make([][]string, 0)
-			// for i := 0; i < int(numberOfTeams); i++ {
-			// 	fmt.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
-			// 	teamName := "katana-team-" + strconv.Itoa(i)
-			// 	utils.DeployChallenge(folderName, teamName, patch, replicas)
-			// 	url, err := deployer.CreateService(folderName, teamName)
-			// 	if err != nil {
-			// 		res = append(res, []string{teamName, err.Error()})
-			// 	} else {
-			// 		res = append(res, []string{teamName, url})
-			// 	}
-			// }
+			clusterConfig := g.ClusterConfig
+			numberOfTeams := clusterConfig.TeamCount
+			res := make([][]string, 0)
+			for i := 0; i < int(numberOfTeams); i++ {
+				fmt.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
+				teamName := "katana-team-" + strconv.Itoa(i)
+				utils.DeployChallenge(folderName, teamName, patch, replicas)
+				url, err := deployer.CreateService(folderName, teamName)
+				if err != nil {
+					res = append(res, []string{teamName, err.Error()})
+				} else {
+					res = append(res, []string{teamName, url})
+				}
+			}
 
 			//Copy challenge in pods and etc.
-			// challcopy(challengePath, folderName, challengetype)
+			challcopy(challengePath, folderName, challengetype)
 
-			// return c.JSON(res)
+			return c.JSON(res)
 		}
 	}
 	fmt.Println("Ending")

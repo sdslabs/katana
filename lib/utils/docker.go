@@ -8,14 +8,9 @@ import (
 )
 
 func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
-
-	fmt.Println("folderpath :", _DockerfilePath)
-	fmt.Println("foldername :", _ChallengeName)
-
 	// Build the docker image
 	fmt.Println("Building docker image, Please wait...")
 	cmd := exec.Command("docker", "build", "-t", configs.HarborConfig.Hostname+"/katana/"+_ChallengeName, _DockerfilePath)
-	fmt.Println("docker build -t", configs.HarborConfig.Hostname+"/katana/"+_ChallengeName, _DockerfilePath)
 	if err := cmd.Run(); err != nil {
 		fmt.Printf("Error: %s\n", err)
 	}
