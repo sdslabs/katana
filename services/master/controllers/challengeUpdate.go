@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os/exec"
 	"strings"
@@ -30,7 +29,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	client, err := utils.GetKubeClient()
 	patch := true
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	//http connection configuration for 30 min
 
@@ -47,7 +46,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	log.Println("Challenge update request received for", challengeName, "by", teamName)
 	repo, err := git.PlainOpen("teams/" + dir)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	auth := &http.BasicAuth{
@@ -62,7 +61,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	})
 
 	if err != nil {
-		fmt.Println("Error pulling changes:", err)
+		log.Println("Error pulling changes:", err)
 	}
 
 	log.Println("Pull successful for", teamName, ". Building image...")

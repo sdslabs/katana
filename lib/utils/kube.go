@@ -90,7 +90,7 @@ func GetMongoIP() string {
 	}
 
 	// Print the IP address of the service
-	fmt.Println(service.Spec.ClusterIP)
+	log.Println(service.Spec.ClusterIP)
 	return service.Spec.ClusterIP
 }
 

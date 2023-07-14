@@ -2,6 +2,7 @@ package master
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -48,6 +49,6 @@ func Server() error {
 	admin.Get("/gitServer", c.GitServer)
 	admin.Get("/cluster/:id", c.ClusterInfo)
 	admin.Get("/deleteChallenge/:chall_name", c.DeleteChallenge)
-	fmt.Printf("Listening on %s:%d\n", cfg.APIConfig.Host, cfg.APIConfig.Port)
+	log.Printf("Listening on %s:%d\n", cfg.APIConfig.Host, cfg.APIConfig.Port)
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port))
 }

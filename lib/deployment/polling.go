@@ -2,7 +2,7 @@ package deployment
 
 import (
 	"context"
-	"fmt"
+	"log"
 
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/types"
@@ -78,7 +78,7 @@ func PollDeployments(kubeclientset *kubernetes.Clientset, done chan<- error) {
 				}
 				allReady = allReady && ready
 				// temporary fix for lint complains
-				fmt.Printf("result: %v", result)
+				log.Printf("result: %v", result)
 				// results = append(results, result...)
 			}
 			if allReady {

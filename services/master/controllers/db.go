@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -26,8 +25,8 @@ func DB(c *fiber.Ctx) error {
 	if err != nil {
 		log.Println(err)
 	}
-	fmt.Println("MySQL Service IP:", service.Spec.ClusterIP)
-	fmt.Println(service.Spec.Ports[0].Port) // NodePort (k8s service)
+	log.Println("MySQL Service IP:", service.Spec.ClusterIP)
+	log.Println(service.Spec.Ports[0].Port) // NodePort (k8s service)
 	//NodePort := strconv.Itoa(int(service.Spec.Ports[0].NodePort))
 	mysql.Init()
 	return c.SendString("Database setup completed\n")

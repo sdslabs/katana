@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"path/filepath"
 	"text/template"
 
@@ -107,7 +108,7 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 
 	for _, m := range clusterConfig.Manifests {
 		manifest := &bytes.Buffer{}
-		fmt.Printf("Applying: %s\n", m)
+		log.Printf("Applying: %s\n", m)
 		tmpl, err := template.ParseFiles(filepath.Join(clusterConfig.ManifestDir, m))
 		if err != nil {
 			return err

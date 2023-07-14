@@ -2,7 +2,7 @@ package challengedeployerservice
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"os"
 	"strconv"
 
@@ -15,10 +15,10 @@ func DeleteChallenge(chall_name string) error {
 	//Delete Challenge Folder
 	dirPath, _ := os.Getwd()
 	challengePath := dirPath + "/challenges/" + chall_name
-	fmt.Println("Deleting challenge folder :", challengePath)
+	log.Println("Deleting challenge folder :", challengePath)
 	err := os.RemoveAll(challengePath)
 	if err != nil {
-		fmt.Println("Error in deleting challenge folder")
+		log.Println("Error in deleting challenge folder")
 		return err
 	}
 
@@ -34,28 +34,28 @@ func DeleteChallenge(chall_name string) error {
 			return err
 		}
 
-		fmt.Println("---------------Deleting challenge for team: ", team_namespace)
+		log.Println("---------------Deleting challenge for team: ", team_namespace)
 		serviceClient := kubeclient.CoreV1().Services(team_namespace)
 		deploymentsClient := kubeclient.AppsV1().Deployments(team_namespace)
 
 		//Get deployment
 		deps, err := deploymentsClient.Get(context.TODO(), chall_name, metav1.GetOptions{})
 		if err != nil {
-			fmt.Println(" Error in getting deployments associated with the challenge. ")
+			log.Println(" Error in getting deployments associated with the challenge. ")
 			continue
 			//panic(err)
 		}
 
 		//Delete deployments
 		if deps.Name != chall_name {
-			fmt.Println("Deployment does not exist. Create one using /deploy route.")
+			log.Println("Deployment does not exist. Create one using /deploy route.")
 			return nil
 		} else {
-			fmt.Println("Deleting deployment...")
+			log.Println("Deleting deployment...")
 			deletePolicy := metav1.DeletePropagationForeground
 			err = deploymentsClient.Delete(context.TODO(), chall_name, metav1.DeleteOptions{PropagationPolicy: &deletePolicy})
 			if err != nil {
-				fmt.Println("Error in deleting deployment.")
+				log.Println("Error in deleting deployment.")
 				continue
 			}
 		}
@@ -63,7 +63,7 @@ func DeleteChallenge(chall_name string) error {
 		//Check if service exists
 		services, err := serviceClient.List(context.TODO(), metav1.ListOptions{})
 		if err != nil {
-			fmt.Println(" Error in getting services for" + chall_name + "in the namespace " + team_namespace)
+			log.Println(" Error in getting services for" + chall_name + "in the namespace " + team_namespace)
 			continue
 			//panic(err)
 		}
@@ -75,20 +75,20 @@ func DeleteChallenge(chall_name string) error {
 			}
 		}
 		if flag == 0 {
-			fmt.Println("Service does not exist for the " + chall_name + " in namespace " + team_namespace)
+			log.Println("Service does not exist for the " + chall_name + " in namespace " + team_namespace)
 			continue
 		}
 
 		//Delete service
-		fmt.Println("Deleting services associated with this challenge...")
+		log.Println("Deleting services associated with this challenge...")
 		err = serviceClient.Delete(context.TODO(), chall_name, metav1.DeleteOptions{})
 		if err != nil {
-			fmt.Println("Error in deleting service for "+chall_name+" in namespace "+team_namespace, err)
+			log.Println("Error in deleting service for "+chall_name+" in namespace "+team_namespace, err)
 			continue
 		}
 
 	}
 
-	fmt.Println("Process completed")
+	log.Println("Process completed")
 	return nil
 }

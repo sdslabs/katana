@@ -46,7 +46,7 @@ func sessionHandler(s ssh.Session) {
 	if err != nil {
 		fmt.Fprintf(s, "ERROR: %s", err.Error())
 		if err := s.Exit(1); err != nil {
-			fmt.Printf("Failed to connect to server: %s", err)
+			log.Printf("Failed to connect to server: %s", err)
 		}
 	}
 	err = exec.Stream(remotecommand.StreamOptions{
@@ -58,7 +58,7 @@ func sessionHandler(s ssh.Session) {
 	if err != nil {
 		fmt.Fprintf(s, "ERROR: %s", err.Error())
 		if err := s.Exit(1); err != nil {
-			fmt.Printf("Failed to stream data to remote server: %s", err)
+			log.Printf("Failed to stream data to remote server: %s", err)
 		}
 	}
 }

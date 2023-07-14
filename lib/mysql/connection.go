@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"time"
 
@@ -19,7 +18,7 @@ func setup() {
 		panic(err.Error())
 	}
 	db = database
-	fmt.Println("Connecting to MySQL")
+	log.Println("Connecting to MySQL")
 	err = db.Ping()
 	if err != nil {
 		log.Println("MySQL connection was not established")

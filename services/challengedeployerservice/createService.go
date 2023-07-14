@@ -2,7 +2,7 @@ package challengedeployerservice
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"os/exec"
 
 	"github.com/sdslabs/katana/lib/utils"
@@ -46,38 +46,38 @@ func CreateService(chall_name, team_name string) (string, error) {
 	services, err := serviceClient.List(context.TODO(), metav1.ListOptions{})
 	for _, service := range services.Items {
 		if service.Name == chall_name {
-			fmt.Println("Service already exists for the challenge " + chall_name + " in namespace " + team_namespace)
+			log.Println("Service already exists for the challenge " + chall_name + " in namespace " + team_namespace)
 			return "", nil
 		}
 	}
 
 	if err != nil {
-		fmt.Println(" Error in getting services. ")
+		log.Println(" Error in getting services. ")
 		//return err
 		panic(err)
 	}
 
 	// Create Service
-	fmt.Println("Creating service...")
+	log.Println("Creating service...")
 	result, err := serviceClient.Create(context.TODO(), service, metav1.CreateOptions{})
 	if err != nil {
-		fmt.Println("Error creating service.. ")
+		log.Println("Error creating service.. ")
 		return "", err
 		// panic(err)
 	}
 
-	fmt.Printf("Created service %q.\n", result.GetObjectMeta().GetName()+" in namespace "+team_namespace)
+	log.Printf("Created service %q.\n", result.GetObjectMeta().GetName()+" in namespace "+team_namespace)
 
 	// expose service to localhost
 	// TODO: change implementation when deploying on cluster
 	url, err := ExposeService(chall_name, team_namespace)
 	if err != nil {
-		fmt.Printf("Error in exposing service %s for namespace %s", chall_name, team_namespace)
-		fmt.Println("Error: ", err)
+		log.Printf("Error in exposing service %s for namespace %s", chall_name, team_namespace)
+		log.Println("Error: ", err)
 		return "", err
 	}
 
-	fmt.Printf("Challenge for %s is deployed at %s", team_name, url)
+	log.Printf("Challenge for %s is deployed at %s", team_name, url)
 
 	return url, nil
 }

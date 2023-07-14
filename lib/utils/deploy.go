@@ -2,7 +2,6 @@ package utils
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	g "github.com/sdslabs/katana/configs"
@@ -25,7 +24,7 @@ func DeployChallenge(challengeName, teamName string, firstPatch bool, replicas i
 		/// Retrieve the existing deployment
 		existingDeployment, err := deploymentsClient.Get(context.TODO(), challengeName, metav1.GetOptions{})
 		if err != nil {
-			fmt.Println("Error in retrieving existing deployment.")
+			log.Println("Error in retrieving existing deployment.")
 			log.Println(err)
 			return err
 		}
@@ -34,12 +33,12 @@ func DeployChallenge(challengeName, teamName string, firstPatch bool, replicas i
 
 		_, err = deploymentsClient.Update(context.TODO(), existingDeployment, metav1.UpdateOptions{})
 		if err != nil {
-			fmt.Println("Error in updating deployment.")
+			log.Println("Error in updating deployment.")
 			log.Println(err)
 			return err
 		}
 
-		fmt.Println("Updated deployment with new image.")
+		log.Println("Updated deployment with new image.")
 		return nil
 	}
 
@@ -84,20 +83,20 @@ func DeployChallenge(challengeName, teamName string, firstPatch bool, replicas i
 	//Check if deployment already exists
 	deployment, err := deploymentsClient.Get(context.TODO(), challengeName, metav1.GetOptions{})
 	if deployment.Name == challengeName {
-		fmt.Println("Deployment already exists for the challenge " + challengeName + " in namespace " + teamNamespace)
+		log.Println("Deployment already exists for the challenge " + challengeName + " in namespace " + teamNamespace)
 		return nil
 	}
 
 	// Create Deployment
-	fmt.Println("Creating deployment...")
+	log.Println("Creating deployment...")
 	result, err := deploymentsClient.Create(context.TODO(), manifest, metav1.CreateOptions{})
 
 	if err != nil {
-		fmt.Println("Unable to create deployement")
+		log.Println("Unable to create deployement")
 		panic(err)
 	}
 
-	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName()+" in namespace "+teamNamespace)
+	log.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName()+" in namespace "+teamNamespace)
 	return nil
 
 }

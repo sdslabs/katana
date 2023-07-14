@@ -6,22 +6,23 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"fmt"
-	"golang.org/x/crypto/ssh"
+	"log"
 	"strings"
+
+	"golang.org/x/crypto/ssh"
 )
 
 func CheckPrivateKey(privateKey, publicKey string) bool {
 	//check key
 	pub, _, _, _, err := ssh.ParseAuthorizedKey([]byte(publicKey))
 	if err != nil {
-		fmt.Println("error in parsing public key")
+		log.Println("error in parsing public key")
 		return false
 	}
 
 	private, err := ssh.ParsePrivateKey([]byte(privateKey))
 	if err != nil {
-		fmt.Println("error in parsing private key")
+		log.Println("error in parsing private key")
 		return false
 	}
 

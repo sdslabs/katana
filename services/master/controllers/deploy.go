@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"regexp"
 	"strconv"
@@ -18,7 +19,7 @@ func challcopy(dirPath, challengename, challengetype string) {
 
 	localFilePath := dirPath + "/" + challengename + ".tar.gz"
 	pathInPod := "/opt/katana/katana_" + challengetype + "_" + challengename + ".tar.gz"
-	fmt.Println("Testing" + localFilePath + "....and..." + pathInPod)
+	log.Println("Testing" + localFilePath + "....and..." + pathInPod)
 	deployer.CopyInPod(localFilePath, pathInPod)
 
 }
@@ -32,14 +33,14 @@ func createfolder(challengename string) (message int, challengePath string) {
 	dir, err := os.Open(dirPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			fmt.Println("Challenges directory does not exist ,creating directory")
+			log.Println("Challenges directory does not exist ,creating directory")
 			os.Mkdir(dirPath, 0777)
 		} else if os.IsPermission(err) {
-			fmt.Println("Error opening challenge directory. Permission Issue", err)
+			log.Println("Error opening challenge directory. Permission Issue", err)
 			//Permission issue
 			return 2, challengePath
 		} else {
-			fmt.Println("Error opening challenge directory:", err)
+			log.Println("Error opening challenge directory:", err)
 			//Some other error
 			return 2, challengePath
 		}
@@ -48,7 +49,7 @@ func createfolder(challengename string) (message int, challengePath string) {
 
 	// Create a new challenge directory to keep challenge
 	challengePath = dirPath + "/" + challengename
-	fmt.Println("Creating directory :", challengename)
+	log.Println("Creating directory :", challengename)
 	err = os.Mkdir(challengePath, 0777)
 	if err != nil {
 		//Directory already exists with same name
@@ -64,7 +65,7 @@ func Deploy(c *fiber.Ctx) error {
 	folderName := ""
 	patch := false
 	replicas := g.KatanaConfig.TeamDeployement
-	fmt.Println("Starting")
+	log.Println("Starting")
 	if form, err := c.MultipartForm(); err == nil {
 
 		files := form.File["challenge"]
@@ -80,10 +81,10 @@ func Deploy(c *fiber.Ctx) error {
 
 			response, challengePath := createfolder(folderName)
 			if response == 1 {
-				fmt.Println("Directory already exists with same name")
+				log.Println("Directory already exists with same name")
 				return c.SendString("Directory already exists with same name")
 			} else if response == 2 {
-				fmt.Println("Issue with creating chall directory.Check permissions")
+				log.Println("Issue with creating chall directory.Check permissions")
 				return c.SendString("Issue with creating chall directory.Check permissions")
 			}
 
@@ -95,14 +96,14 @@ func Deploy(c *fiber.Ctx) error {
 			//Create folder inside the challenge folder
 			err = os.Mkdir(challengePath+"/"+folderName, 0777)
 			if err != nil {
-				fmt.Println("Error in creating folder inside challenge folder")
+				log.Println("Error in creating folder inside challenge folder")
 				return c.SendString("Error in creating folder inside challenge folder")
 			}
 
 			//extract the tar.gz file
 			err := archiver.Unarchive("./challenges/"+folderName+"/"+file.Filename, "./challenges/"+folderName)
 			if err != nil {
-				fmt.Println("Error in unarchiving", err)
+				log.Println("Error in unarchiving", err)
 				return c.SendString("Error in unarchiving")
 			}
 
@@ -116,7 +117,7 @@ func Deploy(c *fiber.Ctx) error {
 			numberOfTeams := clusterConfig.TeamCount
 			res := make([][]string, 0)
 			for i := 0; i < int(numberOfTeams); i++ {
-				fmt.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
+				log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
 				teamName := "katana-team-" + strconv.Itoa(i)
 				utils.DeployChallenge(folderName, teamName, patch, replicas)
 				url, err := deployer.CreateService(folderName, teamName)
@@ -133,7 +134,7 @@ func Deploy(c *fiber.Ctx) error {
 			return c.JSON(res)
 		}
 	}
-	fmt.Println("Ending")
+	log.Println("Ending")
 
 	return c.SendString("Wrong file")
 }
@@ -142,7 +143,7 @@ func DeleteChallenge(c *fiber.Ctx) error {
 
 	chall_name := c.Params("chall_name")
 	//Delete chall directory also ?
-	fmt.Println("Challenge name is : " + chall_name)
+	log.Println("Challenge name is : " + chall_name)
 
 	deployer.DeleteChallenge(chall_name)
 	return c.SendString("Deleted challenge" + chall_name + "in all namespaces.")
