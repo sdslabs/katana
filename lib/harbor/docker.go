@@ -3,9 +3,9 @@ package harbor
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/lib/utils"
 )
 
 func setCertificateToDocker() error {
@@ -31,8 +31,7 @@ func setCertificateToDocker() error {
 
 	basePath, _ := os.Getwd()
 	cmd := fmt.Sprintf("sudo cp %s/lib/harbor/certs/ca.crt /etc/docker/certs.d/"+configs.KatanaConfig.Harbor.Hostname+"/ca.crt", basePath)
-	out := exec.Command("bash", "-c", cmd)
-	if err := out.Run(); err != nil {
+	if err := utils.RunCommand(cmd); err != nil {
 		return err
 	}
 

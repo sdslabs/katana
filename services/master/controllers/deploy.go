@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"regexp"
 	"strconv"
 
@@ -57,17 +56,6 @@ func createfolder(challengename string) (message int, challengePath string) {
 	}
 	//Successfully created directory
 	return 0, challengePath
-}
-
-func buildimage(folderName string) {
-	// Build the challenge with Dockerfile
-	dirPath, _ := os.Getwd()
-	fmt.Println("Dockerfile for the image is at :")
-	fmt.Println(dirPath + "/challenges/" + folderName + "/" + folderName)
-	cmd := exec.Command("docker", "build", "-t", g.HarborConfig.Hostname+"/katana/"+folderName, dirPath+"/chall/"+folderName+"/"+folderName)
-	cmd2 := exec.Command("docker", "push", g.HarborConfig.Hostname+"/katana/"+folderName)
-	cmd.Run()
-	cmd2.Run()
 }
 
 func Deploy(c *fiber.Ctx) error {
