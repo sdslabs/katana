@@ -4,8 +4,10 @@ backendurl = "http://192.168.49.1:3000"
 rootdirectory = "/opt/katana"
 kubenamespace = "default"
 timeout = 20
+numberofdeployments = 1
 
 [cluster]
+deploymentlabel = "katana"
 teamcount = 1
 teamlabel = "ctfteam"
 templated_manifest_dir = "kubernetes/templates"

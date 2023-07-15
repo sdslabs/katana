@@ -25,7 +25,7 @@ type GogsRequest struct {
 }
 
 func ChallengeUpdate(c *fiber.Ctx) error {
-	replicas := g.KatanaConfig.TeamDeployement
+	replicas := g.KatanaConfig.TeamDeployment
 	client, err := utils.GetKubeClient()
 	patch := true
 	if err != nil {

@@ -74,6 +74,10 @@ func GetTeamNumber() int {
 	return int(g.ClusterConfig.TeamCount)
 }
 
+func GetTeamPodLabels() string {
+	return string(g.ClusterConfig.DeploymentLabel)
+}
+
 func GetMongoIP() string {
 	client, err := GetKubeClient()
 	if err != nil {

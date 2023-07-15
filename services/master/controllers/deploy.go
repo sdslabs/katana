@@ -64,7 +64,7 @@ func Deploy(c *fiber.Ctx) error {
 	challengetype := "web"
 	folderName := ""
 	patch := false
-	replicas := g.KatanaConfig.TeamDeployement
+	replicas := g.KatanaConfig.TeamDeployment
 	log.Println("Starting")
 	if form, err := c.MultipartForm(); err == nil {
 
