@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os/exec"
+	intstr "k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/sdslabs/katana/lib/utils"
 	v1 "k8s.io/api/core/v1"
@@ -24,21 +25,23 @@ func CreateService(chall_name, team_name string) (string, error) {
 			Namespace: team_namespace,
 			Name:      chall_name,
 		},
-
+	
 		Spec: v1.ServiceSpec{
-			Type: v1.ServiceTypeNodePort,
+			Type: v1.ServiceTypeLoadBalancer,  // Change the service type to LoadBalancer
 			Selector: map[string]string{
 				"app": chall_name,
 			},
 			Ports: []v1.ServicePort{
 				{
-					Name:     "http",
-					Protocol: v1.ProtocolTCP,
-					Port:     80,
+					Name:       "http",
+					Protocol:   v1.ProtocolTCP,
+					Port:       80,
+					TargetPort: intstr.FromInt(80),
 				},
 			},
 		},
 	}
+	
 
 	//Get all services
 
