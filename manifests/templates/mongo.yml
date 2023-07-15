@@ -95,17 +95,35 @@ kind: Service
 metadata:
   labels:
     app: mongo
-  name: mongo-nodeport-svc
+  name: mongo-svc
   namespace: katana
 spec:
   ports:
-  - port: 27017
-    protocol: TCP
-    targetPort: 27017
-    nodePort: 32000
+    - port: 27017
+      protocol: TCP
+      targetPort: 27017
   selector:
     app: mongo
-  type: NodePort
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mongo-ingress
+  namespace: katana
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: mongo.katana.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mongo-svc
+                port:
+                  number: 27017
 
 ---
 apiVersion: v1

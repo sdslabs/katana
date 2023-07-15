@@ -72,16 +72,34 @@ kind: Service
 metadata:
   labels:
     app: mysql
-  name: mysql-nodeport-svc
+  name: mysql-svc
   namespace: katana
 spec:
   ports:
-  - port: 3306
-    targetPort: 3306
-    nodePort: 32001
+    - port: 3306
+      targetPort: 3306
   selector:
     app: mysql
-  type: NodePort
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mysql-ingress
+  namespace: katana
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: mysql.katana.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mysql-svc
+                port:
+                  number: 3306
 
 ---
 apiVersion: v1
