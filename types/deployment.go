@@ -8,29 +8,23 @@ import (
 
 // ManifestConfig contains the total data to be injected in manifest templates
 type ManifestConfig struct {
-	TeamCount             uint
-	TeamLabel             string
-	BroadcastCount        uint
-	BroadcastLabel        string
-	BroadcastPort         uint
-	KubeNameSpace         string
-	FluentHost            string
-	TeamPodName           string
-	ContainerName         string
-	ChallengDir           string
-	TempDir               string
-	InitFile              string
-	DaemonPort            uint
-	ChallengeDeployerHost string
-	ChallengeArtifact     string
-	MongoUsername         string
-	MongoPassword         string
-	MySQLPassword         string
-	HarborKey             string
-	HarborCrt             string
-	HarborCaCrt           string
-	HarborIP              string
-	HarborHostname        string
+	TeamCount      uint
+	TeamLabel      string
+	KubeNameSpace  string
+	TeamPodName    string
+	ContainerName  string
+	ChallengDir    string
+	TempDir        string
+	InitFile       string
+	DaemonPort     uint
+	MongoUsername  string
+	MongoPassword  string
+	MySQLPassword  string
+	HarborKey      string
+	HarborCrt      string
+	HarborCaCrt    string
+	HarborIP       string
+	HarborHostname string
 }
 
 type ResourceStatus struct {

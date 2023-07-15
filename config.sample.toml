@@ -3,13 +3,9 @@ kubehost = "0.0.0.0"
 backendurl = "http://192.168.49.1:3000"
 rootdirectory = "/opt/katana"
 kubenamespace = "default"
-verbosity = 3
 timeout = 20
-numberofdeployements = 1
+
 [cluster]
-deploymentlabel = "katana"
-broadcastcount = 2
-broadcastlabel = "broadcast"
 teamcount = 1
 teamlabel = "ctfteam"
 templated_manifest_dir = "kubernetes/templates"
@@ -24,9 +20,7 @@ port = 3000
 [services.challengedeployer]
 host = "challengedeployer.katana.local"
 port = 8002
-broadcastport = 3003
 teamclientport = 3004
-challengeartifactlabel = "challfile"
 
 [teamvm]
 teampodname = "katana-team-master-pod"

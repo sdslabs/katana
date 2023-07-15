@@ -6,9 +6,6 @@ type API struct {
 }
 
 type ClusterCfg struct {
-	DeploymentLabel      string   `toml:"deploymentlabel"`
-	BroadcastCount       uint     `toml:"broadcastcount"`
-	BroadcastLabel       string   `toml:"broadcastlabel"`
 	TeamCount            uint     `toml:"teamcount"`
 	TeamLabel            string   `toml:"teamlabel"`
 	TemplatedManifestDir string   `toml:"templated_manifest_dir"`
@@ -18,9 +15,7 @@ type ClusterCfg struct {
 type ChallengeDeployerCfg struct {
 	Host           string `toml:"host"`
 	Port           uint   `toml:"port"`
-	BroadcastPort  uint   `toml:"broadcastport"`
 	TeamClientPort uint   `toml:"teamclientport"`
-	ArtifactLabel  string `toml:"challengeartifactlabel"`
 }
 
 type AdminCfg struct {
@@ -64,21 +59,20 @@ type MySQLCfg struct {
 }
 
 type KatanaCfg struct {
-	KubeHost        string              `toml:"kubehost"`
-	BackendUrl      string              `toml:"backendurl"`
-	RootDirectory   string              `toml:"rootdirectory"`
-	KubeNameSpace   string              `toml:"kubenamespace"`
-	KubeConfig      string              `toml:"kubeconfig"`
-	LogFile         string              `toml:"logfile"`
-	Services        ServicesCfg         `toml:"services"`
-	Cluster         ClusterCfg          `toml:"cluster"`
-	Mongo           MongoCfg            `toml:"mongo"`
-	TeamVmConfig    TeamChallengeConfig `toml:"teamvm"`
-	AdminConfig     AdminCfg            `toml:"admin"`
-	MySQL           MySQLCfg            `toml:"mysql"`
-	Harbor          HarborCfg           `toml:"harbor"`
-	TimeOut         int                 `toml:"timeout"`
-	TeamDeployement int32               `toml:"numberofdeployements"`
+	KubeHost      string              `toml:"kubehost"`
+	BackendUrl    string              `toml:"backendurl"`
+	RootDirectory string              `toml:"rootdirectory"`
+	KubeNameSpace string              `toml:"kubenamespace"`
+	KubeConfig    string              `toml:"kubeconfig"`
+	LogFile       string              `toml:"logfile"`
+	Services      ServicesCfg         `toml:"services"`
+	Cluster       ClusterCfg          `toml:"cluster"`
+	Mongo         MongoCfg            `toml:"mongo"`
+	TeamVmConfig  TeamChallengeConfig `toml:"teamvm"`
+	AdminConfig   AdminCfg            `toml:"admin"`
+	MySQL         MySQLCfg            `toml:"mysql"`
+	Harbor        HarborCfg           `toml:"harbor"`
+	TimeOut       int                 `toml:"timeout"`
 }
 
 type HarborCfg struct {

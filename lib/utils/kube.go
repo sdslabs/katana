@@ -3,7 +3,6 @@ package utils
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -69,10 +68,6 @@ func GetPods(lbls map[string]string, ns ...string) ([]v1.Pod, error) {
 	}
 
 	return pods.Items, nil
-}
-
-func GetTeamPodLabels() string {
-	return string(g.ClusterConfig.DeploymentLabel)
 }
 
 func GetTeamNumber() int {
@@ -187,31 +182,24 @@ func GetGogsIp() string {
 }
 
 func DeploymentConfig() types.ManifestConfig {
-	clusterConfig := g.ClusterConfig
 	config := types.ManifestConfig{
-		FluentHost:            fmt.Sprintf("\"elasticsearch.%s.svc.cluster.local\"", g.KatanaConfig.KubeNameSpace),
-		KubeNameSpace:         g.KatanaConfig.KubeNameSpace,
-		TeamCount:             clusterConfig.TeamCount,
-		TeamLabel:             clusterConfig.TeamLabel,
-		BroadcastCount:        clusterConfig.BroadcastCount,
-		BroadcastLabel:        clusterConfig.BroadcastLabel,
-		BroadcastPort:         g.ServicesConfig.ChallengeDeployer.BroadcastPort,
-		TeamPodName:           g.TeamVmConfig.TeamPodName,
-		ContainerName:         g.TeamVmConfig.ContainerName,
-		ChallengDir:           g.TeamVmConfig.ChallengeDir,
-		TempDir:               g.TeamVmConfig.TempDir,
-		InitFile:              g.TeamVmConfig.InitFile,
-		DaemonPort:            g.TeamVmConfig.DaemonPort,
-		ChallengeDeployerHost: g.ServicesConfig.ChallengeDeployer.Host,
-		ChallengeArtifact:     g.ServicesConfig.ChallengeDeployer.ArtifactLabel,
-		MongoUsername:         Base64Encode(g.KatanaConfig.Mongo.Username),
-		MongoPassword:         Base64Encode(g.KatanaConfig.Mongo.Password),
-		MySQLPassword:         g.KatanaConfig.MySQL.Password,
-		HarborKey:             "",
-		HarborCrt:             "",
-		HarborCaCrt:           "",
-		HarborIP:              "",
-		HarborHostname:        g.KatanaConfig.Harbor.Hostname,
+		KubeNameSpace:  g.KatanaConfig.KubeNameSpace,
+		TeamCount:      g.ClusterConfig.TeamCount,
+		TeamLabel:      g.ClusterConfig.TeamLabel,
+		TeamPodName:    g.TeamVmConfig.TeamPodName,
+		ContainerName:  g.TeamVmConfig.ContainerName,
+		ChallengDir:    g.TeamVmConfig.ChallengeDir,
+		TempDir:        g.TeamVmConfig.TempDir,
+		InitFile:       g.TeamVmConfig.InitFile,
+		DaemonPort:     g.TeamVmConfig.DaemonPort,
+		MongoUsername:  Base64Encode(g.KatanaConfig.Mongo.Username),
+		MongoPassword:  Base64Encode(g.KatanaConfig.Mongo.Password),
+		MySQLPassword:  g.KatanaConfig.MySQL.Password,
+		HarborKey:      "",
+		HarborCrt:      "",
+		HarborCaCrt:    "",
+		HarborIP:       "",
+		HarborHostname: g.KatanaConfig.Harbor.Hostname,
 	}
 
 	// Add Harbor key and cert
