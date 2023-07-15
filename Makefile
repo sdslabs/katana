@@ -20,8 +20,6 @@ SERVICE_NAME_COMMAND =$(shell kubectl get svc --namespace $(OPENVPN_NAMESPACE) -
 SERVICE_IP_COMMAND=$(shell kubectl get svc --namespace $(OPENVPN_NAMESPACE) -l "app=openvpn,release=openvpn" -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
 # CHALLENGE_DEPLOYER_IP :=  $(shell minikube service nginx-ingress-controller --url -n kube-system)
 
-CREATEBIN := $(shell [ ! -d ./bin ] && mkdir bin)
-
 # Make is verbose in Linux. Make it silent.
 MAKEFLAGS += --silent
 
@@ -108,6 +106,5 @@ help:
 	@echo "prepare-for-pr 	- Prepare the code for PR after fmt, lint and checking uncommitted files"
 	@echo "lint    			- Lint code using golangci-lint"
 	@echo "set-env" 		- Setup Katana environment  
-	@echo "gen-vpn"         - Generate VPN configurations
 	@echo "build"         	- Build katana binary
 

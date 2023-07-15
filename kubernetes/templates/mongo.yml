@@ -17,13 +17,13 @@ spec:
         app: mongo-client
     spec:
       containers:
-      - image: mongo
-        name: mongo-client
-        env:
-        - name: mongo-client_INITDB_ROOT_USERNAME
-          value: 'dummy'
-        - name: mongo-client_INITDB_ROOT_PASSWORD
-          value: 'dummy'
+        - image: mongo
+          name: mongo-client
+          env:
+            - name: mongo-client_INITDB_ROOT_USERNAME
+              value: "dummy"
+            - name: mongo-client_INITDB_ROOT_PASSWORD
+              value: "dummy"
 
 ---
 apiVersion: apps/v1
@@ -45,49 +45,49 @@ spec:
         app: mongo
     spec:
       containers:
-      - image: mongo
-        name: mongo
-        args: ["--dbpath","/data/db"]
-        livenessProbe:
-          exec:
-            command:
-              - mongosh
-              - --eval
-              - "db.adminCommand('ping')"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          successThreshold: 1
-          failureThreshold: 6
-        readinessProbe:
-          exec:
-            command:
-              - mongosh
-              - --eval
-              - "db.adminCommand('ping')"
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          successThreshold: 1
-          failureThreshold: 6
-        env:
-        - name: MONGO_INITDB_ROOT_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: mongo-creds
-              key: username
-        - name: MONGO_INITDB_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mongo-creds
-              key: password
-        volumeMounts:
-        - name: "mongo-data-dir"
-          mountPath: "/data/db"
+        - image: mongo
+          name: mongo
+          args: ["--dbpath", "/data/db"]
+          livenessProbe:
+            exec:
+              command:
+                - mongosh
+                - --eval
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          readinessProbe:
+            exec:
+              command:
+                - mongosh
+                - --eval
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-creds
+                  key: username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-creds
+                  key: password
+          volumeMounts:
+            - name: "mongo-data-dir"
+              mountPath: "/data/db"
       volumes:
-      - name: "mongo-data-dir"
-        persistentVolumeClaim:
-          claimName: "mongo-data"
+        - name: "mongo-data-dir"
+          persistentVolumeClaim:
+            claimName: "mongo-data"
 
 ---
 apiVersion: v1
@@ -147,7 +147,7 @@ metadata:
   namespace: katana
 spec:
   accessModes:
-    - ReadWriteOnce 
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
@@ -155,8 +155,8 @@ spec:
 ---
 apiVersion: v1
 data:
-  password: cGFzc3dvcmQxMjM= #password123
   username: YWRtaW51c2Vy #adminuser
+  password: cGFzc3dvcmQxMjM= #password123
 kind: Secret
 metadata:
   creationTimestamp: null
