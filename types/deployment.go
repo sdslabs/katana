@@ -23,6 +23,9 @@ type ManifestConfig struct {
 	DaemonPort            uint
 	ChallengeDeployerHost string
 	ChallengeArtifact     string
+	MongoUsername         string
+	MongoPassword         string
+	MySQLPassword         string
 	HarborKey             string
 	HarborCrt             string
 	HarborCaCrt           string

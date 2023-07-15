@@ -155,8 +155,8 @@ spec:
 ---
 apiVersion: v1
 data:
-  username: YWRtaW51c2Vy #adminuser
-  password: cGFzc3dvcmQxMjM= #password123
+  username: {{.MongoUsername}}
+  password: {{.MongoPassword}}
 kind: Secret
 metadata:
   creationTimestamp: null

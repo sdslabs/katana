@@ -109,4 +109,4 @@ metadata:
   namespace: katana
 type: kubernetes.io/basic-auth
 stringData:
-  password: test1234
+  password: {{.MySQLPassword}}
