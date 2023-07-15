@@ -6,14 +6,13 @@ type API struct {
 }
 
 type ClusterCfg struct {
-	DeploymentLabel    string   `toml:"deploymentlabel"`
-	BroadcastCount     uint     `toml:"broadcastcount"`
-	BroadcastLabel     string   `toml:"broadcastlabel"`
-	TeamCount          uint     `toml:"teamcount"`
-	TeamLabel          string   `toml:"teamlabel"`
-	ManifestDir        string   `toml:"manifest_dir"`
-	ManifestRuntimeDir string   `toml:"manifest_runtime_dir"`
-	Manifests          []string `toml:"manifests"`
+	DeploymentLabel      string   `toml:"deploymentlabel"`
+	BroadcastCount       uint     `toml:"broadcastcount"`
+	BroadcastLabel       string   `toml:"broadcastlabel"`
+	TeamCount            uint     `toml:"teamcount"`
+	TeamLabel            string   `toml:"teamlabel"`
+	TemplatedManifestDir string   `toml:"templated_manifest_dir"`
+	TemplatedManifests   []string `toml:"templated_manifests"`
 }
 
 type ChallengeDeployerCfg struct {

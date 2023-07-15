@@ -28,7 +28,7 @@ func InfraSet(c *fiber.Ctx) error {
 		log.Fatal(err)
 	}
 
-	for _, manifests := range configs.ClusterConfig.Manifests {
+	for _, manifests := range configs.ClusterConfig.TemplatedManifests {
 		if manifests == "harbor.yml" {
 			generateCertsforHarbor()
 		}
@@ -38,7 +38,7 @@ func InfraSet(c *fiber.Ctx) error {
 		log.Fatal(err)
 	}
 
-	for _, manifests := range configs.ClusterConfig.Manifests {
+	for _, manifests := range configs.ClusterConfig.TemplatedManifests {
 		if manifests == "harbor.yml" {
 			err = harbor.SetupHarbor()
 			if err != nil {

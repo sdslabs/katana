@@ -12,9 +12,8 @@ broadcastcount = 2
 broadcastlabel = "broadcast"
 teamcount = 1
 teamlabel = "ctfteam"
-manifest_dir = "manifests/templates"
-manifest_runtime_dir = "manifests/templates/runtime"
-manifests = [
+templated_manifest_dir = "kubernetes/templates"
+templated_manifests = [
     "harbor.yml",
 ]
 

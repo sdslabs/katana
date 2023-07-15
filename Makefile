@@ -8,9 +8,7 @@ GOBIN := $(PROJECTROOT)/bin
 UTILDIR := $(PROJECTROOT)/scripts/utils
 SPINNER := $(UTILDIR)/spinner.sh
 BUILDIR := $(PROJECTROOT)/scripts/build
-CONTROLLER_MANIFEST:= $(PROJECTROOT)/manifests/dev/expose-controller.yml
-HELM_MANIFEST:= $(PROJECTROOT)/manifests/templates/helm-values.yml
-OPENVPN_MANIFEST:= $(PROJECTROOT)/manifests/templates/helm-values.yml
+MANIFEST:= $(PROJECTROOT)/kubernetes/manifests
 
 KEY_NAME := team
 
@@ -83,20 +81,16 @@ gen-certificates:
 	kubectl --namespace $(OPENVPN_NAMESPACE) exec -it $(POD_NAME) cat "/etc/openvpn/certs/pki/$(KEY_NAME)-$$n.ovpn" > $(KEY_NAME)-$$n.ovpn; \
 	done
 
-gen-vpn: set-env
-	helm install openvpn -f $(HELM_MANIFEST) stable/openvpn --namespace openvpn
-	minikube tunnel
-
 set-env: build
 	minikube start --driver=docker && \
 	minikube addons enable ingress  && \
-	kubectl apply -f $(CONTROLLER_MANIFEST) && \
+	kubectl apply -f $(MANIFEST) && \
 	sudo -- sh -c "echo \"$(minikube service nginx-ingress-controller --url -n kube-system | awk '{print substr($0,8)}' | awk '{print substr($0, 1, length($0)-6)}' | head -1)    katana.local\" >> /etc/hosts" &&\
 	cp config.sample.toml config.toml && \
 	./bin/katana run
 
 set-env-prod: build
-	kubectl apply -f $(CONTROLLER_MANIFEST) && \
+	kubectl apply -f $(MANIFEST) && \
 	cp config.sample.toml config.toml && \
 	sudo ./bin/katana run
 

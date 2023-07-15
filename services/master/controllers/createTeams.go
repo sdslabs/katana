@@ -80,7 +80,7 @@ func CreateTeams(c *fiber.Ctx) error {
 			log.Fatal(err)
 		}
 		manifest := &bytes.Buffer{}
-		tmpl, err := template.ParseFiles(filepath.Join(g.ClusterConfig.ManifestRuntimeDir, "teams.yml"))
+		tmpl, err := template.ParseFiles(filepath.Join(g.ClusterConfig.TemplatedManifestDir, "runtime", "teams.yml"))
 		if err != nil {
 			return err
 		}

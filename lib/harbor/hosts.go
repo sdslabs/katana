@@ -33,12 +33,12 @@ func addHarborHostsEntry() error {
 	deploymentName := "katana-release-harbor-core"
 	namespace := "katana"
 
-	err = waitForLoadBalancerExternalIP(client, serviceName)
+	err = utils.WaitForLoadBalancerExternalIP(client, serviceName, namespace)
 	if err != nil {
 		return err
 	}
 
-	err = waitForDeploymentReady(client, deploymentName)
+	err = utils.WaitForDeploymentReady(client, deploymentName, namespace)
 	if err != nil {
 		return err
 	}
@@ -133,7 +133,7 @@ func deployHarborClusterDaemonSet() error {
 
 	manifest := &bytes.Buffer{}
 
-	tmpl, err := template.ParseFiles(filepath.Join(configs.ClusterConfig.ManifestRuntimeDir, "harbor-daemonset.yml"))
+	tmpl, err := template.ParseFiles(filepath.Join(configs.ClusterConfig.TemplatedManifestDir, "runtime", "harbor-daemonset.yml"))
 	if err != nil {
 		return err
 	}

@@ -336,3 +336,67 @@ func DeleteConfigMapAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *res
 
 	watcher.Stop()
 }
+
+func WaitForLoadBalancerExternalIP(clientset *kubernetes.Clientset, serviceName string, namespace string) error {
+	service, err := clientset.CoreV1().Services(namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+
+	if service.Status.LoadBalancer.Ingress != nil && len(service.Status.LoadBalancer.Ingress) > 0 && service.Status.LoadBalancer.Ingress[0].IP != "" {
+		return nil
+	}
+
+	watcher, err := clientset.CoreV1().Services(namespace).Watch(context.TODO(), metav1.ListOptions{
+		FieldSelector: "metadata.name=" + serviceName,
+	})
+	if err != nil {
+		return err
+	}
+	defer watcher.Stop()
+
+	for event := range watcher.ResultChan() {
+		service, ok := event.Object.(*v1.Service)
+		if !ok {
+			continue
+		}
+
+		if service.Status.LoadBalancer.Ingress != nil && len(service.Status.LoadBalancer.Ingress) > 0 && service.Status.LoadBalancer.Ingress[0].IP != "" {
+			return nil
+		}
+	}
+
+	return nil
+}
+
+func WaitForDeploymentReady(clientset *kubernetes.Clientset, deploymentName string, namespace string) error {
+	deployment, err := clientset.AppsV1().Deployments(namespace).Get(context.TODO(), deploymentName, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+
+	if deployment.Status.ReadyReplicas > 0 {
+		return nil
+	}
+
+	watcher, err := clientset.AppsV1().Deployments(namespace).Watch(context.TODO(), metav1.ListOptions{
+		FieldSelector: "metadata.name=" + deploymentName,
+	})
+	if err != nil {
+		return err
+	}
+	defer watcher.Stop()
+
+	for event := range watcher.ResultChan() {
+		deployment, ok := event.Object.(*appsv1.Deployment)
+		if !ok {
+			continue
+		}
+
+		if deployment.Status.ReadyReplicas > 0 {
+			return nil
+		}
+	}
+
+	return nil
+}
