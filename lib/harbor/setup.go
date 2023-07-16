@@ -6,7 +6,12 @@ import (
 )
 
 func SetupHarbor() error {
-	if err := addHarborHostsEntry(); err != nil {
+	client, _ := utils.GetKubeClient()
+
+	deploymentName := "katana-release-harbor-core"
+	namespace := "katana"
+
+	if err := utils.WaitForDeploymentReady(client, deploymentName, namespace); err != nil {
 		return err
 	}
 

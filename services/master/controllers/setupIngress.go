@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -36,6 +37,7 @@ func SetupIngress(c *fiber.Ctx) error {
 		"mongo.katana.local",
 		"gogs.katana.local",
 		"mysql.katana.local",
+		configs.KatanaConfig.Harbor.Hostname,
 	}
 
 	hostsEntry := ""

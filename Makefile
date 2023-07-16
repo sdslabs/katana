@@ -95,6 +95,9 @@ set-env-prod: build
 build:
 	cd cmd && go build -o ../bin/katana
 
+run : build
+	sudo ./bin/katana run
+
 # Prints help message
 help:
 	@echo "KATANA"

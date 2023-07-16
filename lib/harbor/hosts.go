@@ -1,13 +1,10 @@
 package harbor
 
 import (
-	"bufio"
 	"bytes"
 	"context"
-	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"text/template"
 
 	"github.com/sdslabs/katana/configs"
@@ -17,86 +14,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const (
-	hostsFilePath = "/etc/hosts"
-)
-
-var hostsEntry string = configs.KatanaConfig.Harbor.Hostname
-
-func addHarborHostsEntry() error {
-	client, err := utils.GetKubeClient()
-	if err != nil {
-		return err
-	}
-
-	serviceName := "harbor"
-	deploymentName := "katana-release-harbor-core"
-	namespace := "katana"
-
-	err = utils.WaitForLoadBalancerExternalIP(client, serviceName, namespace)
-	if err != nil {
-		return err
-	}
-
-	err = utils.WaitForDeploymentReady(client, deploymentName, namespace)
-	if err != nil {
-		return err
-	}
-
-	service, err := client.CoreV1().Services(namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
-	if err != nil {
-		return err
-	}
-
-	externalIP := service.Status.LoadBalancer.Ingress[0].IP
-
-	// Check if hosts entry already exists
-	file, err := os.Open(hostsFilePath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	lines := make([]string, 0)
-	found := false
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.Contains(line, hostsEntry) {
-			fields := strings.Fields(line)
-			if len(fields) > 1 {
-				fields[0] = externalIP
-				line = strings.Join(fields, " ")
-				found = true
-			}
-		}
-		lines = append(lines, line)
-	}
-
-	if !found {
-		lines = append(lines, fmt.Sprintf("%s %s", externalIP, hostsEntry))
-	}
-
-	if err := scanner.Err(); err != nil {
-		return err
-	}
-
-	// Write to file
-	file, err = os.OpenFile(hostsFilePath, os.O_WRONLY|os.O_TRUNC, 0644)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	w := bufio.NewWriter(file)
-	for _, line := range lines {
-		fmt.Fprintln(w, line)
-	}
-
-	return w.Flush()
-}
-
 func deployHarborClusterDaemonSet() error {
 	kubeConfig, _ := utils.GetKubeConfig()
 	kubeClient, _ := utils.GetKubeClient()
@@ -105,7 +22,7 @@ func deployHarborClusterDaemonSet() error {
 	utils.DeleteConfigMapAndWait(kubeClient, kubeConfig, "setup-script", "kube-system")
 	utils.DeleteDaemonSetAndWait(kubeClient, kubeConfig, "node-custom-setup", "kube-system")
 
-	serviceName := "harbor"
+	serviceName := "katana-release-harbor-core"
 	serviceNamespace := "katana"
 	deplNamespace := "kube-system"
 
