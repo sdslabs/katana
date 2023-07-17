@@ -22,7 +22,7 @@ func deployHarborClusterDaemonSet() error {
 	utils.DeleteConfigMapAndWait(kubeClient, kubeConfig, "setup-script", "kube-system")
 	utils.DeleteDaemonSetAndWait(kubeClient, kubeConfig, "node-custom-setup", "kube-system")
 
-	serviceName := "katana-release-harbor-core"
+	serviceName := "ingress-nginx-controller"
 	serviceNamespace := "katana"
 	deplNamespace := "kube-system"
 
