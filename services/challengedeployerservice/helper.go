@@ -1,6 +1,7 @@
 package challengedeployerservice
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -8,10 +9,12 @@ import (
 
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
-	configs "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/configs"
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
 	v1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType string) error {
@@ -68,12 +71,11 @@ func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType 
 	return nil
 }
 
-func createServiceAndIngressForChallenge(challengeName, teamName string, targetPort int32) (string, error) {
-
+func createServiceAndIngressRuleForChallenge(challengeName, teamName string, targetPort int32) (string, error) {
 	kubeclient, _ := utils.GetKubeClient()
 	serviceName := challengeName + "-svc"
 	teamNamespace := teamName + "-ns"
-	port := int32(80)
+	port := int32(3000)
 	selector := map[string]string{
 		"app": challengeName,
 	}
@@ -82,14 +84,48 @@ func createServiceAndIngressForChallenge(challengeName, teamName string, targetP
 
 	log.Printf("Created service %s for challenge %s in namespace %s", serviceName, challengeName, teamNamespace)
 
-	// Create ingress
-	ingressName := challengeName + "-ingress"
-	ingressHost := fmt.Sprintf("%s.%s.%s", challengeName, teamName, configs.KatanaConfig.IngressHost)
-	utils.CreateIngress(kubeclient, ingressName, teamNamespace, serviceName, port, ingressHost)
+	// Get team ingress
+	ingressName := "team-ingress"
+	teamIngress, err := kubeclient.NetworkingV1().Ingresses(teamNamespace).Get(context.TODO(), ingressName, metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
 
-	log.Printf("Created ingress %s for challenge %s in namespace %s", ingressName, challengeName, teamNamespace)
+	additionalRules := networkingv1.IngressRule{
+		Host: fmt.Sprintf("%s.%s.%s", challengeName, teamName, configs.KatanaConfig.IngressHost),
+		IngressRuleValue: networkingv1.IngressRuleValue{
+			HTTP: &networkingv1.HTTPIngressRuleValue{
+				Paths: []networkingv1.HTTPIngressPath{
+					{
+						Path: "/",
+						PathType: func() *networkingv1.PathType {
+							pt := networkingv1.PathTypePrefix
+							return &pt
+						}(),
+						Backend: networkingv1.IngressBackend{
+							Service: &networkingv1.IngressServiceBackend{
+								Name: serviceName,
+								Port: networkingv1.ServiceBackendPort{
+									Number: port,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
 
-	return ingressHost, nil
+	teamIngress.Spec.Rules = append(teamIngress.Spec.Rules, additionalRules)
+
+	_, err = kubeclient.NetworkingV1().Ingresses(teamNamespace).Update(context.Background(), teamIngress, metav1.UpdateOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	log.Printf("Added ingress rule for challenge %s in namespace %s", challengeName, teamNamespace)
+
+	return fmt.Sprintf("%s.%s.%s", challengeName, teamName, configs.KatanaConfig.IngressHost), nil
 }
 
 func createFolder(challengeName string) (message int, challengePath string) {
