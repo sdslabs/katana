@@ -12,9 +12,11 @@ import (
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/types"
 	appsv1 "k8s.io/api/apps/v1"
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -47,7 +49,7 @@ func GetKubeClient() (*kubernetes.Clientset, error) {
 	return kubernetes.NewForConfig(config)
 }
 
-func GetPods(lbls map[string]string, ns ...string) ([]v1.Pod, error) {
+func GetPods(lbls map[string]string, ns ...string) ([]corev1.Pod, error) {
 	var namespace string
 	if len(ns) == 0 {
 		namespace = g.KatanaConfig.KubeNameSpace
@@ -122,7 +124,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 	}
 
 	// Find the container in the pod
-	var container *v1.Container
+	var container *corev1.Container
 	for _, c := range pod.Spec.Containers {
 		if c.Name == containerName {
 			container = &c
@@ -142,7 +144,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 		SubResource("exec").
 		Param("container", containerName)
 
-	req.VersionedParams(&v1.PodExecOptions{
+	req.VersionedParams(&corev1.PodExecOptions{
 		Container: containerName,
 		Command:   []string{"bash", "-c", "cat > " + pathInPod},
 		Stdin:     true,
@@ -241,7 +243,7 @@ func Podexecutor(command []string, kubeClientset *kubernetes.Clientset, kubeConf
 		Name("katana-team-master-pod-0").
 		Namespace(podNamespace + "-ns").
 		SubResource("exec")
-	req.VersionedParams(&v1.PodExecOptions{
+	req.VersionedParams(&corev1.PodExecOptions{
 		Command: command,
 		Stdin:   false,
 		Stdout:  true,
@@ -320,7 +322,7 @@ func DeleteConfigMapAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *res
 
 	for event := range watcher.ResultChan() {
 		// Check if ConfigMap exists
-		configMapName := event.Object.(*v1.ConfigMap).Name
+		configMapName := event.Object.(*corev1.ConfigMap).Name
 		if configMapName == "" {
 			break
 		}
@@ -351,7 +353,7 @@ func WaitForLoadBalancerExternalIP(clientset *kubernetes.Clientset, serviceName 
 	defer watcher.Stop()
 
 	for event := range watcher.ResultChan() {
-		service, ok := event.Object.(*v1.Service)
+		service, ok := event.Object.(*corev1.Service)
 		if !ok {
 			continue
 		}
@@ -391,6 +393,76 @@ func WaitForDeploymentReady(clientset *kubernetes.Clientset, deploymentName stri
 		if deployment.Status.ReadyReplicas > 0 {
 			return nil
 		}
+	}
+
+	return nil
+}
+
+func CreateService(clientset *kubernetes.Clientset, serviceName string, namespace string, port int32, targetPort int32, selector map[string]string) error {
+	service := &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: serviceName,
+		},
+		Spec: corev1.ServiceSpec{
+			Selector: selector,
+			Ports: []corev1.ServicePort{
+				{
+					Port:       port,
+					TargetPort: intstr.FromInt(int(targetPort)),
+				},
+			},
+		},
+	}
+
+	_, err := clientset.CoreV1().Services(namespace).Create(context.Background(), service, metav1.CreateOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func CreateIngress(clientset *kubernetes.Clientset, ingressName string, namespace string, serviceName string, servicePort int32, host string) error {
+	ingressClassName := "nginx"
+
+	ingress := &networkingv1.Ingress{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: ingressName,
+		},
+		Spec: networkingv1.IngressSpec{
+			IngressClassName: &ingressClassName,
+			Rules: []networkingv1.IngressRule{
+				{
+					Host: host,
+					IngressRuleValue: networkingv1.IngressRuleValue{
+						HTTP: &networkingv1.HTTPIngressRuleValue{
+							Paths: []networkingv1.HTTPIngressPath{
+								{
+									Path: "/",
+									PathType: func() *networkingv1.PathType {
+										pathType := networkingv1.PathTypePrefix
+										return &pathType
+									}(),
+									Backend: networkingv1.IngressBackend{
+										Service: &networkingv1.IngressServiceBackend{
+											Name: serviceName,
+											Port: networkingv1.ServiceBackendPort{
+												Number: servicePort,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	_, err := clientset.NetworkingV1().Ingresses(namespace).Create(context.Background(), ingress, metav1.CreateOptions{})
+	if err != nil {
+		return err
 	}
 
 	return nil

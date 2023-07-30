@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	cfg "github.com/sdslabs/katana/configs"
+	challengeDeployerService "github.com/sdslabs/katana/services/challengedeployerservice"
 	c "github.com/sdslabs/katana/services/master/controllers"
 )
 
@@ -45,9 +46,9 @@ func Server() error {
 	admin.Get("/createTeams/:number", c.CreateTeams)
 	admin.Post("/challengeUpdate", c.ChallengeUpdate)
 	admin.Post("/logs", c.Logs)
-	admin.Post("/deploy", c.Deploy)
+	admin.Post("/deployChallenge", challengeDeployerService.DeployChallenge)
 	admin.Get("/gitServer", c.GitServer)
-	admin.Get("/deleteChallenge/:chall_name", c.DeleteChallenge)
+	admin.Get("/deleteChallenge/:chall_name", challengeDeployerService.DeleteChallenge)
 	admin.Get("/setupIngress", c.SetupIngress)
 	log.Printf("Listening on %s:%d\n", cfg.APIConfig.Host, cfg.APIConfig.Port)
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port))
