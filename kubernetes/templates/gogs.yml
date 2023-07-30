@@ -103,7 +103,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: gogs.katana.local
+    - host: {{ printf "gogs." .IngressHost }}
       http:
         paths:
           - path: /

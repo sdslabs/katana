@@ -1,6 +1,7 @@
 kubeconfig = ""
 kubehost = "0.0.0.0"
 backendurl = "http://192.168.49.1:3000"
+ingresshost = "katana.local"
 rootdirectory = "/opt/katana"
 kubenamespace = "default"
 timeout = 20
@@ -18,11 +19,6 @@ templated_manifests = [
 [services.api]
 host = "0.0.0.0"
 port = 3000
-
-[services.challengedeployer]
-host = "challengedeployer.katana.local"
-port = 8002
-teamclientport = 3004
 
 [teamvm]
 teampodname = "katana-team-master-pod"
@@ -43,7 +39,6 @@ username = "adminuser"
 password = "password123"
 port = "32000"
 mongosh_version = "1.6.1"
-cluster_url = "challengedeployer.katana.local"
 
 [mysql]
 username = "root"

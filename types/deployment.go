@@ -16,6 +16,7 @@ type ManifestConfig struct {
 	ChallengDir    string
 	TempDir        string
 	InitFile       string
+	IngressHost    string
 	DaemonPort     uint
 	MongoUsername  string
 	MongoPassword  string

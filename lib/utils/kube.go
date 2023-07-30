@@ -197,6 +197,7 @@ func DeploymentConfig() types.ManifestConfig {
 		ChallengDir:    g.TeamVmConfig.ChallengeDir,
 		TempDir:        g.TeamVmConfig.TempDir,
 		InitFile:       g.TeamVmConfig.InitFile,
+		IngressHost:    g.KatanaConfig.IngressHost,
 		DaemonPort:     g.TeamVmConfig.DaemonPort,
 		MongoUsername:  Base64Encode(g.KatanaConfig.Mongo.Username),
 		MongoPassword:  Base64Encode(g.KatanaConfig.Mongo.Password),

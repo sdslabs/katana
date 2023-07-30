@@ -8,6 +8,7 @@ import (
 
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
+	configs "github.com/sdslabs/katana/configs"
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
 	v1 "k8s.io/api/core/v1"
@@ -83,7 +84,7 @@ func createServiceAndIngressForChallenge(challengeName, teamName string, targetP
 
 	// Create ingress
 	ingressName := challengeName + "-ingress"
-	ingressHost := fmt.Sprintf("%s.%s.%s", challengeName, teamName, "katana.local")
+	ingressHost := fmt.Sprintf("%s.%s.%s", challengeName, teamName, configs.KatanaConfig.IngressHost)
 	utils.CreateIngress(kubeclient, ingressName, teamNamespace, serviceName, port, ingressHost)
 
 	log.Printf("Created ingress %s for challenge %s in namespace %s", ingressName, challengeName, teamNamespace)

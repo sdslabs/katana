@@ -90,7 +90,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: mysql.katana.local
+    - host: {{ printf "mysql." .IngressHost }}
       http:
         paths:
           - path: /

@@ -114,7 +114,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: mongo.katana.local
+    - host: {{ printf "mongo." .IngressHost }}
       http:
         paths:
           - path: /

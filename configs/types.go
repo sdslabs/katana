@@ -13,21 +13,14 @@ type ClusterCfg struct {
 	TemplatedManifests   []string `toml:"templated_manifests"`
 }
 
-type ChallengeDeployerCfg struct {
-	Host           string `toml:"host"`
-	Port           uint   `toml:"port"`
-	TeamClientPort uint   `toml:"teamclientport"`
-}
-
 type AdminCfg struct {
 	Username string `toml:"username"`
 	Password string `toml:"password"`
 }
 
 type ServicesCfg struct {
-	API               API                  `toml:"api"`
-	ChallengeDeployer ChallengeDeployerCfg `toml:"challengedeployer"`
-	SSHProvider       SSHProviderCfg       `toml:"sshprovider"`
+	API         API            `toml:"api"`
+	SSHProvider SSHProviderCfg `toml:"sshprovider"`
 }
 
 type TeamChallengeConfig struct {
@@ -75,6 +68,7 @@ type KatanaCfg struct {
 	Harbor         HarborCfg           `toml:"harbor"`
 	TimeOut        int                 `toml:"timeout"`
 	TeamDeployment int32               `toml:"numberofdeployments"`
+	IngressHost    string              `toml:"ingresshost"`
 }
 
 type HarborCfg struct {
