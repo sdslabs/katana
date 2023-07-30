@@ -13,7 +13,7 @@ import (
 var db *sql.DB
 
 func setup() {
-	database, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp("+configs.ServicesConfig.ChallengeDeployer.Host+":"+configs.MySQLConfig.Port+")/mysql")
+	database, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp(mysql."+configs.KatanaConfig.IngressHost+":"+configs.MySQLConfig.Port+")/mysql")
 	if err != nil {
 		panic(err.Error())
 	}
