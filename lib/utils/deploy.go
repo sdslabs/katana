@@ -69,7 +69,6 @@ func DeployChallenge(challengeName, teamName string, firstPatch bool, replicas i
 							Ports: []v1.ContainerPort{
 								{
 									Name:          "challenge-port",
-									Protocol:      v1.ProtocolTCP,
 									ContainerPort: 80,
 								},
 							},
