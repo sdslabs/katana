@@ -79,11 +79,13 @@ func CreateTeams(c *fiber.Ctx) error {
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		manifest := &bytes.Buffer{}
 		tmpl, err := template.ParseFiles(filepath.Join(g.ClusterConfig.TemplatedManifestDir, "runtime", "teams.yml"))
 		if err != nil {
 			return err
 		}
+
 		deploymentConfig := utils.DeploymentConfig()
 
 		if err = tmpl.Execute(manifest, deploymentConfig); err != nil {
@@ -94,7 +96,7 @@ func CreateTeams(c *fiber.Ctx) error {
 			return err
 		}
 	}
-	SSH(noOfTeams)
+	//SSH(noOfTeams)
 	return c.SendString("Successfully created teams")
 }
 

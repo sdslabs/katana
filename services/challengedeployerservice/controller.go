@@ -17,7 +17,7 @@ import (
 
 func DeployChallenge(c *fiber.Ctx) error {
 
-	challengeType := "web"
+	//challengeType := "web"
 	folderName := ""
 	patch := false
 	replicas := g.KatanaConfig.TeamDeployment
@@ -85,7 +85,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 			}
 
 			//Copy challenge in pods and etc.
-			copyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			//copyChallengeIntoTsuka(challengePath, folderName, challengeType)
 
 			return c.JSON(res)
 		}
