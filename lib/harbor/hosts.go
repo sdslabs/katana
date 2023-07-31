@@ -18,13 +18,13 @@ func deployHarborClusterDaemonSet() error {
 	kubeConfig, _ := utils.GetKubeConfig()
 	kubeClient, _ := utils.GetKubeClient()
 
-	utils.DeleteConfigMapAndWait(kubeClient, kubeConfig, "trusted-ca", "kube-system")
-	utils.DeleteConfigMapAndWait(kubeClient, kubeConfig, "setup-script", "kube-system")
-	utils.DeleteDaemonSetAndWait(kubeClient, kubeConfig, "node-custom-setup", "kube-system")
+	namespace := "kube-system"
+
+	utils.DeleteConfigMapAndWait(kubeClient, kubeConfig, "trusted-ca", namespace)
+	utils.DeleteConfigMapAndWait(kubeClient, kubeConfig, "setup-script", namespace)
+	utils.DeleteDaemonSetAndWait(kubeClient, kubeConfig, "node-custom-setup", namespace)
 
 	serviceName := "ingress-nginx-controller"
-	serviceNamespace := "katana"
-	deplNamespace := "kube-system"
 
 	basePath, _ := os.Getwd()
 	pathToCaCrt := basePath + "/lib/harbor/certs/ca.crt"
@@ -37,14 +37,14 @@ func deployHarborClusterDaemonSet() error {
 	configMap := &v1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "trusted-ca",
-			Namespace: "kube-system",
+			Namespace: namespace,
 		},
 		Data: map[string]string{
 			"ca.crt": string(data),
 		},
 	}
 
-	if _, err := kubeClient.CoreV1().ConfigMaps("kube-system").Create(context.Background(), configMap, metav1.CreateOptions{}); err != nil {
+	if _, err := kubeClient.CoreV1().ConfigMaps(namespace).Create(context.Background(), configMap, metav1.CreateOptions{}); err != nil {
 		return err
 	}
 
@@ -57,7 +57,7 @@ func deployHarborClusterDaemonSet() error {
 
 	deploymentConfig := utils.DeploymentConfig()
 
-	service, err := kubeClient.CoreV1().Services(serviceNamespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
+	service, err := kubeClient.CoreV1().Services(namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func deployHarborClusterDaemonSet() error {
 		return err
 	}
 
-	if err = deployment.ApplyManifest(kubeConfig, kubeClient, manifest.Bytes(), deplNamespace); err != nil {
+	if err = deployment.ApplyManifest(kubeConfig, kubeClient, manifest.Bytes(), namespace); err != nil {
 		return err
 	}
 

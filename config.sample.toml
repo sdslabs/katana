@@ -9,14 +9,11 @@ numberofdeployments = 1
 
 [cluster]
 deploymentlabel = "katana"
-teamcount = 1
+teamcount = 2
 teamlabel = "ctfteam"
 templated_manifest_dir = "kubernetes/templates"
 templated_manifests = [
     "harbor.yml",
-    "mongo.yml",
-    "gogs.yml",
-    "mysql.yml",
 ]
 
 [services.api]

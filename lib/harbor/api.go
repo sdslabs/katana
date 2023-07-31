@@ -47,7 +47,7 @@ func setAdminPassword() error {
 	if err != nil {
 		return err
 	}
-
+	
 	auth := "Basic " + utils.Base64Encode("admin:Harbor12345") // Harbor12345 is the default admin password
 
 	req.Header.Set("Content-Type", "application/json")

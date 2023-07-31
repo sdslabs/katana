@@ -14,10 +14,6 @@ import (
 
 func InfraSet(c *fiber.Ctx) error {
 
-	// if !utils.VerifyToken(c) {
-	// 	return c.SendString("Unauthorized")
-	// }
-
 	config, err := utils.GetKubeConfig()
 	if err != nil {
 		log.Fatal(err)
@@ -31,6 +27,7 @@ func InfraSet(c *fiber.Ctx) error {
 	for _, manifests := range configs.ClusterConfig.TemplatedManifests {
 		if manifests == "harbor.yml" {
 			generateCertsforHarbor()
+			break
 		}
 	}
 
@@ -44,6 +41,7 @@ func InfraSet(c *fiber.Ctx) error {
 			if err != nil {
 				log.Fatal(err)
 			}
+			break
 		}
 	}
 

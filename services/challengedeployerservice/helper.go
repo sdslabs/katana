@@ -75,7 +75,7 @@ func createServiceAndIngressRuleForChallenge(challengeName, teamName string, tar
 	kubeclient, _ := utils.GetKubeClient()
 	serviceName := challengeName + "-svc"
 	teamNamespace := teamName + "-ns"
-	port := int32(3000)
+	port := int32(80)
 	selector := map[string]string{
 		"app": challengeName,
 	}

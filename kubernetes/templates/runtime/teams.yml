@@ -53,7 +53,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: "*.team0.{{.Domain}}" # Make this dynamic
+    - host: "*.katana-team-0.katana.local" # Make this dynamic
       http:
         paths:
           - pathType: Prefix
