@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strconv"
 
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
@@ -71,7 +72,7 @@ func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType 
 	return nil
 }
 
-func createServiceAndIngressRuleForChallenge(challengeName, teamName string, targetPort int32) (string, error) {
+func createServiceAndIngressRuleForChallenge(challengeName, teamName string, targetPort int32, teamNumber int) (string, error) {
 	kubeclient, _ := utils.GetKubeClient()
 	serviceName := challengeName + "-svc"
 	teamNamespace := teamName + "-ns"
@@ -85,7 +86,7 @@ func createServiceAndIngressRuleForChallenge(challengeName, teamName string, tar
 	log.Printf("Created service %s for challenge %s in namespace %s", serviceName, challengeName, teamNamespace)
 
 	// Get team ingress
-	ingressName := "team-ingress"
+	ingressName := "team-" + strconv.Itoa(teamNumber) + "-ingress"
 	teamIngress, err := kubeclient.NetworkingV1().Ingresses(teamNamespace).Get(context.TODO(), ingressName, metav1.GetOptions{})
 	if err != nil {
 		return "", err

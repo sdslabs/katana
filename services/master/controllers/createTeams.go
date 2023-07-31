@@ -97,7 +97,7 @@ func CreateTeams(c *fiber.Ctx) error {
 			return err
 		}
 
-		utils.CreateIngress(client, "team-"+strconv.Itoa(i)+"ingress", namespace, "sink-svc", 80, "*.katana-team-"+strconv.Itoa(i)+"."+configs.KatanaConfig.IngressHost)
+		utils.CreateIngress(client, "team-"+strconv.Itoa(i)+"-ingress", namespace, "sink-svc", 80, "*.katana-team-"+strconv.Itoa(i)+"."+configs.KatanaConfig.IngressHost)
 	}
 	//SSH(noOfTeams)
 	return c.SendString("Successfully created teams")
