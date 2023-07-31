@@ -45,21 +45,3 @@ spec:
               configMapKeyRef:
                 name: teamvm-config
                 key: daemon_port       
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: team-ingress
-spec:
-  ingressClassName: nginx
-  rules:
-    - host: "*.katana-team-0.katana.local" # Make this dynamic
-      http:
-        paths:
-          - pathType: Prefix
-            backend:
-              service:
-                name: default-backend # This service does not exist intentionally and gives a 404
-                port:
-                  number: 80
-            path: /

@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/sdslabs/katana/configs"
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/utils"
@@ -95,6 +96,8 @@ func CreateTeams(c *fiber.Ctx) error {
 		if err = deployment.ApplyManifest(config, client, manifest.Bytes(), namespace); err != nil {
 			return err
 		}
+
+		utils.CreateIngress(client, "team-"+strconv.Itoa(i)+"ingress", namespace, "sink-svc", 80, "*.katana-team-"+strconv.Itoa(i)+"."+configs.KatanaConfig.IngressHost)
 	}
 	//SSH(noOfTeams)
 	return c.SendString("Successfully created teams")
