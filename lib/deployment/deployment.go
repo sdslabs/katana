@@ -72,6 +72,11 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 
 		if _, err := dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{}); err != nil {
 			if _, err := dri.Update(context.Background(), unstructuredObj, metav1.UpdateOptions{}); err != nil {
+				if unstructuredObj.GetObjectKind().GroupVersionKind().Kind == "PersistentVolumeClaim" {
+					// Skip PVCs
+					continue
+					// TODO: Handle PVCs, currently on deletion of PVCs, the cluster is stuck in a loop
+				}
 				_ = dri.Delete(context.Background(), unstructuredObj.GetName(), metav1.DeleteOptions{})
 				watcher, err := dri.Watch(context.Background(), metav1.ListOptions{
 					FieldSelector: fmt.Sprintf("metadata.name=%s", unstructuredObj.GetName()),
