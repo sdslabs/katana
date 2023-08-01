@@ -13,7 +13,7 @@ teamcount = 2
 teamlabel = "ctfteam"
 templated_manifest_dir = "kubernetes/templates"
 templated_manifests = [
-    "harbor.yml",
+    "gogs.yml"
 ]
 
 [services.api]
