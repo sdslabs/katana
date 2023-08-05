@@ -10,10 +10,12 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      lbtype: external
       app: mongo-client
   template:
     metadata:
       labels:
+        lbtype: external
         app: mongo-client
     spec:
       containers:
@@ -37,11 +39,13 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      lbtype: external
       app: mongo
   strategy: {}
   template:
     metadata:
       labels:
+        lbtype: external
         app: mongo
     spec:
       containers:
@@ -84,6 +88,9 @@ spec:
           volumeMounts:
             - name: "mongo-data-dir"
               mountPath: "/data/db"
+          ports:
+            - name: mongo-port
+              containerPort: 27017
       volumes:
         - name: "mongo-data-dir"
           persistentVolumeClaim:
@@ -99,31 +106,12 @@ metadata:
   namespace: katana
 spec:
   ports:
-    - port: 27017
+    - name: mongo-svc
+      port: 27017
       protocol: TCP
       targetPort: 27017
   selector:
     app: mongo
-
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: mongo-ingress
-  namespace: katana
-spec:
-  ingressClassName: nginx
-  rules:
-    - host: {{ printf "mongo.%s" .IngressHost }}
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: mongo-svc
-                port:
-                  number: 27017
 
 ---
 apiVersion: v1
