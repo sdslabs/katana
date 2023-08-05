@@ -175,16 +175,17 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 	return nil
 }
 
-func GetGogsIp() string {
+func GetKatanaLoadbalancer() string {
 	client, err := GetKubeClient()
 	if err != nil {
 		log.Fatal(err)
 	}
-	service, err := client.CoreV1().Services("katana").Get(context.TODO(), "gogs-svc", metav1.GetOptions{})
+	service, err := client.CoreV1().Services("katana").Get(context.TODO(), "katana-lb", metav1.GetOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}
-	return service.Spec.ClusterIP
+	externalIP := service.Status.LoadBalancer.Ingress[0].IP
+	return externalIP
 }
 
 func DeploymentConfig() types.ManifestConfig {

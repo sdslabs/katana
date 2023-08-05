@@ -12,8 +12,8 @@ import (
 
 var db *sql.DB
 
-func setup() {
-	database, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp(mysql."+configs.KatanaConfig.IngressHost+":"+configs.MySQLConfig.Port+")/mysql")
+func setup(LoadbalancerIP string) {
+	database, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp("+LoadbalancerIP+":3306)/mysql")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -24,7 +24,7 @@ func setup() {
 		log.Println("MySQL connection was not established")
 		log.Println("Error: ", err)
 		time.Sleep(time.Duration(g.KatanaConfig.TimeOut) * time.Second)
-		setup()
+		setup(LoadbalancerIP)
 	} else {
 		log.Println("MySQL Connection Established")
 		setupGogs()
@@ -37,6 +37,6 @@ func setupGogs() {
 	CreateAccessToken(configs.AdminConfig.Username, configs.AdminConfig.Password)
 }
 
-func Init() {
-	go setup()
+func Init(LoadbalancerIP string) {
+	go setup(LoadbalancerIP)
 }

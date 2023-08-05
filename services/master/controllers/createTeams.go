@@ -9,7 +9,6 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/sdslabs/katana/configs"
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/utils"
@@ -76,6 +75,7 @@ func CreateTeams(c *fiber.Ctx) error {
 				Name: namespace,
 			},
 		}
+
 		_, err = client.CoreV1().Namespaces().Create(c.Context(), nsName, metav1.CreateOptions{})
 		if err != nil {
 			log.Fatal(err)
@@ -97,7 +97,7 @@ func CreateTeams(c *fiber.Ctx) error {
 			return err
 		}
 
-		utils.CreateIngress(client, "team-"+strconv.Itoa(i)+"-ingress", namespace, "sink-svc", 80, "*.katana-team-"+strconv.Itoa(i)+"."+configs.KatanaConfig.IngressHost)
+		utils.CreateIngress(client, "team-"+strconv.Itoa(i)+"-ingress", namespace, "sink-svc", 80, "*.katana-team-"+strconv.Itoa(i)+"."+g.KatanaConfig.IngressHost)
 	}
 	SSH(noOfTeams)
 	return c.SendString("Successfully created teams")
@@ -114,7 +114,6 @@ func startServer() {
 		x.ListenAndServe()
 	}()
 	log.Println("Server up and running")
-	for {
-		//to keeep this server running forever
+	for{
 	}
 }

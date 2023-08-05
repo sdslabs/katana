@@ -45,7 +45,7 @@ func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType 
 		}
 		remoteConfig := &config.RemoteConfig{
 			Name: "origin",
-			URLs: []string{"http://sdslabs@" + utils.GetGogsIp() + ":18080" + "/" + path}}
+			URLs: []string{"http://sdslabs@" + utils.GetKatanaLoadbalancer() + ":18080" + "/" + path}}
 		_, err = repo.CreateRemote(remoteConfig)
 
 		if err != nil {

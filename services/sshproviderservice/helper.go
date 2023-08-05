@@ -26,7 +26,7 @@ func CreateTeams(teamnumber int) error {
 		return err
 	}
 	podName := teamlabels + "-team-master-pod-0"
-	gogs := utils.GetGogsIp() + ":18080"
+	gogs := utils.GetKatanaLoadbalancer() + ":18080"
 	for i := 0; i < teamnumber; i++ {
 		pwd := utils.GenPassword()
 		hashed, err := utils.HashPassword(pwd)
@@ -64,11 +64,7 @@ func envVariables(gogs string, pwd string, podNamespace string) {
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
 			command = []string{"bash", "-c", "echo 'export PASSWORD=" + pwd + "' >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
-			command = []string{"bash", "-c", "echo 'export USERNAME=" + podNamespace + "' >> /etc/profile"}
-			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
 			command = []string{"bash", "-c", "echo 'export BACKEND_URL=" + g.KatanaConfig.BackendUrl + "/api/v1/admin/challengeUpdate' >> /etc/profile"}
-			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
-			command = []string{"bash", "-c", "echo 'export ROOT_DIRECTORY=" + g.KatanaConfig.RootDirectory + " >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
 			command = []string{"bash", "-c", "echo 'export ADMIN=" + g.AdminConfig.Username + "' >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)

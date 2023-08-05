@@ -75,7 +75,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 			for i := 0; i < int(numberOfTeams); i++ {
 				log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
 				teamName := "katana-team-" + strconv.Itoa(i)
-				utils.DeployChallenge(folderName, teamName, patch, replicas)
+				utils.DeployChallenge(folderName, teamName, patch, replicas)		
 				url, err := createServiceAndIngressRuleForChallenge(folderName, teamName, 3000, i)
 				if err != nil {
 					res = append(res, []string{teamName, err.Error()})

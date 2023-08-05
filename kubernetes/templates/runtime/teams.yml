@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - name: {{.ContainerName}}
-        image: percy477/katanad
+        image: percy477/tsuka
         env:
           - name: CHALLENGE_DIR 
             valueFrom:

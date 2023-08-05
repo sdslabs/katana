@@ -7,7 +7,6 @@ import (
 )
 
 func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
-	// Build the docker image
 	log.Println("Building docker image, Please wait...")
 	cmd := "docker build -t " + configs.HarborConfig.Hostname + "/katana/" + _ChallengeName + " " + _DockerfilePath
 	if err := RunCommand(cmd); err != nil {
@@ -15,7 +14,6 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 	}
 	log.Println("Docker image built successfully")
 
-	// Push the docker image to Harbor
 	log.Println("Pushing docker image, Please wait...")
 	cmd = "docker push " + configs.HarborConfig.Hostname + "/katana/" + _ChallengeName
 	if err := RunCommand(cmd); err != nil {
