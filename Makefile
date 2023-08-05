@@ -89,13 +89,13 @@ set-env: build
 set-env-prod: build
 	kubectl apply -f $(MANIFEST) && \
 	cp config.sample.toml config.toml && \
-	./bin/katana run
+	sudo ./bin/katana run
 
 build:
 	cd cmd && go build -o ../bin/katana
 
 run : build
-	./bin/katana run
+	sudo ./bin/katana run
 
 # Prints help message
 help:

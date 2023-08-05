@@ -180,6 +180,13 @@ func GetKatanaLoadbalancer() string {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Check if the service is ready
+	err = WaitForLoadBalancerExternalIP(client, "katana-lb", "katana")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	service, err := client.CoreV1().Services("katana").Get(context.TODO(), "katana-lb", metav1.GetOptions{})
 	if err != nil {
 		log.Fatal(err)
