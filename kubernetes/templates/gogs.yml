@@ -12,8 +12,16 @@ spec:
     - ReadWriteOnce
   capacity:
     storage: 2Gi
-  hostPath:
-    path: /mnt/data/gogs
+  local:
+    path: /data/gogs
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - {{ .NodeAffinityValue }}
 
 ---
 apiVersion: v1
@@ -92,7 +100,7 @@ spec:
       targetPort: 22
     - name: http
       protocol: TCP
-      port: 18080
+      port: 80
       targetPort: 3000
 
 ---
@@ -115,4 +123,4 @@ spec:
               service:
                 name: gogs-svc
                 port:
-                  number: 18080
+                  number: 80

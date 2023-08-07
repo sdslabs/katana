@@ -194,24 +194,25 @@ func GetKatanaLoadbalancer() string {
 
 func DeploymentConfig() types.ManifestConfig {
 	config := types.ManifestConfig{
-		KubeNameSpace:  g.KatanaConfig.KubeNameSpace,
-		TeamCount:      g.ClusterConfig.TeamCount,
-		TeamLabel:      g.ClusterConfig.TeamLabel,
-		TeamPodName:    g.TeamVmConfig.TeamPodName,
-		ContainerName:  g.TeamVmConfig.ContainerName,
-		ChallengDir:    g.TeamVmConfig.ChallengeDir,
-		TempDir:        g.TeamVmConfig.TempDir,
-		InitFile:       g.TeamVmConfig.InitFile,
-		IngressHost:    g.KatanaConfig.IngressHost,
-		DaemonPort:     g.TeamVmConfig.DaemonPort,
-		MongoUsername:  Base64Encode(g.KatanaConfig.Mongo.Username),
-		MongoPassword:  Base64Encode(g.KatanaConfig.Mongo.Password),
-		MySQLPassword:  g.KatanaConfig.MySQL.Password,
-		HarborKey:      "",
-		HarborCrt:      "",
-		HarborCaCrt:    "",
-		HarborIP:       "",
-		HarborHostname: g.KatanaConfig.Harbor.Hostname,
+		KubeNameSpace:     g.KatanaConfig.KubeNameSpace,
+		TeamCount:         g.ClusterConfig.TeamCount,
+		TeamLabel:         g.ClusterConfig.TeamLabel,
+		TeamPodName:       g.TeamVmConfig.TeamPodName,
+		ContainerName:     g.TeamVmConfig.ContainerName,
+		ChallengDir:       g.TeamVmConfig.ChallengeDir,
+		TempDir:           g.TeamVmConfig.TempDir,
+		InitFile:          g.TeamVmConfig.InitFile,
+		IngressHost:       g.KatanaConfig.IngressHost,
+		DaemonPort:        g.TeamVmConfig.DaemonPort,
+		MongoUsername:     Base64Encode(g.KatanaConfig.Mongo.Username),
+		MongoPassword:     Base64Encode(g.KatanaConfig.Mongo.Password),
+		MySQLPassword:     g.KatanaConfig.MySQL.Password,
+		HarborKey:         "",
+		HarborCrt:         "",
+		HarborCaCrt:       "",
+		HarborIP:          "",
+		HarborHostname:    g.KatanaConfig.Harbor.Hostname,
+		NodeAffinityValue: "",
 	}
 
 	// Add Harbor key and cert
@@ -472,4 +473,13 @@ func CreateIngress(clientset *kubernetes.Clientset, ingressName string, namespac
 	}
 
 	return nil
+}
+
+func GetNodes(clientset *kubernetes.Clientset) ([]corev1.Node, error) {
+	nodes, err := clientset.CoreV1().Nodes().List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return nodes.Items, nil
 }

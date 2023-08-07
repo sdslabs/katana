@@ -120,12 +120,21 @@ metadata:
   name: mongo-data-pv
   namespace: katana
 spec:
+  persistentVolumeReclaimPolicy: Delete
   accessModes:
     - ReadWriteOnce
   capacity:
     storage: 1Gi
-  hostPath:
+  local:
     path: /data/mongo
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - {{ .NodeAffinityValue }}
 
 ---
 apiVersion: v1

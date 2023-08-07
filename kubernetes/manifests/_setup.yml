@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: katana
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: katana-lb
+  namespace: katana
+spec:
+  type: LoadBalancer
+  ports:
+    - name: gogs
+      port: 80
+      targetPort: gogs-port
+    - name: mongo
+      port: 27017
+      targetPort: mongo-port
+    - name: mysql
+      port: 3306
+      targetPort: mysql
+  selector:
+    lbtype: external

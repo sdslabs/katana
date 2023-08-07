@@ -111,6 +111,12 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 
 	deploymentConfig := utils.DeploymentConfig()
 
+	clientset, _ := utils.GetKubeClient()
+
+	nodes, _ := utils.GetNodes(clientset)
+
+	deploymentConfig.NodeAffinityValue = nodes[0].Name
+
 	for _, m := range clusterConfig.TemplatedManifests {
 		manifest := &bytes.Buffer{}
 		log.Printf("Applying: %s\n", m)

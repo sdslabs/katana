@@ -4,7 +4,7 @@ backendurl = "http://52.172.254.231:3000"
 ingresshost = "katana.local"
 rootdirectory = "/opt/katana"
 kubenamespace = "default"
-timeout = 20
+timeout = 20 # in seconds
 numberofdeployments = 1
 
 [cluster]
@@ -13,10 +13,11 @@ teamcount = 2
 teamlabel = "ctfteam"
 templated_manifest_dir = "kubernetes/templates"
 templated_manifests = [
+    "storage-init.yml", # should be first and always present
     "gogs.yml",
-    "harbor.yml",
     "mysql.yml",
-    "mongo.yml"
+    "mongo.yml",
+    "harbor.yml",
 ]
 
 [services.api]

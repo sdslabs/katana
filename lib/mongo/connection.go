@@ -29,7 +29,7 @@ func setupAdmin() {
 		Password: pwd,
 	}
 
-	if err = AddAdmin(context.Background(), admin); err != nil {
+	if _, err = AddAdmin(context.Background(), admin); err != nil {
 		log.Fatal(err)
 	} else {
 		log.Printf("admin privileges have been given to username: %s", admin.Username)
