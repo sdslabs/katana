@@ -109,7 +109,6 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 	localFile, err := os.Open(localFilePath)
 	if err != nil {
 		log.Printf("Error opening local file: %s\n", err)
-		return err
 	}
 
 	namespace := "katana"
@@ -120,7 +119,6 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 	pod, err := client.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
 	if err != nil {
 		log.Printf("Error getting pod: %s\n", err)
-		return err
 	}
 
 	// Find the container in the pod
@@ -134,7 +132,6 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 
 	if container == nil {
 		log.Printf("Container not found in pod\n")
-		return err
 	}
 	// Create a stream to the container
 	req := client.CoreV1().RESTClient().Post().

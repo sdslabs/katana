@@ -64,9 +64,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 			}
 
 			//Update challenge path to get dockerfile
-			challengePath = challengePath + "/" + folderName
-
-			utils.BuildDockerImage(folderName, challengePath)
+			utils.BuildDockerImage(folderName, challengePath+ "/" + folderName)
 
 			//Get no.of teams and DEPLOY CHALLENGE to each namespace (assuming they exist and /createTeams has been called)
 			clusterConfig := g.ClusterConfig
@@ -75,7 +73,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 			for i := 0; i < int(numberOfTeams); i++ {
 				log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
 				teamName := "katana-team-" + strconv.Itoa(i)
-				utils.DeployChallenge(folderName, teamName, patch, replicas)		
+				utils.DeployChallenge(folderName, teamName, patch, replicas)
 				url, err := createServiceAndIngressRuleForChallenge(folderName, teamName, 3000, i)
 				if err != nil {
 					res = append(res, []string{teamName, err.Error()})

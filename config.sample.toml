@@ -1,6 +1,6 @@
 kubeconfig = ""
 kubehost = "0.0.0.0"
-backendurl = "http://192.168.49.1:3000"
+backendurl = "http://52.172.254.231:3000"
 ingresshost = "katana.local"
 rootdirectory = "/opt/katana"
 kubenamespace = "default"
@@ -13,7 +13,10 @@ teamcount = 2
 teamlabel = "ctfteam"
 templated_manifest_dir = "kubernetes/templates"
 templated_manifests = [
-    "gogs.yml"
+    "gogs.yml",
+    "harbor.yml",
+    "mysql.yml",
+    "mongo.yml"
 ]
 
 [services.api]

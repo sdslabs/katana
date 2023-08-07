@@ -14,7 +14,7 @@ import (
 )
 
 var ctx, _ = context.WithTimeout(context.Background(), time.Duration(configs.KatanaConfig.TimeOut)*time.Second)
-var client, err = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+configs.MongoConfig.Username+":"+configs.MongoConfig.Password+"@"+utils.GetKatanaLoadbalancer()+":12027/?directConnection=true&appName=mongosh+"+configs.MongoConfig.Version))
+var client, err = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+configs.MongoConfig.Username+":"+configs.MongoConfig.Password+"@"+utils.GetKatanaLoadbalancer()+":27017/?directConnection=true&appName=mongosh+"+configs.MongoConfig.Version))
 var link = client.Database(projectDatabase)
 
 func setupAdmin() {

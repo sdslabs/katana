@@ -69,7 +69,7 @@ func DeployChallenge(challengeName, teamName string, firstPatch bool, replicas i
 							Ports: []v1.ContainerPort{
 								{
 									Name:          "challenge-port",
-									ContainerPort: 80,
+									ContainerPort: 3000,
 								},
 							},
 						},
@@ -78,17 +78,6 @@ func DeployChallenge(challengeName, teamName string, firstPatch bool, replicas i
 			},
 		},
 	}
-	deployment, err := deploymentsClient.Get(context.TODO(), challengeName, metav1.GetOptions{})
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	if deployment.Name == challengeName {
-		log.Println("Deployment already exists for the challenge " + challengeName + " in namespace " + teamNamespace)
-		return nil
-	}
-
-	// Create Deployment
 	log.Println("Creating deployment...")
 	result, err := deploymentsClient.Create(context.TODO(), manifest, metav1.CreateOptions{})
 
