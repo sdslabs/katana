@@ -1,6 +1,6 @@
 kubeconfig = ""
 kubehost = "0.0.0.0"
-backendurl = "http://52.172.254.231:3000"
+backendurl = "http://52.172.254.231:15528"
 ingresshost = "katana.local"
 rootdirectory = "/opt/katana"
 kubenamespace = "default"
@@ -22,7 +22,7 @@ templated_manifests = [
 
 [services.api]
 host = "0.0.0.0"
-port = 3000
+port = 15528
 
 [teamvm]
 teampodname = "katana-team-master-pod"
