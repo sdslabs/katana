@@ -37,3 +37,13 @@ type ResourceStatus struct {
 }
 
 type ResourcePinger func(context.Context, *kubernetes.Clientset, map[string]string) ([]*ResourceStatus, bool, error)
+
+type Repo struct {
+	FullName string `json:"full_name"`
+}
+
+type GogsRequest struct {
+	Ref        string `json:"ref"`
+	Before     string `json:"before"`
+	Repository Repo   `json:"repository"`
+}

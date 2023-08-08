@@ -5,7 +5,6 @@ ingresshost = "katana.local"
 rootdirectory = "/opt/katana"
 kubenamespace = "default"
 timeout = 20 # in seconds
-numberofdeployments = 1
 
 [cluster]
 deploymentlabel = "katana"

@@ -44,7 +44,7 @@ func Server() error {
 	admin.Get("/db", c.DB)
 	admin.Post("/login", c.Login)
 	admin.Get("/createTeams/:number", c.CreateTeams)
-	admin.Post("/challengeUpdate", c.ChallengeUpdate)
+	admin.Post("/challengeUpdate", challengeDeployerService.ChallengeUpdate)
 	admin.Post("/logs", c.Logs)
 	admin.Post("/deployChallenge", challengeDeployerService.DeployChallenge)
 	admin.Get("/gitServer", c.GitServer)

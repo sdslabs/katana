@@ -7,11 +7,16 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 
+	git "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/gofiber/fiber/v2"
 	archiver "github.com/mholt/archiver/v3"
 	g "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/utils"
+	"github.com/sdslabs/katana/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -20,7 +25,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 	challengeType := "web"
 	folderName := ""
 	patch := false
-	replicas := g.KatanaConfig.TeamDeployment
+	replicas := int32(1)
 	log.Println("Starting")
 	if form, err := c.MultipartForm(); err == nil {
 
@@ -64,7 +69,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 			}
 
 			//Update challenge path to get dockerfile
-			utils.BuildDockerImage(folderName, challengePath+ "/" + folderName)
+			utils.BuildDockerImage(folderName, challengePath+"/"+folderName)
 
 			//Get no.of teams and DEPLOY CHALLENGE to each namespace (assuming they exist and /createTeams has been called)
 			clusterConfig := g.ClusterConfig
@@ -73,7 +78,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 			for i := 0; i < int(numberOfTeams); i++ {
 				log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
 				teamName := "katana-team-" + strconv.Itoa(i)
-				utils.DeployChallenge(folderName, teamName, patch, replicas)
+				deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
 				url, err := createServiceAndIngressRuleForChallenge(folderName, teamName, 3000, i)
 				if err != nil {
 					res = append(res, []string{teamName, err.Error()})
@@ -91,6 +96,73 @@ func DeployChallenge(c *fiber.Ctx) error {
 	log.Println("Ending")
 
 	return c.SendString("Wrong file")
+}
+
+func ChallengeUpdate(c *fiber.Ctx) error {
+	replicas := int32(1)
+	client, _ := utils.GetKubeClient()
+	patch := true
+
+	//http connection configuration for 30 min
+
+	var p types.GogsRequest
+	if err := c.BodyParser(&p); err != nil {
+		return err
+	}
+
+	dir := p.Repository.FullName
+	s := strings.Split(dir, "/")
+	challengeName := s[1]
+	teamName := s[0]
+	namespace := teamName + "-ns"
+	log.Println("Challenge update request received for", challengeName, "by", teamName)
+	repo, err := git.PlainOpen("teams/" + dir)
+	if err != nil {
+		log.Println(err)
+	}
+
+	auth := &http.BasicAuth{
+		Username: g.AdminConfig.Username,
+		Password: g.AdminConfig.Password,
+	}
+
+	worktree, err := repo.Worktree()
+	worktree.Pull(&git.PullOptions{
+		RemoteName: "origin",
+		Auth:       auth,
+	})
+
+	if err != nil {
+		log.Println("Error pulling changes:", err)
+	}
+
+	imageName := strings.Replace(dir, "/", "-", -1)
+
+	log.Println("Pull successful for", teamName, ". Building image...")
+	firstPatch := utils.DockerImageExists(imageName)
+	utils.BuildDockerImage(imageName, "./teams/"+dir)
+
+	if firstPatch {
+		log.Println("First Patch for", teamName)
+		deployment.DeployChallengeToCluster(challengeName, teamName, patch, replicas)
+	} else {
+		log.Println("Not the first patch for", teamName, ". Simply deploying the image...")
+		labelSelector := metav1.LabelSelector{
+			MatchLabels: map[string]string{
+				"app": challengeName,
+			},
+		}
+		// Delete the challenge pod
+		err = client.CoreV1().Pods(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{
+			LabelSelector: metav1.FormatLabelSelector(&labelSelector),
+		})
+		if err != nil {
+			log.Println("Error")
+			log.Println(err)
+		}
+	}
+	log.Println("Image built for", teamName)
+	return c.SendString("Challenge updated")
 }
 
 func DeleteChallenge(c *fiber.Ctx) error {

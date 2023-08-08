@@ -30,3 +30,11 @@ func DockerLogin(username string, password string) {
 	}
 	log.Println("Logged into Harbor successfully")
 }
+
+func DockerImageExists(imageName string) bool {
+	cmd := "docker image inspect " + imageName
+	if err := RunCommand(cmd); err != nil {
+		return false
+	}
+	return true
+}
