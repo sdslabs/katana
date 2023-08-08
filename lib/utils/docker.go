@@ -8,7 +8,7 @@ import (
 
 func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 	log.Println("Building docker image, Please wait...")
-	cmd := "docker build -t "+_ChallengeName + " " + _DockerfilePath
+	cmd := "docker build -t " + configs.HarborConfig.Hostname + "/katana/" + _ChallengeName + " " + _DockerfilePath
 	if err := RunCommand(cmd); err != nil {
 		log.Printf("Error: %s\n", err)
 	}
@@ -32,7 +32,7 @@ func DockerLogin(username string, password string) {
 }
 
 func DockerImageExists(imageName string) bool {
-	cmd := "docker image inspect " + imageName
+	cmd := "docker image inspect " + configs.HarborConfig.Hostname + "/katana/" + imageName
 	if err := RunCommand(cmd); err != nil {
 		return false
 	}
