@@ -137,12 +137,12 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	}
 
 	imageName := strings.Replace(dir, "/", "-", -1)
-
+	imageName = g.HarborConfig.Hostname + "/katana/" + imageName + ":latest"
 	log.Println("Pull successful for", teamName, ". Building image...")
 	firstPatch := utils.DockerImageExists(imageName)
 	utils.BuildDockerImage(imageName, "./teams/"+dir)
 
-	if firstPatch {
+	if !firstPatch {
 		log.Println("First Patch for", teamName)
 		deployment.DeployChallengeToCluster(challengeName, teamName, patch, replicas)
 	} else {
