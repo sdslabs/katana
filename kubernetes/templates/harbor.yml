@@ -999,6 +999,7 @@ metadata:
   name: "katana-release-harbor-portal"
   namespace: katana
   labels:
+    lbtype: external
     heritage: Helm
     release: katana-release
     chart: harbor
@@ -1015,6 +1016,7 @@ spec:
   template:
     metadata:
       labels:
+        lbtype: external
         release: katana-release
         app: "harbor"
         component: portal
@@ -1045,6 +1047,7 @@ spec:
             periodSeconds: 10
           ports:
             - containerPort: 8080
+              name: harbor-port
           volumeMounts:
             - name: portal-config
               mountPath: /etc/nginx/nginx.conf
