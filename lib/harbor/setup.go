@@ -2,6 +2,7 @@ package harbor
 
 import (
 	"log"
+
 	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
 )
@@ -23,6 +24,9 @@ func SetupHarbor() error {
 		}
 	}
 
+	if err := updateOrAddHost(); err != nil {
+		return err
+	}
 	if err := setAdminPassword(); err != nil {
 		return err
 	}

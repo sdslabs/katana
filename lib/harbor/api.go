@@ -11,7 +11,7 @@ import (
 	"github.com/sdslabs/katana/lib/utils"
 )
 
-var baseURL string = "https://" + utils.GetKatanaLoadbalancer() + ":8080/api/v2.0"
+var baseURL string = "https://harbor.katana.local/api/v2.0"
 
 var httpClient *http.Client = &http.Client{
 	Transport: &http.Transport{

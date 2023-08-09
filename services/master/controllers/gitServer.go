@@ -28,10 +28,10 @@ func GitServer(c *fiber.Ctx) error {
 	writer.WriteField("app_name", "Gogs")
 	writer.WriteField("repo_root_path", "/data/git/gogs-repositories")
 	writer.WriteField("run_user", "git")
-	writer.WriteField("domain", LoadBalancer+":80")
+	writer.WriteField("domain", LoadBalancer+":3000")
 	writer.WriteField("ssh_port", "22")
 	writer.WriteField("http_port", "3000")
-	writer.WriteField("app_url", "http://"+LoadBalancer+":80")
+	writer.WriteField("app_url", "http://"+LoadBalancer+":3000")
 	writer.WriteField("log_root_path", "/app/gogs/log")
 	writer.WriteField("default_branch", "master")
 
@@ -39,7 +39,7 @@ func GitServer(c *fiber.Ctx) error {
 	writer.Close()
 
 	// Create the request
-	req, err := http.NewRequest("POST", "http://"+LoadBalancer+":80"+"/install", &requestBody)
+	req, err := http.NewRequest("POST", "http://"+LoadBalancer+":3000"+"/install", &requestBody)
 	if err != nil {
 		return err
 	}

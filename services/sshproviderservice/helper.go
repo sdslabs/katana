@@ -26,7 +26,7 @@ func CreateTeams(teamnumber int) error {
 		return err
 	}
 	podName := teamlabels + "-team-master-pod-0"
-	gogs := utils.GetKatanaLoadbalancer() + ":80"
+	gogs := utils.GetKatanaLoadbalancer() + ":3000"
 	for i := 0; i < teamnumber; i++ {
 		pwd := utils.GenPassword()
 		hashed, err := utils.HashPassword(pwd)

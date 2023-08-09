@@ -644,15 +644,13 @@ metadata:
 spec:
   ports:
     - name: http
-      port: 8080
+      port: 80
       targetPort: 8080
     - name: https
       port: 443
       targetPort: 8443
   selector:
-    release: katana-release
-    app: "harbor"
-    component: nginx
+    lbtype: external
 ---
 # Source: harbor/templates/portal/service.yaml
 apiVersion: v1
@@ -926,27 +924,17 @@ metadata:
   name: katana-release-harbor-nginx
   namespace: katana
   labels:
-    heritage: Helm
-    release: katana-release
-    chart: harbor
-    app: "harbor"
-    component: nginx
+    lbtype: external
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      release: katana-release
-      app: "harbor"
-      component: nginx
+      lbtype: external
   template:
     metadata:
       labels:
-        heritage: Helm
-        release: katana-release
-        chart: harbor
-        app: "harbor"
-        component: nginx
+        lbtype: external
       annotations:
         checksum/configmap: 105718f42a530b8d97d6f17752226462eda712f91bf534d50dad96d9216c986f
         checksum/secret: 685fbfeff6d43e88f6407a880c2b3d82ae700c16a5584c3f0e447702ecd4997a
@@ -974,8 +962,7 @@ spec:
             initialDelaySeconds: 1
             periodSeconds: 10
           ports:
-            - name: harbor-port
-              containerPort: 8080
+            - containerPort: 8080
             - containerPort: 8443
             - containerPort: 4443
           volumeMounts:
@@ -999,7 +986,6 @@ metadata:
   name: "katana-release-harbor-portal"
   namespace: katana
   labels:
-    lbtype: external
     heritage: Helm
     release: katana-release
     chart: harbor
@@ -1016,7 +1002,6 @@ spec:
   template:
     metadata:
       labels:
-        lbtype: external
         release: katana-release
         app: "harbor"
         component: portal
@@ -1047,7 +1032,6 @@ spec:
             periodSeconds: 10
           ports:
             - containerPort: 8080
-              name: harbor-port
           volumeMounts:
             - name: portal-config
               mountPath: /etc/nginx/nginx.conf
