@@ -96,8 +96,6 @@ func CreateTeams(c *fiber.Ctx) error {
 		if err = deployment.ApplyManifest(config, client, manifest.Bytes(), namespace); err != nil {
 			return err
 		}
-
-		utils.CreateIngress(client, "team-"+strconv.Itoa(i)+"-ingress", namespace, "sink-svc", 80, "*.katana-team-"+strconv.Itoa(i)+"."+g.KatanaConfig.IngressHost)
 	}
 	SSH(noOfTeams)
 	return c.SendString("Successfully created teams")
@@ -114,6 +112,6 @@ func startServer() {
 		x.ListenAndServe()
 	}()
 	log.Println("Server up and running")
-	for{
+	for {
 	}
 }

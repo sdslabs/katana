@@ -12,13 +12,13 @@ metadata:
 type: Opaque
 data:
   secretKey: "bm90LWEtc2VjdXJlLWtleQ=="
-  secret: "UUpxc2o0cG9mQjVaYzNMVw=="
+  secret: "c1hGQzNqenJseUl3R3JzVw=="
   tls.key: {{ .HarborKey }}
   tls.crt: {{ .HarborCrt }}
   HARBOR_ADMIN_PASSWORD: "SGFyYm9yMTIzNDU="
   POSTGRESQL_PASSWORD: "Y2hhbmdlaXQ="
   REGISTRY_CREDENTIAL_PASSWORD: "aGFyYm9yX3JlZ2lzdHJ5X3Bhc3N3b3Jk"
-  CSRF_KEY: "eHVicVI0OFVrZFh5SElaYWVLRm8yU3dHcjlTbW1US1Q="
+  CSRF_KEY: "WEJMZTlPblJOOWwyRHZyNXJCV0FSeFhhNFA5RDlIckE="
 ---
 # Source: harbor/templates/database/database-secret.yaml
 apiVersion: v1
@@ -35,23 +35,6 @@ type: Opaque
 data:
   POSTGRES_PASSWORD: "Y2hhbmdlaXQ="
 ---
-# Source: harbor/templates/ingress/secret.yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: "katana-release-harbor-ingress"
-  namespace: katana
-  labels:
-    heritage: Helm
-    release: katana-release
-    chart: harbor
-    app: "harbor"
-type: kubernetes.io/tls
-data:
-  tls.crt: {{ .HarborCrt }}
-  tls.key: {{ .HarborKey }}
-  ca.crt: {{ .HarborCaCrt }}
----
 # Source: harbor/templates/jobservice/jobservice-secrets.yaml
 apiVersion: v1
 kind: Secret
@@ -65,8 +48,25 @@ metadata:
     app: "harbor"
 type: Opaque
 data:
-  JOBSERVICE_SECRET: "anY1MzlGVThKV2t3cTVLVw=="
+  JOBSERVICE_SECRET: "VVZJYlREMmp0aEZuT1A4Mg=="
   REGISTRY_CREDENTIAL_PASSWORD: "aGFyYm9yX3JlZ2lzdHJ5X3Bhc3N3b3Jk"
+---
+# Source: harbor/templates/nginx/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: katana-release-harbor-nginx
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+type: Opaque
+data:
+  tls.crt: {{ .HarborCrt }}
+  tls.key: {{ .HarborKey }}
+  ca.crt: {{ .HarborCaCrt }}
 ---
 # Source: harbor/templates/registry/registry-secret.yaml
 apiVersion: v1
@@ -81,7 +81,7 @@ metadata:
     app: "harbor"
 type: Opaque
 data:
-  REGISTRY_HTTP_SECRET: "dVhDbUdUVVpzWGNUajFoag=="
+  REGISTRY_HTTP_SECRET: "MU0ybG5JUWdINGZyT2tXZA=="
   REGISTRY_REDIS_PASSWORD: ""
 ---
 # Source: harbor/templates/registry/registry-secret.yaml
@@ -97,7 +97,7 @@ metadata:
     app: "harbor"
 type: Opaque
 data:
-  REGISTRY_HTPASSWD: "aGFyYm9yX3JlZ2lzdHJ5X3VzZXI6JDJhJDEwJERWenlxV0NBYWtlaTZoZWR2N0RjYXVncUFXWjJtNnFMMjBubzhFc21NSzVQdDZCazNZUXE2"
+  REGISTRY_HTPASSWD: "aGFyYm9yX3JlZ2lzdHJ5X3VzZXI6JDJhJDEwJHkvVTBEcDg2bkxlZXNUWkUzWTlOV2VaUDRRZmpxZmhDMXhJeTdtc0F5Tng4dHJVQVo5N0pX"
 ---
 # Source: harbor/templates/registry/registryctl-secret.yaml
 apiVersion: v1
@@ -141,7 +141,7 @@ data:
   POSTGRESQL_SSLMODE: "disable"
   POSTGRESQL_MAX_IDLE_CONNS: "100"
   POSTGRESQL_MAX_OPEN_CONNS: "900"
-  EXT_ENDPOINT: {{ printf "https://%s" .HarborHostname }}
+  EXT_ENDPOINT: "https://harbor.katana.local"
   CORE_URL: "http://katana-release-harbor-core:80"
   JOBSERVICE_URL: "http://katana-release-harbor-jobservice"
   REGISTRY_URL: "http://katana-release-harbor-registry:5000"
@@ -230,6 +230,176 @@ data:
       max_update_hours: 24
       # the max time for execution in running state without new task created
       max_dangling_hours: 168
+---
+# Source: harbor/templates/nginx/configmap-https.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: katana-release-harbor-nginx
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+data:
+  nginx.conf: |+
+    worker_processes auto;
+    pid /tmp/nginx.pid;
+
+    events {
+      worker_connections 3096;
+      use epoll;
+      multi_accept on;
+    }
+
+    http {
+      client_body_temp_path /tmp/client_body_temp;
+      proxy_temp_path /tmp/proxy_temp;
+      fastcgi_temp_path /tmp/fastcgi_temp;
+      uwsgi_temp_path /tmp/uwsgi_temp;
+      scgi_temp_path /tmp/scgi_temp;
+      tcp_nodelay on;
+
+      # this is necessary for us to be able to disable request buffering in all cases
+      proxy_http_version 1.1;
+
+      upstream core {
+        server "katana-release-harbor-core:80";
+      }
+
+      upstream portal {
+        server "katana-release-harbor-portal:80";
+      }
+
+      log_format timed_combined '[$time_local]:$remote_addr - '
+        '"$request" $status $body_bytes_sent '
+        '"$http_referer" "$http_user_agent" '
+        '$request_time $upstream_response_time $pipe';
+
+      access_log /dev/stdout timed_combined;
+
+      map $http_x_forwarded_proto $x_forwarded_proto {
+        default $http_x_forwarded_proto;
+        ""      $scheme;
+      }
+
+      server {
+        listen 8443 ssl;
+        listen [::]:8443 ssl;
+    #    server_name harbordomain.com;
+        server_tokens off;
+        # SSL
+        ssl_certificate /etc/nginx/cert/tls.crt;
+        ssl_certificate_key /etc/nginx/cert/tls.key;
+
+        # Recommendations from https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
+        ssl_protocols TLSv1.2;
+        ssl_ciphers '!aNULL:kECDH+AESGCM:ECDH+AESGCM:RSA+AESGCM:kECDH+AES:ECDH+AES:RSA+AES:';
+        ssl_prefer_server_ciphers on;
+        ssl_session_cache shared:SSL:10m;
+
+        # disable any limits to avoid HTTP 413 for large image uploads
+        client_max_body_size 0;
+
+        # required to avoid HTTP 411: see Issue #1486 (https://github.com/docker/docker/issues/1486)
+        chunked_transfer_encoding on;
+
+        # Add extra headers
+        add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";
+        add_header X-Frame-Options DENY;
+        add_header Content-Security-Policy "frame-ancestors 'none'";
+
+        location / {
+          proxy_pass http://portal/;
+          proxy_set_header Host $http_host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $x_forwarded_proto;
+
+          proxy_cookie_path / "/; HttpOnly; Secure";
+
+          proxy_buffering off;
+          proxy_request_buffering off;
+        }
+
+        location /api/ {
+          proxy_pass http://core/api/;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $x_forwarded_proto;
+
+          proxy_cookie_path / "/; Secure";
+
+          proxy_buffering off;
+          proxy_request_buffering off;
+        }
+
+        location /chartrepo/ {
+          proxy_pass http://core/chartrepo/;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $x_forwarded_proto;
+
+          proxy_cookie_path / "/; Secure";
+
+          proxy_buffering off;
+          proxy_request_buffering off;
+        }
+
+        location /c/ {
+          proxy_pass http://core/c/;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $x_forwarded_proto;
+
+          proxy_cookie_path / "/; Secure";
+
+          proxy_buffering off;
+          proxy_request_buffering off;
+        }
+
+        location /v1/ {
+          return 404;
+        }
+
+        location /v2/ {
+          proxy_pass http://core/v2/;
+          proxy_set_header Host $http_host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $x_forwarded_proto;
+          proxy_buffering off;
+          proxy_request_buffering off;
+        }
+
+        location /service/ {
+          proxy_pass http://core/service/;
+          proxy_set_header Host $http_host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $x_forwarded_proto;
+
+          proxy_cookie_path / "/; Secure";
+
+          proxy_buffering off;
+          proxy_request_buffering off;
+        }
+
+      location /service/notifications {
+          return 404;
+        }
+      }
+        server {
+          listen 8080;
+          listen [::]:8080;
+          #server_name harbordomain.com;
+          return 301 https://$host$request_uri;
+      }
+    }
 ---
 # Source: harbor/templates/portal/configmap.yaml
 apiVersion: v1
@@ -460,6 +630,30 @@ spec:
     app: "harbor"
     component: jobservice
 ---
+# Source: harbor/templates/nginx/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: harbor
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: https
+      port: 443
+      targetPort: 8443
+  selector:
+    release: katana-release
+    app: "harbor"
+    component: nginx
+---
 # Source: harbor/templates/portal/service.yaml
 apiVersion: v1
 kind: Service
@@ -550,8 +744,8 @@ spec:
         component: core
       annotations:
         checksum/configmap: 8cd0eca6d30642ead0507382b7d5d1f3d2458f0d4d6db1461ead904cf9dc8530
-        checksum/secret: 11e6cbdfb4e14c2b82fb2d8129130b6197cea7f0c24d0e083409e1b62ea2aa6b
-        checksum/secret-jobservice: 9227df0c9dac6d150c0b16a9f56b49e9a5a6a30aa40758baac0a94a2088879a4
+        checksum/secret: 98b873fcd0de081a88e6939438786643d6e5b2fca031f0fb98e46a152bee2b5d
+        checksum/secret-jobservice: ebdfa3a4b66690ddd30e751b56631c1b29db91e98791a9703fa42cb7580d585d
     spec:
       securityContext:
         runAsUser: 10000
@@ -634,7 +828,7 @@ spec:
             secretName: katana-release-harbor-core
         - name: ca-download
           secret:
-            secretName: "katana-release-harbor-ingress"
+            secretName: katana-release-harbor-nginx
         - name: psc
           emptyDir: {}
 ---
@@ -671,8 +865,8 @@ spec:
       annotations:
         checksum/configmap: 587e1545e6a568040ec0af96f8a466585c1a23ec5861a9c9f9491321d1252e05
         checksum/configmap-env: a0425bc37f228887ba7a046bff04594b627dfcc4f7159e8d31e45da84122ded5
-        checksum/secret: 7eddf654971c6ff4a90cd89e8f7246f0d2e63c0bd149146dc688a7fd12293a11
-        checksum/secret-core: c5b5ab3707348c652e56471fad8b803ae369d8c7b6179f0bb4250325f9496d88
+        checksum/secret: 3cdc43d7ede7e266357c16dc024d4d6752592aa44c6c34f06a142cf338a2fcf3
+        checksum/secret-core: bda2f2118d81977ba65befa0a9aaddc992fc784040428e67eeb965a081e650ce
     spec:
       securityContext:
         runAsUser: 10000
@@ -724,6 +918,79 @@ spec:
         - name: job-logs
           persistentVolumeClaim:
             claimName: katana-release-harbor-jobservice
+---
+# Source: harbor/templates/nginx/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: katana-release-harbor-nginx
+  namespace: katana
+  labels:
+    heritage: Helm
+    release: katana-release
+    chart: harbor
+    app: "harbor"
+    component: nginx
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      release: katana-release
+      app: "harbor"
+      component: nginx
+  template:
+    metadata:
+      labels:
+        heritage: Helm
+        release: katana-release
+        chart: harbor
+        app: "harbor"
+        component: nginx
+      annotations:
+        checksum/configmap: 105718f42a530b8d97d6f17752226462eda712f91bf534d50dad96d9216c986f
+        checksum/secret: 685fbfeff6d43e88f6407a880c2b3d82ae700c16a5584c3f0e447702ecd4997a
+    spec:
+      securityContext:
+        runAsUser: 10000
+        fsGroup: 10000
+      automountServiceAccountToken: false
+      containers:
+        - name: nginx
+          image: "goharbor/nginx-photon:v2.8.2"
+          imagePullPolicy: "IfNotPresent"
+          livenessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /
+              port: 8443
+            initialDelaySeconds: 300
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /
+              port: 8443
+            initialDelaySeconds: 1
+            periodSeconds: 10
+          ports:
+            - name: harbor-port
+              containerPort: 8080
+            - containerPort: 8443
+            - containerPort: 4443
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: certificate
+              mountPath: /etc/nginx/cert
+      volumes:
+        - name: config
+          configMap:
+            name: katana-release-harbor-nginx
+        - name: certificate
+          secret:
+            secretName: katana-release-harbor-nginx
 ---
 # Source: harbor/templates/portal/deployment.yaml
 apiVersion: apps/v1
@@ -819,9 +1086,9 @@ spec:
         component: registry
       annotations:
         checksum/configmap: 4592e0c51955c1ad847aa0d84f4f7a757c912e84a951800703701d368f8cb45f
-        checksum/secret: ee31b32537690c297c5e5304db839d987681d07a5482ed89c44228d0f8d7dbe6
-        checksum/secret-jobservice: ff75e97b9c110268596199ac66e864820e05a9e4ea5aaf9b986e956410773de3
-        checksum/secret-core: dd01e742ab1217c8a36127862025c6cd4d545abdb2f693063378d6fa9075db53
+        checksum/secret: 5be95751049cf9d8245a1a7a1b46bd3d223bc52528a0bad431e47a27d8b39a17
+        checksum/secret-jobservice: 18ef17ec1312b90e0476c56c5604ba0a4d18cb72b3e51eb5d0fbef59b6421a11
+        checksum/secret-core: 474fe0602f7d6b488fd996bb5901500e4cea8f192ca297d3574551e0493479f4
     spec:
       securityContext:
         runAsUser: 10000
@@ -1112,72 +1379,3 @@ spec:
         resources:
           requests:
             storage: "1Gi"
----
-# Source: harbor/templates/ingress/ingress.yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: "katana-release-harbor-ingress"
-  namespace: katana
-  labels:
-    heritage: Helm
-    release: katana-release
-    chart: harbor
-    app: "harbor"
-  annotations:
-    ingress.kubernetes.io/proxy-body-size: "0"
-    ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-spec:
-  ingressClassName: nginx
-  tls:
-    - secretName: katana-release-harbor-ingress
-      hosts:
-        - {{.HarborHostname}}
-  rules:
-    - http:
-        paths:
-          - path: /api/
-            pathType: Prefix
-            backend:
-              service:
-                name: katana-release-harbor-core
-                port:
-                  number: 80
-          - path: /service/
-            pathType: Prefix
-            backend:
-              service:
-                name: katana-release-harbor-core
-                port:
-                  number: 80
-          - path: /v2/
-            pathType: Prefix
-            backend:
-              service:
-                name: katana-release-harbor-core
-                port:
-                  number: 80
-          - path: /chartrepo/
-            pathType: Prefix
-            backend:
-              service:
-                name: katana-release-harbor-core
-                port:
-                  number: 80
-          - path: /c/
-            pathType: Prefix
-            backend:
-              service:
-                name: katana-release-harbor-core
-                port:
-                  number: 80
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: katana-release-harbor-portal
-                port:
-                  number: 80
-      host: {{.HarborHostname}}

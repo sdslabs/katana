@@ -67,11 +67,9 @@ type KatanaCfg struct {
 	MySQL         MySQLCfg            `toml:"mysql"`
 	Harbor        HarborCfg           `toml:"harbor"`
 	TimeOut       int                 `toml:"timeout"`
-	IngressHost   string              `toml:"ingresshost"`
 }
 
 type HarborCfg struct {
 	Username string `toml:"username"`
 	Password string `toml:"password"`
-	Hostname string `toml:"hostname"`
 }

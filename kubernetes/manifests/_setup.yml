@@ -19,6 +19,9 @@ spec:
       targetPort: mongo-port
     - name: mysql
       port: 3306
-      targetPort: mysql
+      targetPort: mysql-port
+    - name: harbor
+      port: 8080
+      targetPort: harbor-port
   selector:
     lbtype: external

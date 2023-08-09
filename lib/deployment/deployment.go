@@ -143,7 +143,7 @@ func DeployChallengeToCluster(challengeName, teamName string, firstPatch bool, r
 	kubeclient, _ := utils.GetKubeClient()
 
 	deploymentsClient := kubeclient.AppsV1().Deployments(teamNamespace)
-	imageName := g.HarborConfig.Hostname + "/katana/" + challengeName + ":latest"
+	imageName := "harbor.katana.local/katana/" + challengeName + ":latest"
 	if firstPatch {
 		/// Retrieve the existing deployment
 		existingDeployment, err := deploymentsClient.Get(context.TODO(), challengeName, metav1.GetOptions{})
@@ -153,7 +153,7 @@ func DeployChallengeToCluster(challengeName, teamName string, firstPatch bool, r
 			return err
 		}
 
-		existingDeployment.Spec.Template.Spec.Containers[0].Image = g.HarborConfig.Hostname + "/katana/" + teamName + "-" + challengeName + ":latest"
+		existingDeployment.Spec.Template.Spec.Containers[0].Image = "harbor.katana.local/katana/" + teamName + "-" + challengeName + ":latest"
 
 		_, err = deploymentsClient.Update(context.TODO(), existingDeployment, metav1.UpdateOptions{})
 		if err != nil {

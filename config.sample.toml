@@ -1,7 +1,6 @@
 kubeconfig = ""
 kubehost = "0.0.0.0"
 backendurl = "http://52.172.254.231:15528"
-ingresshost = "katana.local"
 rootdirectory = "/opt/katana"
 kubenamespace = "default"
 timeout = 20 # in seconds
@@ -55,4 +54,3 @@ password = "sdslabs"
 [harbor]
 username = "admin"
 password = "Password12345" # NOTE: Password should be 8-128 characters long with at least 1 uppercase, 1 lowercase and 1 number
-hostname = "harbor.katana.local"

@@ -16,7 +16,6 @@ type ManifestConfig struct {
 	ChallengDir       string
 	TempDir           string
 	InitFile          string
-	IngressHost       string
 	DaemonPort        uint
 	MongoUsername     string
 	MongoPassword     string
@@ -25,7 +24,6 @@ type ManifestConfig struct {
 	HarborCrt         string
 	HarborCaCrt       string
 	HarborIP          string
-	HarborHostname    string
 	NodeAffinityValue string
 }
 

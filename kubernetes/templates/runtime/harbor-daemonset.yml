@@ -6,14 +6,14 @@ metadata:
 data:
   setup.sh: |
     echo "$TRUSTED_CERT" > /usr/local/share/ca-certificates/ca.crt && update-ca-certificates && systemctl restart containerd &&
-    if grep -q "{{.HarborHostname}}" /etc/hosts; then
+    if grep -q "harbor.katana.local" /etc/hosts; then
       echo "Updating entry in /etc/hosts"
-      current_ip=$(grep "{{.HarborHostname}}" /etc/hosts | awk '{print $1}')
+      current_ip=$(grep "harbor.katana.local" /etc/hosts | awk '{print $1}')
       new_ip="{{.HarborIP}}"
       sed -i "s/$current_ip/$new_ip/" /etc/hosts
     else
       echo "Adding entry to /etc/hosts"
-      echo "{{.HarborIP}}  {{.HarborHostname}}" >> /etc/hosts
+      echo "{{.HarborIP}}  harbor.katana.local" >> /etc/hosts
     fi
 ---
 apiVersion: apps/v1

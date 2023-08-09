@@ -6,7 +6,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/sdslabs/katana/configs"
-	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/harbor"
 	utils "github.com/sdslabs/katana/lib/utils"
@@ -68,7 +67,7 @@ func generateCertsforHarbor() {
 	}
 
 	// Generate the certificates
-	if err := utils.GenerateCerts(g.KatanaConfig.Harbor.Hostname, path); err != nil {
+	if err := utils.GenerateCerts("harbor.katana.local", path); err != nil {
 		log.Fatal(err)
 	}
 }

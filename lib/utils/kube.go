@@ -13,7 +13,6 @@ import (
 	"github.com/sdslabs/katana/types"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -202,7 +201,6 @@ func DeploymentConfig() types.ManifestConfig {
 		ChallengDir:       g.TeamVmConfig.ChallengeDir,
 		TempDir:           g.TeamVmConfig.TempDir,
 		InitFile:          g.TeamVmConfig.InitFile,
-		IngressHost:       g.KatanaConfig.IngressHost,
 		DaemonPort:        g.TeamVmConfig.DaemonPort,
 		MongoUsername:     Base64Encode(g.KatanaConfig.Mongo.Username),
 		MongoPassword:     Base64Encode(g.KatanaConfig.Mongo.Password),
@@ -211,7 +209,6 @@ func DeploymentConfig() types.ManifestConfig {
 		HarborCrt:         "",
 		HarborCaCrt:       "",
 		HarborIP:          "",
-		HarborHostname:    g.KatanaConfig.Harbor.Hostname,
 		NodeAffinityValue: "",
 	}
 
@@ -225,11 +222,11 @@ func PopulateHarborCerts(config types.ManifestConfig) types.ManifestConfig {
 	// Read the harbor key and cert
 	basePath, _ := os.Getwd()
 
-	harborKey, err := ioutil.ReadFile(basePath + "/lib/harbor/certs/" + g.KatanaConfig.Harbor.Hostname + ".key")
+	harborKey, err := ioutil.ReadFile(basePath + "/lib/harbor/certs/harbor.katana.local.key")
 	if err != nil {
 		log.Fatal(err)
 	}
-	harborCrt, err := ioutil.ReadFile(basePath + "/lib/harbor/certs/" + g.KatanaConfig.Harbor.Hostname + ".crt")
+	harborCrt, err := ioutil.ReadFile(basePath + "/lib/harbor/certs/harbor.katana.local.crt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -422,52 +419,6 @@ func CreateService(clientset *kubernetes.Clientset, serviceName string, namespac
 	}
 
 	_, err := clientset.CoreV1().Services(namespace).Create(context.Background(), service, metav1.CreateOptions{})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func CreateIngress(clientset *kubernetes.Clientset, ingressName string, namespace string, serviceName string, servicePort int32, host string) error {
-	ingressClassName := "nginx"
-
-	ingress := &networkingv1.Ingress{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: ingressName,
-		},
-		Spec: networkingv1.IngressSpec{
-			IngressClassName: &ingressClassName,
-			Rules: []networkingv1.IngressRule{
-				{
-					Host: host,
-					IngressRuleValue: networkingv1.IngressRuleValue{
-						HTTP: &networkingv1.HTTPIngressRuleValue{
-							Paths: []networkingv1.HTTPIngressPath{
-								{
-									Path: "/",
-									PathType: func() *networkingv1.PathType {
-										pathType := networkingv1.PathTypePrefix
-										return &pathType
-									}(),
-									Backend: networkingv1.IngressBackend{
-										Service: &networkingv1.IngressServiceBackend{
-											Name: serviceName,
-											Port: networkingv1.ServiceBackendPort{
-												Number: servicePort,
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-
-	_, err := clientset.NetworkingV1().Ingresses(namespace).Create(context.Background(), ingress, metav1.CreateOptions{})
 	if err != nil {
 		return err
 	}

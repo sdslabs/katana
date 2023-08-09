@@ -67,7 +67,7 @@ spec:
               key: password
         ports:
         - containerPort: 3306
-          name: mysql
+          name: mysql-port
         volumeMounts:
         - name: mysql-persistent-storage
           mountPath: /var/lib/mysql
@@ -86,7 +86,7 @@ metadata:
   namespace: katana
 spec:
   ports:
-    - name: mysql-port
+    - name: mysql-svc
       port: 3306
       targetPort: 3306
   selector:

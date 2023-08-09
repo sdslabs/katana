@@ -2,20 +2,18 @@ package utils
 
 import (
 	"log"
-
-	"github.com/sdslabs/katana/configs"
 )
 
 func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 	log.Println("Building docker image, Please wait...")
-	cmd := "docker build -t " + configs.HarborConfig.Hostname + "/katana/" + _ChallengeName + " " + _DockerfilePath
+	cmd := "docker build -t " + "harbor.katana.local/katana/" + _ChallengeName + " " + _DockerfilePath
 	if err := RunCommand(cmd); err != nil {
 		log.Printf("Error: %s\n", err)
 	}
 	log.Println("Docker image built successfully")
 
 	log.Println("Pushing docker image, Please wait...")
-	cmd = "docker push " + configs.HarborConfig.Hostname + "/katana/" + _ChallengeName
+	cmd = "docker push " + "harbor.katana.local/katana/" + _ChallengeName
 	if err := RunCommand(cmd); err != nil {
 		log.Printf("Error: %s\n", err)
 	}
@@ -24,7 +22,7 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 
 func DockerLogin(username string, password string) {
 	log.Println("Logging into Harbor, Please wait...")
-	cmd := "docker login -u " + username + " -p " + password + " " + configs.KatanaConfig.Harbor.Hostname
+	cmd := "docker login -u " + username + " -p " + password + " " + "harbor.katana.local"
 	if err := RunCommand(cmd); err != nil {
 		log.Printf("Error: %s\n", err)
 	}
@@ -32,7 +30,7 @@ func DockerLogin(username string, password string) {
 }
 
 func DockerImageExists(imageName string) bool {
-	cmd := "docker image inspect " + configs.HarborConfig.Hostname + "/katana/" + imageName
+	cmd := "docker image inspect " + "harbor.katana.local/katana/" + imageName
 	if err := RunCommand(cmd); err != nil {
 		return false
 	}
