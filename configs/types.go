@@ -6,21 +6,11 @@ type API struct {
 }
 
 type ClusterCfg struct {
-	DeploymentLabel string   `toml:"deploymentlabel"`
-	BroadcastCount  uint     `toml:"broadcastcount"`
-	BroadcastLabel  string   `toml:"broadcastlabel"`
-	TeamCount       uint     `toml:"teamcount"`
-	TeamLabel       string   `toml:"teamlabel"`
-	ManifestDir     string   `toml:"manifest_dir"`
-	Manifests       []string `toml:"manifests"`
-}
-
-type ChallengeDeployerCfg struct {
-	Host           string `toml:"host"`
-	Port           uint   `toml:"port"`
-	BroadcastPort  uint   `toml:"broadcastport"`
-	TeamClientPort uint   `toml:"teamclientport"`
-	ArtifactLabel  string `toml:"challengeartifactlabel"`
+	DeploymentLabel      string   `toml:"deploymentlabel"`
+	TeamCount            uint     `toml:"teamcount"`
+	TeamLabel            string   `toml:"teamlabel"`
+	TemplatedManifestDir string   `toml:"templated_manifest_dir"`
+	TemplatedManifests   []string `toml:"templated_manifests"`
 }
 
 type AdminCfg struct {
@@ -29,9 +19,8 @@ type AdminCfg struct {
 }
 
 type ServicesCfg struct {
-	API               API                  `toml:"api"`
-	ChallengeDeployer ChallengeDeployerCfg `toml:"challengedeployer"`
-	SSHProvider       SSHProviderCfg       `toml:"sshprovider"`
+	API         API            `toml:"api"`
+	SSHProvider SSHProviderCfg `toml:"sshprovider"`
 }
 
 type TeamChallengeConfig struct {
@@ -66,6 +55,7 @@ type MySQLCfg struct {
 type KatanaCfg struct {
 	KubeHost      string              `toml:"kubehost"`
 	BackendUrl    string              `toml:"backendurl"`
+	RootDirectory string              `toml:"rootdirectory"`
 	KubeNameSpace string              `toml:"kubenamespace"`
 	KubeConfig    string              `toml:"kubeconfig"`
 	LogFile       string              `toml:"logfile"`
@@ -75,4 +65,11 @@ type KatanaCfg struct {
 	TeamVmConfig  TeamChallengeConfig `toml:"teamvm"`
 	AdminConfig   AdminCfg            `toml:"admin"`
 	MySQL         MySQLCfg            `toml:"mysql"`
+	Harbor        HarborCfg           `toml:"harbor"`
+	TimeOut       int                 `toml:"timeout"`
+}
+
+type HarborCfg struct {
+	Username string `toml:"username"`
+	Password string `toml:"password"`
 }

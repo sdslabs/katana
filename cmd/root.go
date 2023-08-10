@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -15,7 +15,7 @@ var rootCmd = &cobra.Command{
 	challenge dispatcher, VM deployer and flag juggler.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := cmd.Help(); err != nil {
-			fmt.Printf("Failed to print cobra help: %s", err)
+			log.Printf("Failed to print cobra help: %s", err)
 		}
 	},
 }

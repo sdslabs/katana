@@ -1,37 +1,26 @@
 kubeconfig = ""
-kubehost = "http://localhost"
-backendurl = "http://192.168.49.1"
+kubehost = "0.0.0.0"
+backendurl = "http://52.172.254.231:15528"
+rootdirectory = "/opt/katana"
 kubenamespace = "default"
-verbosity = 3
+timeout = 20 # in seconds
 
 [cluster]
 deploymentlabel = "katana"
-broadcastcount = 2
-broadcastlabel = "broadcast"
 teamcount = 2
 teamlabel = "ctfteam"
-manifest_dir = "manifests/templates"
-manifests = [
-    "broadcast.yml",
-    "broadcast-service.yml",
-    "ingress.yml",
-    "openvpn.yml",
-    "mysql.yml",
-    "logs.yml",
-    "mongo.yml",
+templated_manifest_dir = "kubernetes/templates"
+templated_manifests = [
+    "storage-init.yml", # should be first and always present
     "gogs.yml",
+    "mysql.yml",
+    "mongo.yml",
+    "harbor.yml",
 ]
 
 [services.api]
-host = "localhost"
-port = 3000
-
-[services.challengedeployer]
-host = "challengedeployer.katana.local"
-port = 8002
-broadcastport = 3003
-teamclientport = 3004
-challengeartifactlabel = "challfile"
+host = "0.0.0.0"
+port = 15528
 
 [teamvm]
 teampodname = "katana-team-master-pod"
@@ -52,7 +41,6 @@ username = "adminuser"
 password = "password123"
 port = "32000"
 mongosh_version = "1.6.1"
-cluster_url = "challengedeployer.katana.local"
 
 [mysql]
 username = "root"
@@ -62,3 +50,7 @@ port = "32001"
 [admin]
 username = "sdslabs"
 password = "sdslabs"
+
+[harbor]
+username = "admin"
+password = "Password12345" # NOTE: Password should be 8-128 characters long with at least 1 uppercase, 1 lowercase and 1 number

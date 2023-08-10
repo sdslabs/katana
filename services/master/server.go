@@ -2,11 +2,13 @@ package master
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	cfg "github.com/sdslabs/katana/configs"
+	challengeDeployerService "github.com/sdslabs/katana/services/challengedeployerservice"
 	c "github.com/sdslabs/katana/services/master/controllers"
 )
 
@@ -14,11 +16,15 @@ func Server() error {
 	fiberConfig := fiber.Config{
 		ReadTimeout:           5 * time.Second,
 		WriteTimeout:          30 * time.Second,
+		BodyLimit:             10 * 1024 * 1024,
 		DisableStartupMessage: false,
 	}
 
 	app := fiber.New(fiberConfig)
-	app.Use(cors.New())
+
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+	}))
 
 	corsConfig := cors.Config{
 		AllowOrigins:     "*",
@@ -38,11 +44,11 @@ func Server() error {
 	admin.Get("/db", c.DB)
 	admin.Post("/login", c.Login)
 	admin.Get("/createTeams/:number", c.CreateTeams)
-	admin.Post("/challengeUpdate", c.ChallengeUpdate)
+	admin.Post("/challengeUpdate", challengeDeployerService.ChallengeUpdate)
 	admin.Post("/logs", c.Logs)
-	admin.Get("/deploy", c.Deploy)
+	admin.Post("/deployChallenge", challengeDeployerService.DeployChallenge)
 	admin.Get("/gitServer", c.GitServer)
-	admin.Get("/cluster/:id", c.ClusterInfo)
-	fmt.Printf("Listening on %s:%d\n", cfg.APIConfig.Host, cfg.APIConfig.Port)
+	admin.Get("/deleteChallenge/:chall_name", challengeDeployerService.DeleteChallenge)
+	log.Printf("Listening on %s:%d\n", cfg.APIConfig.Host, cfg.APIConfig.Port)
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port))
 }

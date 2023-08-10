@@ -8,9 +8,7 @@ GOBIN := $(PROJECTROOT)/bin
 UTILDIR := $(PROJECTROOT)/scripts/utils
 SPINNER := $(UTILDIR)/spinner.sh
 BUILDIR := $(PROJECTROOT)/scripts/build
-CONTROLLER_MANIFEST:= $(PROJECTROOT)/manifests/dev/expose-controller.yml
-HELM_MANIFEST:= $(PROJECTROOT)/manifests/templates/helm-values.yml
-OPENVPN_MANIFEST:= $(PROJECTROOT)/manifests/templates/helm-values.yml
+MANIFEST:= $(PROJECTROOT)/kubernetes/manifests
 
 KEY_NAME := team
 
@@ -21,8 +19,6 @@ POD_COMMAND =$(shell kubectl get pods --namespace $(OPENVPN_NAMESPACE) -l "app=o
 SERVICE_NAME_COMMAND =$(shell kubectl get svc --namespace $(OPENVPN_NAMESPACE) -l "app=openvpn,release=openvpn" -o jsonpath='{ .items[0].metadata.name }') 
 SERVICE_IP_COMMAND=$(shell kubectl get svc --namespace $(OPENVPN_NAMESPACE) -l "app=openvpn,release=openvpn" -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
 # CHALLENGE_DEPLOYER_IP :=  $(shell minikube service nginx-ingress-controller --url -n kube-system)
-
-CREATEBIN := $(shell [ ! -d ./bin ] && mkdir bin)
 
 # Make is verbose in Linux. Make it silent.
 MAKEFLAGS += --silent
@@ -83,20 +79,23 @@ gen-certificates:
 	kubectl --namespace $(OPENVPN_NAMESPACE) exec -it $(POD_NAME) cat "/etc/openvpn/certs/pki/$(KEY_NAME)-$$n.ovpn" > $(KEY_NAME)-$$n.ovpn; \
 	done
 
-gen-vpn: set-env
-	helm install openvpn -f $(HELM_MANIFEST) stable/openvpn --namespace openvpn
-	minikube tunnel
-
 set-env: build
 	minikube start --driver=docker && \
 	minikube addons enable ingress  && \
-	kubectl apply -f $(CONTROLLER_MANIFEST) && \
-	sudo -- sh -c "echo \"$(minikube service nginx-ingress-controller --url -n kube-system | awk '{print substr($0,8)}' | awk '{print substr($0, 1, length($0)-6)}' | head -1)    katana.local\" >> /etc/hosts" &&\
+	kubectl apply -f $(MANIFEST) && \
 	cp config.sample.toml config.toml && \
 	./bin/katana run
 
+set-env-prod: build
+	kubectl apply -f $(MANIFEST) && \
+	cp config.sample.toml config.toml && \
+	sudo ./bin/katana run
+
 build:
 	cd cmd && go build -o ../bin/katana
+
+run : build
+	sudo ./bin/katana run
 
 # Prints help message
 help:
@@ -109,6 +108,5 @@ help:
 	@echo "prepare-for-pr 	- Prepare the code for PR after fmt, lint and checking uncommitted files"
 	@echo "lint    			- Lint code using golangci-lint"
 	@echo "set-env" 		- Setup Katana environment  
-	@echo "gen-vpn"         - Generate VPN configurations
 	@echo "build"         	- Build katana binary
 

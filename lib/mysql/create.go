@@ -23,7 +23,7 @@ func CreateDatabase(database string) error {
 func CreateGogsUser(username, password string) error {
 
 	// Get time in unix format and convert it to string
-	gogs, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp("+configs.ServicesConfig.ChallengeDeployer.Host+":"+configs.MySQLConfig.Port+")/gogs")
+	gogs, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp("+utils.GetKatanaLoadbalancer()+":3306)/gogs")
 	if err != nil {
 		return err
 	}
@@ -64,7 +64,7 @@ func CreateGogsUser(username, password string) error {
 
 func CreateGogsAdmin(username, password string) error {
 	// Get time in unix format and convert it to string
-	gogs, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp("+configs.ServicesConfig.ChallengeDeployer.Host+":"+configs.MySQLConfig.Port+")/gogs")
+	gogs, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp("+utils.GetKatanaLoadbalancer()+":3306)/gogs")
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func CreateGogsAdmin(username, password string) error {
 }
 
 func CreateAccessToken(username, token string) error {
-	gogs, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp("+configs.ServicesConfig.ChallengeDeployer.Host+":"+configs.MySQLConfig.Port+")/gogs")
+	gogs, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp("+utils.GetKatanaLoadbalancer()+":3306)/gogs")
 	if err != nil {
 		return err
 	}

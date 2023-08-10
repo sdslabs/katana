@@ -1,45 +1,73 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/gofiber/fiber/v2"
-	g "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
+	"github.com/sdslabs/katana/lib/harbor"
+	utils "github.com/sdslabs/katana/lib/utils"
 )
 
 func InfraSet(c *fiber.Ctx) error {
 
-	// if !utils.VerifyToken(c) {
-	// 	return c.SendString("Unauthorized")
-	// }
-
-	pathToCfg := filepath.Join(
-		os.Getenv("HOME"), ".kube", "config",
-	)
-
-	fmt.Println(g.KatanaConfig.KubeNameSpace)
-
-	config, err := clientcmd.BuildConfigFromFlags("", pathToCfg)
+	config, err := utils.GetKubeConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	kubeclient, err := kubernetes.NewForConfig(config)
+	kubeclient, err := utils.GetKubeClient()
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	for _, manifests := range configs.ClusterConfig.TemplatedManifests {
+		if manifests == "harbor.yml" {
+			generateCertsforHarbor()
+			break
+		}
 	}
 
 	if err = deployment.DeployCluster(config, kubeclient); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(kubeclient)
+	for _, manifests := range configs.ClusterConfig.TemplatedManifests {
+		if manifests == "harbor.yml" {
+			err = harbor.SetupHarbor()
+			if err != nil {
+				log.Fatal(err)
+			}
+			break
+		}
+	}
 
 	return c.SendString("Infrastructure setup completed")
+}
+
+func generateCertsforHarbor() {
+	path, _ := os.Getwd()
+	path = path + "/lib/harbor/certs"
+
+	// Delete the directory if it already exists
+	if _, err := os.Stat(path); os.IsExist(err) {
+		errDir := os.RemoveAll(path)
+		if errDir != nil {
+			log.Fatal(err)
+		}
+	}
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		errDir := os.Mkdir(path, 0755)
+		if errDir != nil {
+			log.Fatal(err)
+		}
+	}
+
+	// Generate the certificates
+	if err := utils.GenerateCerts("harbor.katana.local", path); err != nil {
+		log.Fatal(err)
+	}
 }
