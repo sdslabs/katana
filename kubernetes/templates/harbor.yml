@@ -13,8 +13,8 @@ type: Opaque
 data:
   secretKey: "bm90LWEtc2VjdXJlLWtleQ=="
   secret: "c1hGQzNqenJseUl3R3JzVw=="
-  tls.key: { { .HarborKey } }
-  tls.crt: { { .HarborCrt } }
+  tls.key: {{ .HarborKey }}
+  tls.crt: {{ .HarborCrt }}
   HARBOR_ADMIN_PASSWORD: "SGFyYm9yMTIzNDU="
   POSTGRESQL_PASSWORD: "Y2hhbmdlaXQ="
   REGISTRY_CREDENTIAL_PASSWORD: "aGFyYm9yX3JlZ2lzdHJ5X3Bhc3N3b3Jk"
@@ -64,9 +64,9 @@ metadata:
     app: "harbor"
 type: Opaque
 data:
-  tls.crt: { { .HarborCrt } }
-  tls.key: { { .HarborKey } }
-  ca.crt: { { .HarborCaCrt } }
+  tls.crt: {{ .HarborCrt }}
+  tls.key: {{ .HarborKey }}
+  ca.crt: {{ .HarborCaCrt }}
 ---
 # Source: harbor/templates/registry/registry-secret.yaml
 apiVersion: v1
