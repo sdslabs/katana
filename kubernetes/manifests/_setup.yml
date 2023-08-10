@@ -20,10 +20,10 @@ spec:
     - name: mysql
       port: 3306
       targetPort: mysql-port
-    - name: http
+    - name: harbor-http
       port: 80
       targetPort: harbor-http
-    - name: https
+    - name: harbor-https
       port: 443
       targetPort: harbor-https
   selector:
