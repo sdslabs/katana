@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wireguard-configmap
+  namespace: katana
+data:
+  PUID: "1000"
+  PGID: "1000"
+  TZ: "America/Mexico_City"
+  SERVERPORT: "31820"
+  PEERS: "2"
+  PEERDNS: "10.0.0.10"
+  ALLOWEDIPS: "0.0.0.0/0, ::/0"
+  INTERNAL_SUBNET: "10.13.13.0"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: wireguard
+  namespace: katana
+  labels:
+    app: wireguard
+spec:
+  containers:
+    - name: wireguard
+      image: linuxserver/wireguard
+      envFrom:
+        - configMapRef:
+            name: wireguard-configmap
+      securityContext:
+        capabilities:
+          add:
+            - NET_ADMIN
+            - SYS_MODULE
+        privileged: true
+      volumeMounts:
+        - name: wg-config
+          mountPath: /config
+      ports:
+        - containerPort: 51820
+          protocol: UDP
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "100m"
+        limits:
+          memory: "128Mi"
+          cpu: "200m"
+  volumes:
+    - name: wg-config
+      emptyDir: {}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: wireguard
+  name: wireguard-service
+  namespace: katana
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 51820
+      protocol: UDP
+      targetPort: 51820
+  selector:
+    app: wireguard
