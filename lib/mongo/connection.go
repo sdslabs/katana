@@ -36,7 +36,7 @@ func setupAdmin() {
 	}
 }
 
-func setup(LoadbalancerIP string) {
+func setup() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(configs.KatanaConfig.TimeOut)*time.Second)
 	defer cancel()
 	err = client.Ping(ctx, nil)
@@ -44,7 +44,7 @@ func setup(LoadbalancerIP string) {
 		log.Println("MongoDB connection was not established")
 		log.Println("Error: ", err)
 		time.Sleep(time.Duration(configs.KatanaConfig.TimeOut) * time.Second)
-		setup(LoadbalancerIP)
+		setup()
 	} else {
 		log.Println("MongoDB Connection Established")
 		setupAdmin()
@@ -60,6 +60,6 @@ func Test() {
 	log.Println(res)
 }
 
-func Init(LoadbalancerIP string) {
-	go setup(LoadbalancerIP)
+func Init() {
+	go setup()
 }

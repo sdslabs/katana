@@ -1,9 +1,6 @@
 package controllers
 
 import (
-	// "context"
-	// "log"
-
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -11,16 +8,13 @@ import (
 	"github.com/sdslabs/katana/lib/mongo"
 	"github.com/sdslabs/katana/lib/mysql"
 
-	// "github.com/sdslabs/katana/lib/mysql"
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
-	// metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func DB(c *fiber.Ctx) error {
-	LoadbalancerIP := utils.GetKatanaLoadbalancer()
-	mongo.Init(LoadbalancerIP)
-	mysql.Init(LoadbalancerIP)
+	mongo.Init()
+	mysql.Init()
 	return c.SendString("Database setup completed\n")
 }
 

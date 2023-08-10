@@ -212,14 +212,6 @@ func DeploymentConfig() types.ManifestConfig {
 		NodeAffinityValue: "",
 	}
 
-	// Add Harbor key and cert
-	config = PopulateHarborCerts(config)
-
-	return config
-}
-
-func PopulateHarborCerts(config types.ManifestConfig) types.ManifestConfig {
-	// Read the harbor key and cert
 	basePath, _ := os.Getwd()
 
 	harborKey, err := ioutil.ReadFile(basePath + "/lib/harbor/certs/harbor.katana.local.key")
@@ -238,6 +230,7 @@ func PopulateHarborCerts(config types.ManifestConfig) types.ManifestConfig {
 	config.HarborKey = Base64Encode(string(harborKey))
 	config.HarborCrt = Base64Encode(string(harborCrt))
 	config.HarborCaCrt = Base64Encode(string(harborCaCrt))
+
 	return config
 }
 
