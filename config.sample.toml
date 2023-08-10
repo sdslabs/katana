@@ -52,5 +52,5 @@ username = "sdslabs"
 password = "sdslabs"
 
 [harbor]
-username = "admin"
+username = "admin" # cannot be changed
 password = "Password12345" # NOTE: Password should be 8-128 characters long with at least 1 uppercase, 1 lowercase and 1 number

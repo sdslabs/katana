@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/sdslabs/katana/configs"
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/utils"
@@ -31,7 +32,7 @@ func CreateTeams(c *fiber.Ctx) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	noOfTeams, err := strconv.Atoi(c.Params("number"))
+	noOfTeams := int(configs.ClusterConfig.TeamCount)
 
 	if err != nil {
 		log.Fatal(err)
