@@ -2,6 +2,7 @@ package deployment
 
 import (
 	"context"
+	"log"
 
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/types"
@@ -69,18 +70,21 @@ func PollDeployments(kubeclientset *kubernetes.Clientset, done chan<- error) {
 	go func() {
 		for {
 			allReady := true
-			var results []*types.ResourceStatus
+			// var results []*types.ResourceStatus
 			for _, pinger := range pingers {
 				result, ready, err := pinger(ctx, kubeclientset, opts)
 				if err != nil {
 					done <- err
 				}
 				allReady = allReady && ready
-				results = append(results, result...)
+				// temporary fix for lint complains
+				log.Printf("result: %v", result)
+				// results = append(results, result...)
 			}
 			if allReady {
 				close(done)
 			}
 		}
 	}()
+
 }

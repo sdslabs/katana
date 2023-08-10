@@ -2,6 +2,8 @@ package mongo
 
 import (
 	"context"
+
+	"github.com/sdslabs/katana/types"
 )
 
 func InsertOne(ctx context.Context, collectionName string, data interface{}) (interface{}, error) {
@@ -24,4 +26,8 @@ func InsertMany(ctx context.Context, collectionName string, data []interface{}) 
 
 func CreateTeams(teams []interface{}) (interface{}, error) {
 	return InsertMany(context.Background(), TeamsCollection, teams)
+}
+
+func AddAdmin(ctx context.Context, admin types.AdminUser) (interface{}, error) {
+	return InsertOne(ctx, AdminCollection, admin)
 }

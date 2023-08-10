@@ -1,9 +1,7 @@
 package logger
 
 import (
-	"fmt"
 	"os"
-	"time"
 
 	logging "github.com/op/go-logging"
 )
@@ -20,9 +18,9 @@ var (
 	LogError = log.Error
 )
 
-func getTimeStamp() string {
-	return fmt.Sprintf("%v", time.Now().Unix())
-}
+// func getTimeStamp() string {
+// 	return fmt.Sprintf("%v", time.Now().Unix())
+// }
 
 func init() {
 	var infoBackend logging.Backend

@@ -26,9 +26,9 @@ var (
 func sessionHandler(s ssh.Session) {
 	kubeclient := kubeClientset.CoreV1().RESTClient()
 
-	podName := s.User()
+	namespace := s.User()
 
-	req := kubeclient.Post().Resource("pods").Name(podName).Namespace(g.KatanaConfig.KubeNameSpace).SubResource("exec")
+	req := kubeclient.Post().Resource("pods").Name("katana-team-master-pod-0").Namespace(namespace + "-ns").SubResource("exec")
 
 	option := &v1.PodExecOptions{
 		Command: execCmd,
@@ -45,7 +45,9 @@ func sessionHandler(s ssh.Session) {
 	exec, err := remotecommand.NewSPDYExecutor(kubeConfig, "POST", req.URL())
 	if err != nil {
 		fmt.Fprintf(s, "ERROR: %s", err.Error())
-		s.Exit(1)
+		if err := s.Exit(1); err != nil {
+			log.Printf("Failed to connect to server: %s", err)
+		}
 	}
 	err = exec.Stream(remotecommand.StreamOptions{
 		Stdin:  s,
@@ -55,7 +57,9 @@ func sessionHandler(s ssh.Session) {
 
 	if err != nil {
 		fmt.Fprintf(s, "ERROR: %s", err.Error())
-		s.Exit(1)
+		if err := s.Exit(1); err != nil {
+			log.Printf("Failed to stream data to remote server: %s", err)
+		}
 	}
 }
 

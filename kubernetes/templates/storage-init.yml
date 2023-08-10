@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: katana-storage-setup-pv-volume
+  namespace: katana
+  labels:
+    type: local
+spec:
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: storage
+  capacity:
+    storage: 64Mi
+  accessModes:
+    - ReadWriteOnce
+  local:
+    path: "/data"
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - {{ .NodeAffinityValue }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: katana-storage-setup-pv-claim
+  namespace: katana
+spec:
+  storageClassName: storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 64Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: katana-storage-setup
+  namespace: katana
+spec:
+  containers:
+  - name: create-data-dirs
+    image: busybox
+    command: ["sh", "-c", "mkdir /data/gogs /data/mysql /data/mongo && sleep infinity"]
+    volumeMounts:
+    - mountPath: "/data"
+      name: setup-volume
+    lifecycle:
+      preStop:
+        exec:
+          command: ["sh", "-c", "rm -rf /data/gogs /data/mysql /data/mongo"]
+  volumes:
+  - name: setup-volume
+    persistentVolumeClaim:
+      claimName: katana-storage-setup-pv-claim

@@ -10,3 +10,6 @@ katana
 test.go
 vendor/*
 *.log
+teams/*
+teamcreds.txt
+lib/harbor/certs/*

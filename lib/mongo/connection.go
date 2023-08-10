@@ -13,8 +13,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
-var client, err = mongo.Connect(ctx, options.Client().ApplyURI(configs.MongoConfig.URL))
+var ctx, _ = context.WithTimeout(context.Background(), time.Duration(configs.KatanaConfig.TimeOut)*time.Second)
+var client, err = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+configs.MongoConfig.Username+":"+configs.MongoConfig.Password+"@"+utils.GetKatanaLoadbalancer()+":27017/?directConnection=true&appName=mongosh+"+configs.MongoConfig.Version))
 var link = client.Database(projectDatabase)
 
 func setupAdmin() {
@@ -29,21 +29,22 @@ func setupAdmin() {
 		Password: pwd,
 	}
 
-	if err = AddAdmin(context.Background(), admin); err != nil {
+	if _, err = AddAdmin(context.Background(), admin); err != nil {
 		log.Fatal(err)
 	} else {
 		log.Printf("admin privileges have been given to username: %s", admin.Username)
 	}
 }
 
-func setup() {
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+func setup(LoadbalancerIP string) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(configs.KatanaConfig.TimeOut)*time.Second)
 	defer cancel()
 	err = client.Ping(ctx, nil)
 	if err != nil {
 		log.Println("MongoDB connection was not established")
-		time.Sleep(5 * time.Second)
-		setup()
+		log.Println("Error: ", err)
+		time.Sleep(time.Duration(configs.KatanaConfig.TimeOut) * time.Second)
+		setup(LoadbalancerIP)
 	} else {
 		log.Println("MongoDB Connection Established")
 		setupAdmin()
@@ -59,6 +60,6 @@ func Test() {
 	log.Println(res)
 }
 
-func init() {
-	go setup()
+func Init(LoadbalancerIP string) {
+	go setup(LoadbalancerIP)
 }
