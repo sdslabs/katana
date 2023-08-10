@@ -963,7 +963,9 @@ spec:
             periodSeconds: 10
           ports:
             - containerPort: 8080
+              name: harbor-http
             - containerPort: 8443
+              name: harbor-https
             - containerPort: 4443
           volumeMounts:
             - name: config
