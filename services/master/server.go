@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	cfg "github.com/sdslabs/katana/configs"
 	challengeDeployerService "github.com/sdslabs/katana/services/challengedeployerservice"
+	infraSetService "github.com/sdslabs/katana/services/infrasetservice"
 	c "github.com/sdslabs/katana/services/master/controllers"
 )
 
@@ -40,14 +41,13 @@ func Server() error {
 
 	admin := api.Group("/admin")
 	admin.Get("/echo/:name", c.HelloAdmin)
-	admin.Get("/infraSet", c.InfraSet)
-	admin.Get("/db", c.DB)
-	admin.Post("/login", c.Login)
-	admin.Get("/createTeams", c.CreateTeams)
+	admin.Get("/infraSet", infraSetService.InfraSet)
+	admin.Get("/db", infraSetService.DB)
+	admin.Post("/login", infraSetService.Login)
+	admin.Get("/createTeams", infraSetService.CreateTeams)
 	admin.Post("/challengeUpdate", challengeDeployerService.ChallengeUpdate)
-	admin.Post("/logs", c.Logs)
 	admin.Post("/deployChallenge", challengeDeployerService.DeployChallenge)
-	admin.Get("/gitServer", c.GitServer)
+	admin.Get("/gitServer", infraSetService.GitServer)
 	admin.Get("/deleteChallenge/:chall_name", challengeDeployerService.DeleteChallenge)
 	log.Printf("Listening on %s:%d\n", cfg.APIConfig.Host, cfg.APIConfig.Port)
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port))
