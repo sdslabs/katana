@@ -9,7 +9,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	g "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/mongo"
 	"github.com/sdslabs/katana/lib/mysql"
 	"github.com/sdslabs/katana/lib/utils"
@@ -19,14 +19,14 @@ import (
 func CreateTeams(teamnumber int) error {
 	teamlabels := utils.GetTeamPodLabels()
 	var teams []interface{}
-	credsFile, err := os.Create(g.SSHProviderConfig.CredsFile)
+	credsFile, err := os.Create(configs.SSHProviderConfig.CredsFile)
 	if err != nil {
 		return err
 	}
 	podName := teamlabels + "-team-master-pod-0"
 	gogs := utils.GetKatanaLoadbalancer() + ":3000"
 	for i := 0; i < teamnumber; i++ {
-		pwd := utils.GenPassword()
+		pwd := utils.RandomString(configs.SSHProviderConfig.PasswordLen)
 		hashed, err := utils.HashPassword(pwd)
 		if err != nil {
 			return err
@@ -64,9 +64,9 @@ func envVariables(gogs string, pwd string, podNamespace string) {
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
 			command = []string{"bash", "-c", "echo 'export USERNAME=" + podNamespace + "' >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
-			command = []string{"bash", "-c", "echo 'export BACKEND_URL=" + g.KatanaConfig.BackendUrl + "/api/v1/admin/challengeUpdate' >> /etc/profile"}
+			command = []string{"bash", "-c", "echo 'export BACKEND_URL=" + configs.KatanaConfig.BackendUrl + "/api/v1/admin/challengeUpdate' >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
-			command = []string{"bash", "-c", "echo 'export ADMIN=" + g.AdminConfig.Username + "' >> /etc/profile"}
+			command = []string{"bash", "-c", "echo 'export ADMIN=" + configs.AdminConfig.Username + "' >> /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
 			command = []string{"bash", "-c", "source /etc/profile"}
 			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
