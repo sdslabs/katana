@@ -7,35 +7,43 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-func getConfiguration() *KatanaCfg {
+func LoadConfiguration() {
 	flag.Parse()
 	config := &KatanaCfg{}
+	configFile := flag.String("conf", "config.toml", "location of config file")
 	if _, err := toml.DecodeFile(*configFile, config); err != nil {
 		log.Fatal(err)
 	}
-	return config
+	KatanaConfig = config
+	ServicesConfig = &KatanaConfig.Services
+	APIConfig = &ServicesConfig.API
+	ClusterConfig = &KatanaConfig.Cluster
+	SSHProviderConfig = &ServicesConfig.SSHProvider
+	AdminConfig = &KatanaConfig.AdminConfig
+	TeamVmConfig = &KatanaConfig.TeamVmConfig
+	MongoConfig = &KatanaConfig.Mongo
+	MySQLConfig = &KatanaConfig.MySQL
+	HarborConfig = &KatanaConfig.Harbor
 }
 
 var (
-	configFile = flag.String("conf", "config.toml", "location of config file")
+	KatanaConfig *KatanaCfg
 
-	KatanaConfig = getConfiguration()
+	ServicesConfig *ServicesCfg
 
-	ServicesConfig = KatanaConfig.Services
+	APIConfig *API
 
-	APIConfig = ServicesConfig.API
+	ClusterConfig *ClusterCfg
 
-	ClusterConfig = KatanaConfig.Cluster
+	SSHProviderConfig *SSHProviderCfg
 
-	SSHProviderConfig = ServicesConfig.SSHProvider
+	AdminConfig *AdminCfg
 
-	AdminConfig = KatanaConfig.AdminConfig
+	TeamVmConfig *TeamChallengeConfig
 
-	TeamVmConfig = KatanaConfig.TeamVmConfig
+	MongoConfig *MongoCfg
 
-	MongoConfig = KatanaConfig.Mongo
+	MySQLConfig *MySQLCfg
 
-	MySQLConfig = KatanaConfig.MySQL
-
-	HarborConfig = KatanaConfig.Harbor
+	HarborConfig *HarborCfg
 )
