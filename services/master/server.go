@@ -49,7 +49,6 @@ func Server() error {
 	admin.Post("/deployChallenge", challengeDeployerService.DeployChallenge)
 	admin.Get("/gitServer", infraSetService.GitServer)
 	admin.Get("/deleteChallenge/:chall_name", challengeDeployerService.DeleteChallenge)
-	admin.Get("/test", infraSetService.Test)
 	log.Printf("Listening on %s:%d\n", cfg.APIConfig.Host, cfg.APIConfig.Port)
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port))
 }

@@ -48,6 +48,8 @@ func InfraSet(c *fiber.Ctx) error {
 		log.Fatal(err)
 	}
 
+	buildKatanaServices()
+
 	return c.SendString("Infrastructure setup completed")
 }
 
@@ -226,9 +228,4 @@ func GitServer(c *fiber.Ctx) error {
 	}
 
 	return c.SendString("Git Server setup completed\n")
-}
-
-func Test(c *fiber.Ctx) error {
-	buildKatanaServices()
-	return c.SendString("Test")
 }
