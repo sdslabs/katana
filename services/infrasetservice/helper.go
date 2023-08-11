@@ -63,7 +63,7 @@ func buildKatanaServices() {
 		}
 		if service.IsDir() {
 			log.Println("Building " + service.Name())
-			imageName := "harbor.katana.local/katana/" + strings.ToLower(service.Name())
+			imageName := strings.ToLower(service.Name())
 			utils.BuildDockerImage(imageName, katanaServicesDir+"/"+service.Name())
 		}
 	}
