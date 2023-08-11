@@ -4,8 +4,6 @@ import (
 	r "crypto/rand"
 	"math/big"
 	"math/rand"
-
-	"github.com/sdslabs/katana/configs"
 )
 
 func RandomString(n uint) string {
@@ -18,12 +16,11 @@ func RandomString(n uint) string {
 	return string(s)
 }
 
-func GenPassword() string {
-	return RandomString(configs.SSHProviderConfig.PasswordLen)
-}
-
 // RandomChars returns a generated string in given number of random characters.
 func randomChars(n int) (string, error) {
+	if n <= 0 {
+		return "", nil
+	}
 	const alphanum = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
 	randomInt := func(max *big.Int) (int, error) {

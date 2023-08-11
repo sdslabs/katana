@@ -2,20 +2,20 @@ package utils
 
 import (
 	"crypto/md5"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
+	"fmt"
+
+	"github.com/xdg-go/pbkdf2"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // MD5 encodes string to hexadecimal of MD5 checksum.
 func MD5(str string) string {
-	return hex.EncodeToString(MD5Bytes(str))
-}
-
-// MD5Bytes encodes string to MD5 checksum.
-func MD5Bytes(str string) []byte {
 	m := md5.New()
 	_, _ = m.Write([]byte(str))
-	return m.Sum(nil)
+	return hex.EncodeToString(m.Sum(nil))
 }
 
 // Base64Encode encodes string to base64.
@@ -62,4 +62,31 @@ func GenerateCerts(domain string, basePath string) error {
 	}
 
 	return nil
+}
+
+func HashPassword(password string) (string, error) {
+	pass := []byte(password)
+	hash, err := bcrypt.GenerateFromPassword(pass, bcrypt.MinCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hash), nil
+}
+
+func CompareHashWithPassword(hashedPassword, password string) bool {
+	hash := []byte(hashedPassword)
+	pass := []byte(password)
+	err := bcrypt.CompareHashAndPassword(hash, pass)
+	return err == nil
+}
+
+// EncodePassword encodes password using PBKDF2 SHA256 with given salt.
+func EncodePassword(password, salt string) string {
+	newPasswd := pbkdf2.Key([]byte(password), []byte(salt), 10000, 50, sha256.New)
+	return fmt.Sprintf("%x", newPasswd)
+}
+
+func SHA256(text string) string {
+	hash := sha256.Sum256([]byte(text))
+	return fmt.Sprintf("%x", hash)
 }
