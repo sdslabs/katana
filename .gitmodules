@@ -1,0 +1,3 @@
+[submodule "katana-services"]
+	path = katana-services
+	url = git@github.com:sdslabs/katana-services.git
