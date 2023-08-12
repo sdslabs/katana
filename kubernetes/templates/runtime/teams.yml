@@ -7,6 +7,7 @@ data:
     tmp_dir: {{.TempDir}} 
     init_file: {{.InitFile}}
     daemon_port: "{{.DaemonPort}}"
+    ssh_password: "{{.SSHPassword}}"
 ---    
 apiVersion: apps/v1
 kind: StatefulSet
@@ -24,6 +25,8 @@ spec:
       containers:
       - name: {{.ContainerName}}
         image: harbor.katana.local/katana/tsuka
+        ports:
+        - containerPort: 22
         env:
           - name: CHALLENGE_DIR 
             valueFrom:
@@ -44,4 +47,9 @@ spec:
             valueFrom:
               configMapKeyRef:
                 name: teamvm-config
-                key: daemon_port       
+                key: daemon_port
+          - name: SSH_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: teamvm-config
+                key: ssh_password

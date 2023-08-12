@@ -205,6 +205,7 @@ func DeploymentConfig() types.ManifestConfig {
 		MongoUsername:     Base64Encode(g.KatanaConfig.Mongo.Username),
 		MongoPassword:     Base64Encode(g.KatanaConfig.Mongo.Password),
 		MySQLPassword:     g.KatanaConfig.MySQL.Password,
+		SSHPassword:       "",
 		HarborKey:         "",
 		HarborCrt:         "",
 		HarborCaCrt:       "",

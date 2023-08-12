@@ -20,6 +20,7 @@ type ManifestConfig struct {
 	MongoUsername     string
 	MongoPassword     string
 	MySQLPassword     string
+	SSHPassword       string
 	HarborKey         string
 	HarborCrt         string
 	HarborCaCrt       string

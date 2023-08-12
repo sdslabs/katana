@@ -137,6 +137,12 @@ func CreateTeams(c *fiber.Ctx) error {
 		}
 	}
 
+	var teams []interface{}
+	credsFile, err := os.Create(configs.SSHProviderConfig.CredsFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	for i := 0; i < noOfTeams; i++ {
 		// Create a directory named katana-team-i in the teams directory
 		if _, err := os.Stat("teams/katana-team-" + strconv.Itoa(i)); os.IsNotExist(err) {
@@ -165,7 +171,11 @@ func CreateTeams(c *fiber.Ctx) error {
 			return err
 		}
 
+		pwd, team := createTeamCredentials(i)
+
 		deploymentConfig := utils.DeploymentConfig()
+
+		deploymentConfig.SSHPassword = pwd
 
 		if err = tmpl.Execute(manifest, deploymentConfig); err != nil {
 			return err
@@ -174,8 +184,10 @@ func CreateTeams(c *fiber.Ctx) error {
 		if err = deployment.ApplyManifest(config, client, manifest.Bytes(), namespace); err != nil {
 			return err
 		}
+		teams = append(teams, team)
+		fmt.Fprintf(credsFile, "Team: %d, Username: %s, Password: %s\n", i, team.Name, pwd)
 	}
-	SSH(noOfTeams)
+	mongo.CreateTeams(teams)
 	return c.SendString("Successfully created teams")
 }
 
