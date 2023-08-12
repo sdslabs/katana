@@ -54,8 +54,13 @@ func InfraSet(c *fiber.Ctx) error {
 }
 
 func DB(c *fiber.Ctx) error {
-	mongo.Init()
-	mysql.Init()
+	// TODO: run Mongo and MySQL setup in parallel
+	if err := mongo.Init(); err != nil {
+		return err
+	}
+	if err := mysql.Init(); err != nil {
+		return err
+	}
 	return c.SendString("Database setup completed\n")
 }
 

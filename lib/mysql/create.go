@@ -40,6 +40,7 @@ func CreateGogsUser(username, password string) error {
 
 	password = utils.EncodePassword(password, salt)
 
+	// TODO: use an illegal TLD instead of .com
 	user := &types.GogsUser{
 		LowerName:   username,
 		Name:        username,
@@ -117,6 +118,7 @@ func CreateGogsAdmin(username, password string) error {
 }
 
 func CreateAccessToken(username, token string) error {
+	// TODO: Don't create connections again
 	gogs, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp("+utils.GetKatanaLoadbalancer()+":3306)/gogs")
 	if err != nil {
 		return err
@@ -127,6 +129,7 @@ func CreateAccessToken(username, token string) error {
 	sha1 := string(sha256[:40])
 
 	var uid int
+	// TODO: Don't concatenate strings to form query
 	err = gogs.QueryRow("SELECT id FROM user WHERE name = '" + username + "'").Scan(&uid)
 	if err != nil {
 		return err

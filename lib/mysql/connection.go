@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"time"
 
@@ -13,31 +14,47 @@ import (
 
 var db *sql.DB
 
-func setup() {
-	database, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp("+utils.GetKatanaLoadbalancer()+":3306)/mysql")
-	if err != nil {
-		panic(err.Error())
+func setup() error {
+	for i := 0; i < 10; i++ {
+		log.Printf("Trying to connect to MySQL, attempt %d", i+1)
+		database, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp("+utils.GetKatanaLoadbalancer()+":3306)/mysql")
+		if err != nil {
+			return fmt.Errorf("cannot connect to mysql: %w", err)
+		}
+		db = database
+		log.Println("Connecting to MySQL")
+		err = db.Ping()
+		if err != nil {
+			log.Println("MySQL connection was not established")
+			log.Println("Error: ", err)
+			time.Sleep(time.Duration(g.KatanaConfig.TimeOut) * time.Second)
+		} else {
+			log.Println("MySQL Connection Established")
+			if err := setupGogs(); err != nil {
+				return fmt.Errorf("cannot setup gogs: %w", err)
+			}
+			return nil
+		}
 	}
-	db = database
-	log.Println("Connecting to MySQL")
-	err = db.Ping()
-	if err != nil {
-		log.Println("MySQL connection was not established")
-		log.Println("Error: ", err)
-		time.Sleep(time.Duration(g.KatanaConfig.TimeOut) * time.Second)
-		setup()
-	} else {
-		log.Println("MySQL Connection Established")
-		setupGogs()
-	}
+	return fmt.Errorf("cannot connect to mysql")
 }
 
-func setupGogs() {
-	CreateDatabase(gogsDatabase)
-	CreateGogsAdmin(configs.AdminConfig.Username, configs.AdminConfig.Password)
-	CreateAccessToken(configs.AdminConfig.Username, configs.AdminConfig.Password)
+func setupGogs() error {
+	if err := CreateDatabase(gogsDatabase); err != nil {
+		return fmt.Errorf("cannot create database: %w", err)
+	}
+	if err := CreateGogsAdmin(configs.AdminConfig.Username, configs.AdminConfig.Password); err != nil {
+		return fmt.Errorf("cannot create gogs admin: %w", err)
+	}
+	if err := CreateAccessToken(configs.AdminConfig.Username, configs.AdminConfig.Password); err != nil {
+		return fmt.Errorf("cannot create access token: %w", err)
+	}
+	return nil
 }
 
-func Init() {
-	go setup()
+func Init() error {
+	if err := setup(); err != nil {
+		return fmt.Errorf("cannot setup: %w", err)
+	}
+	return nil
 }

@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -13,15 +14,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var ctx, _ = context.WithTimeout(context.Background(), time.Duration(configs.KatanaConfig.TimeOut)*time.Second)
-var client, err = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+configs.MongoConfig.Username+":"+configs.MongoConfig.Password+"@"+utils.GetKatanaLoadbalancer()+":27017/?directConnection=true&appName=mongosh+"+configs.MongoConfig.Version))
-var link = client.Database(projectDatabase)
+var ctx context.Context
+var client *mongo.Client
+var link *mongo.Database
 
-func setupAdmin() {
+func setupAdmin() error {
 	adminUser := configs.AdminConfig
 	pwd, err := utils.HashPassword(adminUser.Password)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("cannot hash password: %w", err)
 	}
 
 	admin := types.AdminUser{
@@ -30,25 +31,37 @@ func setupAdmin() {
 	}
 
 	if _, err = AddAdmin(context.Background(), admin); err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("cannot add admin: %w", err)
 	} else {
 		log.Printf("admin privileges have been given to username: %s", admin.Username)
+		return nil
 	}
 }
 
-func setup() {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(configs.KatanaConfig.TimeOut)*time.Second)
-	defer cancel()
-	err = client.Ping(ctx, nil)
-	if err != nil {
-		log.Println("MongoDB connection was not established")
-		log.Println("Error: ", err)
-		time.Sleep(time.Duration(configs.KatanaConfig.TimeOut) * time.Second)
-		setup()
-	} else {
-		log.Println("MongoDB Connection Established")
-		setupAdmin()
+func setup() error {
+	for i := 0; i < 10; i++ {
+		log.Printf("Trying to connect to MongoDB, attempt %d", i+1)
+		ctx, _ = context.WithTimeout(context.Background(), time.Duration(configs.KatanaConfig.TimeOut)*time.Second)
+		var err error
+		client, err = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+configs.MongoConfig.Username+":"+configs.MongoConfig.Password+"@"+utils.GetKatanaLoadbalancer()+":27017/?directConnection=true&appName=mongosh+"+configs.MongoConfig.Version))
+		if err != nil {
+			return fmt.Errorf("cannot connect to mongo: %w", err)
+		}
+		link = client.Database(projectDatabase)
+		err = client.Ping(ctx, nil)
+		if err != nil {
+			log.Println("MongoDB connection was not established")
+			log.Println("Error: ", err)
+			time.Sleep(time.Duration(configs.KatanaConfig.TimeOut) * time.Second)
+		} else {
+			log.Println("MongoDB Connection Established")
+			if err := setupAdmin(); err != nil {
+				return fmt.Errorf("cannot setup admin: %w", err)
+			}
+			return nil
+		}
 	}
+	return fmt.Errorf("cannot connect to mongo")
 }
 
 func Test() {
@@ -60,6 +73,9 @@ func Test() {
 	log.Println(res)
 }
 
-func Init() {
-	go setup()
+func Init() error {
+	if err := setup(); err != nil {
+		return err
+	}
+	return nil
 }
