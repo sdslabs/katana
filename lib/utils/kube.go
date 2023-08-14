@@ -236,11 +236,11 @@ func DeploymentConfig() types.ManifestConfig {
 	return config
 }
 
-func PodExecutor(command []string, kubeClientset *kubernetes.Clientset, kubeConfig *rest.Config, podName string, podNamespace string) string {
+func Podexecutor(command []string, kubeClientset *kubernetes.Clientset, kubeConfig *rest.Config, podNamespace string) {
 	req := kubeClientset.CoreV1().RESTClient().Post().
 		Resource("pods").
-		Name(podName).
-		Namespace(podNamespace).
+		Name("katana-team-master-pod-0").
+		Namespace(podNamespace + "-ns").
 		SubResource("exec")
 	req.VersionedParams(&corev1.PodExecOptions{
 		Command: command,
@@ -249,20 +249,19 @@ func PodExecutor(command []string, kubeClientset *kubernetes.Clientset, kubeConf
 		Stderr:  true,
 		TTY:     false,
 	}, scheme.ParameterCodec)
-	exec, err := remotecommand.NewSPDYExecutor(kubeConfig, http.MethodPost, req.URL())
+	exec, err := remotecommand.NewSPDYExecutor(kubeConfig, "POST", req.URL())
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	stdout, stderr := &bytes.Buffer{}, &bytes.Buffer{}
+	var stdout, stderr bytes.Buffer
 	err = exec.Stream(remotecommand.StreamOptions{
-		Stdout: stdout,
-		Stderr: stderr,
+		Stdout: &stdout,
+		Stderr: &stderr,
+		Tty:    false,
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
-	return stdout.String()
 }
 
 func DeleteDaemonSetAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *rest.Config, daemonSetName string, daemonSetNamespace string) {
