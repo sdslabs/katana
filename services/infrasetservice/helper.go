@@ -57,6 +57,7 @@ func createTeamCredentials(teamNumber int) (string, types.CTFTeam) {
 		Name:     podNamespace,
 		PodName:  podName,
 		Password: hashed,
+		Score: 0,
 	}
 	mysql.CreateGogsUser(team.Name, pwd)
 	mysql.CreateAccessToken(team.Name, pwd)
