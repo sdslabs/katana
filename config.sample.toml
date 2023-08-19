@@ -1,6 +1,6 @@
 kubeconfig = ""
 kubehost = "0.0.0.0"
-backendurl = "http://52.172.254.231:15528"
+backendurl = "http://127.0.0.1:15528"
 kubenamespace = "default"
 timeout = 20 # in seconds
 

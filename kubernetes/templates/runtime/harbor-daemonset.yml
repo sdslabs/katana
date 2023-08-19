@@ -4,8 +4,9 @@ metadata:
   name: setup-script
   namespace: kube-system
 data:
+# To add in setup script: systemctl restart containerd &&
   setup.sh: |
-    echo "$TRUSTED_CERT" > /usr/local/share/ca-certificates/ca.crt && update-ca-certificates && systemctl restart containerd &&
+    echo "$TRUSTED_CERT" > /usr/local/share/ca-certificates/ca.crt && update-ca-certificates &&
     if grep -q "harbor.katana.local" /etc/hosts; then
       echo "Updating entry in /etc/hosts"
       current_ip=$(grep "harbor.katana.local" /etc/hosts | awk '{print $1}')

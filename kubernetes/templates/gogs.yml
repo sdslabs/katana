@@ -13,7 +13,7 @@ spec:
   capacity:
     storage: 2Gi
   local:
-    path: /data/gogs
+    path: /mnt/gogs
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -71,14 +71,14 @@ spec:
               value: "false"
           volumeMounts:
             - name: gogs-persistent-storage
-              mountPath: /data
+              mountPath: /mnt
           lifecycle:
             postStart:
               exec:
                 command:
                   - /bin/sh
                   - -c
-                  - nohup sh -c "if [ ! -f /data/gogs/conf/app.ini ]; then while [ ! -f /data/gogs/conf/app.ini ]; do sleep 1; done; sleep 10; echo 'LOCAL_NETWORK_ALLOWLIST = *' >> /data/gogs/conf/app.ini; kill 1; fi" > /dev/null 2>&1 &
+                  - nohup sh -c "if [ ! -f /mnt/gogs/conf/app.ini ]; then while [ ! -f /mnt/gogs/conf/app.ini ]; do sleep 1; done; sleep 10; echo 'LOCAL_NETWORK_ALLOWLIST = *' >> /mnt/gogs/conf/app.ini; kill 1; fi" > /dev/null 2>&1 &
       volumes:
         - name: gogs-persistent-storage
           persistentVolumeClaim:

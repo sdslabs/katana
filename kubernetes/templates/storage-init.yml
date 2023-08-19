@@ -13,7 +13,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   local:
-    path: "/data"
+    path: "/mnt"
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -45,14 +45,14 @@ spec:
   containers:
   - name: create-data-dirs
     image: busybox
-    command: ["sh", "-c", "mkdir /data/gogs /data/mysql /data/mongo && sleep infinity"]
+    command: ["sh", "-c", "mkdir /mnt/gogs /mnt/mysql /mnt/mongo && sleep infinity"]
     volumeMounts:
-    - mountPath: "/data"
+    - mountPath: "/mnt"
       name: setup-volume
     lifecycle:
       preStop:
         exec:
-          command: ["sh", "-c", "rm -rf /data/gogs /data/mysql /data/mongo"]
+          command: ["sh", "-c", "rm -rf /mnt/gogs /mnt/mysql /mnt/mongo"]
   volumes:
   - name: setup-volume
     persistentVolumeClaim:
