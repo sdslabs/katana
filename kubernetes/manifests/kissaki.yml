@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kissaki-pv
+  namespace: katana
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  hostPath:
+    path: /data/kissaki-pv
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kissaki-pvc
+  namespace: katana
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: standard
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kissaki
+  namespace: katana
+  annotations:
+    tick: "false"
+spec:
+  selector:
+    matchLabels:
+      app: kissaki
+  serviceName: kissaki-svc
+  replicas: 1
+  template:
+    metadata:
+      namespace: katana
+      labels:
+        app: kissaki
+    spec:
+      serviceAccountName: cluster-admin
+      containers:
+        - name: kissaki
+          image: harbor.katana.local/katana/kissaki
+          ports:
+            - containerPort: 80
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        namespace: katana
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kissaki-svc
+  namespace: katana
+spec:
+  selector:
+    app: kissaki
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
