@@ -147,7 +147,7 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 		log.Fatal(err, " :unable to read image build response")
 	}
 	defer imageBuildResponse.Body.Close()
-
+	os.Remove(tarName)
 	DockerLogin(configs.KatanaConfig.Harbor.Username, configs.KatanaConfig.Harbor.Password)
 	log.Println("Pushing Docker image to Docker Hub, please wait...")
 
