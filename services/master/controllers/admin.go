@@ -10,3 +10,7 @@ func HelloAdmin(c *fiber.Ctx) error {
 	msg := fmt.Sprintf("Hello, admin %s 👋!", c.Params("name"))
 	return c.SendString(msg)
 }
+
+func Test() {
+
+}
