@@ -42,7 +42,6 @@ func Server() error {
 	admin := api.Group("/admin")
 	admin.Get("/echo/:name", c.HelloAdmin)
 	admin.Get("/infraSet", infraSetService.InfraSet)
-	admin.Get("/test", infraSetService.InfraSet)
 	admin.Get("/db", infraSetService.DB)
 	admin.Post("/login", infraSetService.Login)
 	admin.Get("/createTeams", infraSetService.CreateTeams)
