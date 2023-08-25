@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"log"
+	"os"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/registry"
@@ -12,21 +14,51 @@ import (
 	"github.com/sdslabs/katana/configs"
 )
 
+func DockerLogin(username string, password string) {
+
+	log.Println("Logging into Harbor, Please wait...")
+
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		log.Fatal("Error creating Docker client:", err)
+		return
+	}
+
+	authConfig := registry.AuthConfig{
+		Username:      username,
+		Password:      password,
+		ServerAddress: "harbor.katana.local",
+	}
+
+	_, err = cli.RegistryLogin(context.Background(), authConfig)
+	if err != nil {
+		log.Printf("Error during login: %s\n", err)
+		return
+	}
+	if err != nil {
+		log.Fatal(err, " :unable to read push response")
+		return
+	}
+
+	log.Println("Logged into Harbor successfully")
+}
+
 func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 	buf := new(bytes.Buffer)
 	if err := Tar(_DockerfilePath, buf); err != nil {
 		log.Fatal(err, ": error tarring directory")
 		return
 	}
-	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+
 	log.Println("Building Docker image, Please wait......")
+
 	imageBuildResponse, err := cli.ImageBuild(
-		ctx,
+		context.Background(),
 		buf,
 		types.ImageBuildOptions{
 			Dockerfile: "Dockerfile",
@@ -39,9 +71,16 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 		return
 	}
 
-	defer imageBuildResponse.Body.Close()
+	_, err = io.Copy(os.Stdout, imageBuildResponse.Body)
+	if err != nil {
+		log.Fatal(err, " :unable to read image build response")
+		return
+	}
+
 	log.Println("Docker image built successfully")
+
 	DockerLogin(configs.KatanaConfig.Harbor.Username, configs.KatanaConfig.Harbor.Password)
+
 	log.Println("Pushing Docker image to Harbor, please wait...")
 
 	authConfig := registry.AuthConfig{
@@ -60,52 +99,23 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 		RegistryAuth: encodedAuth,
 	}
 
-	pushResponse, err := cli.ImagePush(ctx, "harbor.katana.local/katana/"+_ChallengeName, pushOptions)
+	_, err = cli.ImagePush(context.Background(), "harbor.katana.local/katana/"+_ChallengeName, pushOptions)
 	if err != nil {
 		log.Fatal(err, " :unable to push docker image")
 		return
 	}
-	defer pushResponse.Close()
 
-}
+	log.Println("Image Pushed to Harbor successfully")
 
-func DockerLogin(username string, password string) {
-	log.Println("Logging into Harbor, Please wait...")
-
-	ctx := context.Background()
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		log.Fatal("Error creating Docker client:", err)
-		return
-	}
-
-	authConfig := registry.AuthConfig{
-		Username:      username,
-		Password:      password,
-		ServerAddress: "harbor.katana.local",
-	}
-
-	_, err = cli.RegistryLogin(ctx, authConfig)
-	if err != nil {
-		log.Printf("Error during login: %s\n", err)
-		return
-	}
-	if err != nil {
-		log.Fatal(err, " :unable to read push response")
-		return
-	}
-
-	log.Println("Logged into Harbor successfully")
 }
 
 func DockerImageExists(imageName string) bool {
-	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		log.Fatal("Error: ", err)
 		return false
 	}
 
-	_, _, err = cli.ImageInspectWithRaw(ctx, "harbor.katana.local/katana/"+imageName)
+	_, _, err = cli.ImageInspectWithRaw(context.Background(), "harbor.katana.local/katana/"+imageName)
 	return err == nil
 }
