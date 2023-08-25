@@ -14,7 +14,7 @@ import (
 	"github.com/sdslabs/katana/configs"
 )
 
-func DockerLogin(username string, password string) {
+func dockerLogin(username string, password string) {
 
 	log.Println("Logging into Harbor, Please wait...")
 
@@ -79,7 +79,7 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 
 	log.Println("Docker image built successfully")
 
-	DockerLogin(configs.KatanaConfig.Harbor.Username, configs.KatanaConfig.Harbor.Password)
+	dockerLogin(configs.KatanaConfig.Harbor.Username, configs.KatanaConfig.Harbor.Password)
 
 	log.Println("Pushing Docker image to Harbor, please wait...")
 

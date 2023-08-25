@@ -39,7 +39,5 @@ func SetupHarbor() error {
 		return err
 	}
 
-	// utils.DockerLogin(configs.KatanaConfig.Harbor.Username, configs.KatanaConfig.Harbor.Password)
-
 	return nil
 }
