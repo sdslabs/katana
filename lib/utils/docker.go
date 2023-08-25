@@ -35,11 +35,6 @@ func dockerLogin(username string, password string) {
 		log.Printf("Error during login: %s\n", err)
 		return
 	}
-	if err != nil {
-		log.Fatal(err, " :unable to read push response")
-		return
-	}
-
 	log.Println("Logged into Harbor successfully")
 }
 
