@@ -135,12 +135,12 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	if err != nil {
 		log.Println("Error pulling changes:", err)
 	}
-
+	katanaDir, err := utils.GetKatanaRootPath()
 	imageName := strings.Replace(dir, "/", "-", -1)
 
 	log.Println("Pull successful for", teamName, ". Building image...")
 	firstPatch := !utils.DockerImageExists(imageName)
-	utils.BuildDockerImage(imageName, "./teams/"+dir)
+	utils.BuildDockerImage(imageName, katanaDir+"/teams/"+dir)
 
 	if firstPatch {
 		log.Println("First Patch for", teamName)

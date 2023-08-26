@@ -51,7 +51,7 @@ spec:
       containers:
         - image: mongo
           name: mongo
-          args: ["--dbpath", "/mnt/db"]
+          args: ["--dbpath", "/data/db"]
           livenessProbe:
             exec:
               command:
@@ -87,7 +87,7 @@ spec:
                   key: password
           volumeMounts:
             - name: "mongo-data-dir"
-              mountPath: "/mnt/db"
+              mountPath: "/data/db"
           ports:
             - name: mongo-port
               containerPort: 27017

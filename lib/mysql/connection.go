@@ -41,13 +41,13 @@ func setup() error {
 
 func setupGogs() error {
 	if err := CreateDatabase(gogsDatabase); err != nil {
-		return fmt.Errorf("cannot create database: %w", err)
+		fmt.Errorf("cannot create database: %w", err)
 	}
 	if err := CreateGogsAdmin(configs.AdminConfig.Username, configs.AdminConfig.Password); err != nil {
-		return fmt.Errorf("cannot create gogs admin: %w", err)
+		fmt.Errorf("cannot create gogs admin: %w", err)
 	}
 	if err := CreateAccessToken(configs.AdminConfig.Username, configs.AdminConfig.Password); err != nil {
-		return fmt.Errorf("cannot create access token: %w", err)
+		fmt.Errorf("cannot create access token: %w", err)
 	}
 	return nil
 }

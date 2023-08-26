@@ -3,7 +3,6 @@ package harbor
 import (
 	"log"
 
-	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
 )
 
@@ -39,8 +38,6 @@ func SetupHarbor() error {
 	if err := deployHarborClusterDaemonSet(); err != nil {
 		return err
 	}
-
-	utils.DockerLogin(configs.KatanaConfig.Harbor.Username, configs.KatanaConfig.Harbor.Password)
 
 	return nil
 }
