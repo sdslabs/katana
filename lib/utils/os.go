@@ -70,7 +70,7 @@ func RunCommand(cmd string) error {
 	return nil
 }
 
-func GetPath() (string, error) {
+func GetKatanaRootPath() (string, error) {
 	katanaDir, err := os.Getwd()
 	if err != nil {
 		fmt.Println("Error:", err)

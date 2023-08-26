@@ -71,3 +71,20 @@ func TestTar(t *testing.T) {
 		assert.Equal(t, sampleFileName, fileName)
 	}
 }
+
+func TestGetKatanaRootPath(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	originalDir, _ := os.Getwd()
+	defer os.Chdir(originalDir)
+	os.Chdir(tmpDir)
+
+	result, err := GetKatanaRootPath()
+	if err != nil {
+		t.Errorf("Expected no error, but got: %v", err)
+	}
+
+	if result != tmpDir {
+		t.Errorf("Expected result: %s, but got: %s", tmpDir, result)
+	}
+}
