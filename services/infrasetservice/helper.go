@@ -94,7 +94,8 @@ func envVariables(gogs string, pwd string, podNamespace string) {
 }
 
 func buildKatanaServices() {
-	katanaServicesDir := "./katana-services"
+	katanaDir, err := utils.GetPath()
+	katanaServicesDir := katanaDir + "/katana-services"
 
 	services, err := os.ReadDir(katanaServicesDir)
 	if err != nil {

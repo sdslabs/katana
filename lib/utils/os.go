@@ -40,7 +40,7 @@ func Tar(src string, writers ...io.Writer) error {
 			return err
 		}
 
-		header.Name = strings.TrimPrefix("./"+file, src+string(filepath.Separator))
+		header.Name = strings.TrimPrefix(file, src+string(filepath.Separator))
 		if err := tw.WriteHeader(header); err != nil {
 			return err
 		}
@@ -68,4 +68,13 @@ func RunCommand(cmd string) error {
 	}
 
 	return nil
+}
+
+func GetPath() (string, error) {
+	katanaDir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return "", nil
+	}
+	return katanaDir, nil
 }
