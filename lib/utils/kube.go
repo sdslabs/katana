@@ -3,6 +3,8 @@ package utils
 import (
 	"bytes"
 	"context"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -170,6 +172,85 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 	log.Println("File copied successfully")
 	return nil
 }
+
+func CopyTarIntoPod(podName string, containerName string, pathInPod string, tarData io.Reader, ns ...string) error {
+	config, err := GetKubeConfig()
+	if err != nil {
+		return err
+	}
+
+	client, err := GetKubeClient()
+	if err != nil {
+		return err
+	}
+
+	namespace := "katana"
+	if len(ns) > 0 {
+		namespace = ns[0]
+	}
+
+	pod, err := client.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
+	if err != nil {
+		log.Printf("Error getting pod: %s\n", err)
+		return err
+	}
+
+	// Find the container in the pod
+	var container *corev1.Container
+	for _, c := range pod.Spec.Containers {
+		if c.Name == containerName {
+			container = &c
+			break
+		}
+	}
+
+	if container == nil {
+		log.Printf("Container not found in pod\n")
+		return fmt.Errorf("Container not found in pod")
+	}
+
+	// Create a stream to the container
+	req := client.CoreV1().RESTClient().Post().
+		Resource("pods").
+		Name(podName).
+		Namespace(namespace).
+		SubResource("exec").
+		Param("container", containerName)
+
+	req.VersionedParams(&corev1.PodExecOptions{
+		Container: containerName,
+		Command:   []string{"bash", "-c", "tar xzf - -C " + pathInPod},
+		Stdin:     true,
+		Stdout:    true,
+		Stderr:    true,
+		TTY:       false,
+	}, scheme.ParameterCodec)
+
+	exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
+	if err != nil {
+		log.Printf("Error creating executor: %s\n", err)
+		return err
+	}
+
+	// Stream the tar data into the pod
+	err = exec.Stream(remotecommand.StreamOptions{
+		Stdin:  tarData,
+		Stdout: os.Stdout,
+		Stderr: os.Stderr,
+		Tty:    false,
+	})
+	if err != nil {
+		log.Printf("Error streaming the tar data : %s\n", err)
+		return err
+	} else {
+		log.Println("Tar data copied and extracted successfully ")
+		return nil
+
+	}
+
+}
+
+
 
 func GetKatanaLoadbalancer() string {
 	client, err := GetKubeClient()

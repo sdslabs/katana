@@ -5,16 +5,77 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"io"
 
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
 	v1 "k8s.io/api/core/v1"
+
+	"archive/tar"
+	"compress/gzip"
+	"path/filepath"
+
 )
 
-func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType string) error {
-	localFilePath := dirPath + "/" + challengeName + ".tar.gz"
+func copyChallengeIntoTsuka(tarData io.Reader, challengeName string, challengeType string) error {
+	log.Println("check1")
+	
+	// localFilePath := dirPath + "/subfolders/" + challengeName + ".tar.gz"
+	pathInPod := "/opt/katana/katana_" + challengeType + "_" + challengeName + ".tar.gz"
+	
+	filename := challengeName
+
+	// Get pods from different namespaces
+	var pods []v1.Pod
+	numberOfTeams := utils.GetTeamNumber()
+	for i := 0; i < numberOfTeams; i++ {
+		path := "katana-team-" + fmt.Sprint(i) + "/" + filename
+		err := os.Mkdir("teams/"+path, 0755)
+		if err != nil {
+			log.Println(err)
+		}
+		git.PlainInit("teams/"+path, false)
+		repo, err := git.PlainOpen("teams/" + path)
+		if err != nil {
+			log.Println(err)
+		}
+		remoteConfig := &config.RemoteConfig{
+			Name: "origin",
+			URLs: []string{"http://sdslabs@" + utils.GetKatanaLoadbalancer() + ":3000" + "/" + path}}
+		_, err = repo.CreateRemote(remoteConfig)
+
+		if err != nil {
+			log.Println(err)
+		}
+		podsInTeam, err := utils.GetPods(map[string]string{
+			"app": g.ClusterConfig.TeamLabel,
+		}, "katana-team-"+fmt.Sprint(i)+"-ns")
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+		pods = append(pods, podsInTeam...)
+	}
+	// Loop over pods
+	for _, pod := range pods {
+		// Copy file into pod
+		
+		if err := utils.CopyTarIntoPod(pod.Name, g.TeamVmConfig.ContainerName, pathInPod, tarData, pod.Namespace); err != nil {
+			log.Println(err)
+			return err
+		}
+
+		
+	}
+	
+	return nil
+}
+
+
+func copyChallengeIntoTsukaOriginal(dirPath string, challengeName string, challengeType string) error {
+	localFilePath := dirPath +"/"+ challengeName + ".tar.gz"
 	pathInPod := "/opt/katana/katana_" + challengeType + "_" + challengeName + ".tar.gz"
 	log.Println("Testing" + localFilePath + "....and..." + pathInPod)
 
@@ -66,6 +127,40 @@ func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType 
 
 	return nil
 }
+
+func createTarGz(sourceDir, targetDir, targetFileName string) error {
+	// Create the target directory if it doesn't exist
+	if err := os.MkdirAll(targetDir, os.ModePerm); err != nil {
+		return err
+	}
+
+	// Construct the full target file path
+	targetFile := filepath.Join(targetDir, targetFileName)
+
+	// Create the output file
+	outputFile, err := os.Create(targetFile)
+	if err != nil {
+		return err
+	}
+	defer outputFile.Close()
+
+	// Create a gzip writer
+	gzipWriter := gzip.NewWriter(outputFile)
+	defer gzipWriter.Close()
+
+	// Create a tar writer
+	tarWriter := tar.NewWriter(gzipWriter)
+	defer tarWriter.Close()
+
+	// Rest of your existing code for walking through the source directory and adding files
+
+	// (No changes needed here)
+
+	return nil
+}
+
+
+
 
 func createServiceForChallenge(challengeName, teamName string, targetPort int32, teamNumber int) (string, error) {
 	kubeclient, _ := utils.GetKubeClient()
