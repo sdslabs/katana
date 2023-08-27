@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kashira
+  namespace: katana
+  annotations:
+    tick: "false"
+spec:
+  selector:
+    matchLabels:
+      app: kashira
+  serviceName: kashira-svc
+  replicas: 1
+  template:
+    metadata:
+      namespace: katana
+      labels:
+        app: kashira
+    spec:
+      serviceAccountName: cluster-admin
+      containers:
+        - name: kashira
+          image: harbor.katana.local/katana/kashira
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: kashira-data
+              mountPath: /opt/kashira/flag-data
+  volumeClaimTemplates:
+    - metadata:
+        name: kashira-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kashira-svc
+  namespace: katana
+spec:
+  selector:
+    app: kashira
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
