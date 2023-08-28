@@ -9,6 +9,7 @@ require (
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/gofiber/fiber/v2 v2.48.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/mholt/archiver/v3 v3.5.1
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/sirupsen/logrus v1.9.3

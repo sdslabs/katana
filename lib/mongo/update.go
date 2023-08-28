@@ -11,7 +11,3 @@ func UpdateOne(ctx context.Context, collectionName string, filter bson.M, data i
 	collection := link.Collection(collectionName)
 	return collection.FindOneAndUpdate(ctx, filter, bson.M{"$set": data}, option).Err()
 }
-
-func UpsertOne(ctx context.Context, collectionName string, filter bson.M, data interface{}) error {
-	return UpdateOne(ctx, collectionName, filter, data, options.FindOneAndUpdate().SetUpsert(true))
-}

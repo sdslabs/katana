@@ -20,17 +20,13 @@ var link *mongo.Database
 
 func setupAdmin() error {
 	adminUser := configs.AdminConfig
-	pwd, err := utils.HashPassword(adminUser.Password)
-	if err != nil {
-		return fmt.Errorf("cannot hash password: %w", err)
-	}
-
+	pwd:= utils.SHA256(adminUser.Password)
 	admin := types.AdminUser{
 		Username: adminUser.Username,
 		Password: pwd,
 	}
 
-	if _, err = AddAdmin(context.Background(), admin); err != nil {
+	if _, err := AddAdmin(context.Background(), admin); err != nil {
 		return fmt.Errorf("cannot add admin: %w", err)
 	} else {
 		log.Printf("admin privileges have been given to username: %s", admin.Username)

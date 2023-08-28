@@ -35,7 +35,7 @@ metadata:
   name: cluster-admin-role
   namespace: katana
 rules:
-  - apiGroups: ["apps"]
+  - apiGroups: ["apps",""]
     resources:
       ["pods", "pods/exec", "services", "statefulsets", "statefulsets/scale"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]

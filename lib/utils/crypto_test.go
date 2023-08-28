@@ -104,23 +104,20 @@ func TestHashPassword(t *testing.T) {
 func TestCompareHashWithPassword(t *testing.T) {
 	// Generate a hash from a password
 	password := "myStrongPassword123"
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
-	if err != nil {
-		t.Fatalf("Error generating hash: %v", err)
-	}
+	hashedPassword := SHA256(password)
 
 	// Test case 1: Hash matches the original password
-	if !CompareHashWithPassword(string(hashedPassword), password) {
+	if !CompareHashWithPassword(hashedPassword, password) {
 		t.Error("Hash and password should match")
 	}
 
 	// Test case 2: Hash does not match the original password
-	if CompareHashWithPassword(string(hashedPassword), "wrongPassword") {
+	if CompareHashWithPassword(hashedPassword, "wrongPassword") {
 		t.Error("Hash and wrong password should not match")
 	}
 
 	// Test case 3: Empty password
-	if CompareHashWithPassword(string(hashedPassword), "") {
+	if CompareHashWithPassword(hashedPassword, "") {
 		t.Error("Hash and empty password should not match")
 	}
 }

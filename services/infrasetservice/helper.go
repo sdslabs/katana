@@ -45,10 +45,7 @@ func createTeamCredentials(teamNumber int) (string, types.CTFTeam) {
 	podName := teamlabels + "-team-master-pod-0"
 	gogs := utils.GetKatanaLoadbalancer() + ":3000"
 	pwd := utils.RandomString(configs.SSHProviderConfig.PasswordLen)
-	hashed, err := utils.HashPassword(pwd)
-	if err != nil {
-		log.Fatal(err)
-	}
+	hashed := utils.SHA256(pwd)
 	podNamespace := "katana-team-" + fmt.Sprint(teamNumber)
 	// start watching for container events
 	go envVariables(gogs, pwd, podNamespace)
@@ -57,6 +54,8 @@ func createTeamCredentials(teamNumber int) (string, types.CTFTeam) {
 		Name:     podNamespace,
 		PodName:  podName,
 		Password: hashed,
+		Score: 0,
+		Challenges: []types.Challenge{},
 	}
 	mysql.CreateGogsUser(team.Name, pwd)
 	mysql.CreateAccessToken(team.Name, pwd)

@@ -74,10 +74,13 @@ func HashPassword(password string) (string, error) {
 }
 
 func CompareHashWithPassword(hashedPassword, password string) bool {
-	hash := []byte(hashedPassword)
-	pass := []byte(password)
-	err := bcrypt.CompareHashAndPassword(hash, pass)
-	return err == nil
+	
+	pass := SHA256(password)
+	if pass == hashedPassword {
+		return true;
+	}else{
+		return false
+	}
 }
 
 // EncodePassword encodes password using PBKDF2 SHA256 with given salt.
