@@ -16,7 +16,7 @@ type CTFTeam struct {
 }
 
 type Challenge struct {
-	ChallengeName string  `json:"ChallengeName"`
+	ChallengeName string  `json:"challengename"`
 	Uptime        float64 `json:"uptime"`
 	Attacks       int     `json:"attacks"`
 	Defences      int     `json:"defences"`

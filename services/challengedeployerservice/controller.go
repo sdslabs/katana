@@ -15,6 +15,7 @@ import (
 	archiver "github.com/mholt/archiver/v3"
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
+	"github.com/sdslabs/katana/lib/mongo"
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -78,6 +79,19 @@ func DeployChallenge(c *fiber.Ctx) error {
 			for i := 0; i < int(numberOfTeams); i++ {
 				log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
 				teamName := "katana-team-" + strconv.Itoa(i)
+				challenge := types.Challenge{
+					ChallengeName: folderName,
+					Uptime:        0,
+					Attacks:       0,
+					Defences:      0,
+					Points:        0,
+					Flag:          "flag{test}",
+				}
+				err := mongo.AddChallenge(challenge, teamName)
+				if err != nil {
+					fmt.Println("Error in adding challenge to mongo")
+					log.Println(err)
+				}
 				deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
 				url, err := createServiceForChallenge(folderName, teamName, 3000, i)
 				if err != nil {
