@@ -19,6 +19,7 @@ type Challenge struct {
 	ChallengeName string  `json:"ChallengeName"`
 	Uptime        float64 `json:"uptime"`
 	Attacks       int     `json:"attacks"`
-	Defenses      int     `json:"defenses"`
+	Defences      int     `json:"defences"`
 	Flag          string  `json:"flag"`
+	Points		  int     `json:"points"`
 }
