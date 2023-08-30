@@ -23,6 +23,7 @@ import (
 	"github.com/sdslabs/katana/lib/mongo"
 	"github.com/sdslabs/katana/lib/mysql"
 	utils "github.com/sdslabs/katana/lib/utils"
+	"github.com/sdslabs/katana/lib/wireguard"
 	"github.com/sdslabs/katana/types"
 )
 
@@ -43,6 +44,12 @@ func InfraSet(c *fiber.Ctx) error {
 		return err
 	}
 	if err = BuildKatanaServices(); err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	err = wireguard.SetupWireguard()
+	if err != nil {
 		log.Fatal(err)
 		return err
 	}

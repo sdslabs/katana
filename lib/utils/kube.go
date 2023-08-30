@@ -144,6 +144,7 @@ func DeploymentConfig() types.ManifestConfig {
 		HarborCrt:         "",
 		HarborCaCrt:       "",
 		HarborIP:          "",
+		WireguardIP:       "",
 		NodeAffinityValue: "",
 	}
 

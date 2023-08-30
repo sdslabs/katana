@@ -20,6 +20,7 @@ func GenerateCertsforHarbor() error {
 	path, _ := os.Getwd()
 	path = path + "/lib/harbor/certs"
 
+	log.Println("CHECK 1")
 	// Delete the directory if it already exists
 	if _, err := os.Stat(path); os.IsExist(err) {
 		errDir := os.RemoveAll(path)
@@ -28,19 +29,20 @@ func GenerateCertsforHarbor() error {
 			return err
 		}
 	}
-
+	log.Println("CHECK 2")
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		errDir := os.Mkdir(path, 0755)
 		if errDir != nil {
 			log.Fatal(err)
 		}
 	}
-
+	log.Println("CHECK 3")
 	// Generate the certificates
 	if err := utils.GenerateCerts("harbor.katana.local", path); err != nil {
 		log.Fatal(err)
 		return err
 	}
+	log.Println("CHECK 4")
 	return nil
 }
 
