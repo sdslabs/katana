@@ -8,8 +8,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"bytes"
-
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/gofiber/fiber/v2"
@@ -19,10 +17,7 @@ import (
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"archive/tar"
-	"compress/gzip"
-	"io"
-	"path/filepath"
+    _ "unsafe"
 )
 
 func DeployChallenge(c *fiber.Ctx) error {
@@ -44,7 +39,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 			regex := regexp.MustCompile(pattern)
 			match := regex.FindStringSubmatch(file.Filename)
 			folderName = match[1]
-			log.Println(folderName +"check1")
+			log.Println(folderName)
 
 			response, challengePath := createFolder(folderName)
 			if response == 1 {
@@ -55,8 +50,8 @@ func DeployChallenge(c *fiber.Ctx) error {
 				return c.SendString("Issue with creating chall directory.Check permissions")
 			}
 
-            log.Println(file.Filename + "check2")
-			log.Println(challengePath + "check3")
+            log.Println(file.Filename)
+			log.Println(challengePath)
 			//save to disk in that directory
 			if err := c.SaveFile(file, fmt.Sprintf("./challenges/%s/%s", folderName, file.Filename)); err != nil {
 				return err
@@ -64,11 +59,6 @@ func DeployChallenge(c *fiber.Ctx) error {
 
 			//Create folder inside the challenge folder
 			err = os.Mkdir(challengePath+"/"+folderName, 0777)
-			if err != nil {
-				log.Println("Error in creating folder inside challenge folder")
-				return c.SendString("Error in creating folder inside challenge folder")
-			}
-			err = os.Mkdir(challengePath+ "/" + "subfolders", 0777)
 			if err != nil {
 				log.Println("Error in creating folder inside challenge folder")
 				return c.SendString("Error in creating folder inside challenge folder")
@@ -99,36 +89,19 @@ func DeployChallenge(c *fiber.Ctx) error {
 				}
 			}
 
-	// 		sourceDir := "./challenges" + "/" + folderName + "/" + folderName + "/" + folderName 
-	// targetDir := "./challenges" + "/" + folderName + "/" + "subfolders"
-	// targetFileName := folderName + ".tar.gz"
-
-	// error := createTarGz(sourceDir, targetDir, targetFileName)
-	// if error != nil {
-	// 	return error
-	// } 
-
-
-var tarBuffer bytes.Buffer
-error := Tar("/home/somya/katana/challenges/" + folderName + "/" + folderName + "/" + folderName, &tarBuffer)
-if error != nil {
-    log.Printf("Error creating tar data: %s\n", error)
-    return error
-}
-
-
-			//Copy challenge in pods and etc.
-			copyChallengeIntoTsuka(&tarBuffer ,folderName, challengeType)
+			copyChallengeIntoTsuka(challengePath,folderName, challengeType)
+			copyFlagGetterIntoKashira(challengePath,folderName, challengeType)
+			copyFlagSetterIntoKashira(challengePath,folderName, challengeType)
+			copyChallengeCheckerIntoKissaki(challengePath,folderName, challengeType)
+			
 			
 
 			return c.JSON(res)
 		}
 	}
 	log.Println("Ending")
-
 	return c.SendString("Wrong file")
 }
-
 
 
 func DeployChallengeOriginal(c *fiber.Ctx) error {
@@ -208,9 +181,6 @@ func DeployChallengeOriginal(c *fiber.Ctx) error {
 
 	return c.SendString("Wrong file")
 }
-
-
-
 
 func ChallengeUpdate(c *fiber.Ctx) error {
 	replicas := int32(1)
@@ -364,53 +334,4 @@ func DeleteChallenge(c *fiber.Ctx) error {
 	log.Println("Process completed")
 
 	return c.SendString("Deleted challenge" + challengeName + "in all namespaces.")
-}
-
-func Tar(src string, writers ...io.Writer) error {
-
-	if _, err := os.Stat(src); err != nil {
-		return fmt.Errorf("unable to tar files - %v", err.Error())
-	}
-
-	mw := io.MultiWriter(writers...)
-
-	gzw := gzip.NewWriter(mw)
-	defer gzw.Close()
-
-	tw := tar.NewWriter(gzw)
-	defer tw.Close()
-
-	return filepath.Walk(src, func(file string, fi os.FileInfo, err error) error {
-
-		if err != nil {
-			return err
-		}
-
-		if !fi.Mode().IsRegular() {
-			return nil
-		}
-
-		header, err := tar.FileInfoHeader(fi, fi.Name())
-		if err != nil {
-			return err
-		}
-
-		header.Name = strings.TrimPrefix(file, src+string(filepath.Separator))
-		if err := tw.WriteHeader(header); err != nil {
-			return err
-		}
-
-		f, err := os.Open(file)
-		if err != nil {
-			return err
-		}
-
-		if _, err := io.Copy(tw, f); err != nil {
-			return err
-		}
-
-		f.Close()
-
-		return nil
-	})
 }

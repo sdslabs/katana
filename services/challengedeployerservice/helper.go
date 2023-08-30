@@ -5,25 +5,16 @@ import (
 	"log"
 	"os"
 	"regexp"
-	"io"
-
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
 	v1 "k8s.io/api/core/v1"
-
-	"archive/tar"
-	"compress/gzip"
-	"path/filepath"
-
 )
 
-func copyChallengeIntoTsuka(tarData io.Reader, challengeName string, challengeType string) error {
-	log.Println("check1")
-	
-	// localFilePath := dirPath + "/subfolders/" + challengeName + ".tar.gz"
-	pathInPod := "/opt/katana/katana_" + challengeType + "_" + challengeName + ".tar.gz"
+func copyChallengeIntoTsuka(dirPath, challengeName string, challengeType string) error {
+	srcFilePath := dirPath +"/"+ challengeName + "/" + challengeName
+	pathInPod := "/opt/katana"
 	
 	filename := challengeName
 
@@ -62,12 +53,10 @@ func copyChallengeIntoTsuka(tarData io.Reader, challengeName string, challengeTy
 	for _, pod := range pods {
 		// Copy file into pod
 		
-		if err := utils.CopyTarIntoPod(pod.Name, g.TeamVmConfig.ContainerName, pathInPod, tarData, pod.Namespace); err != nil {
+		if err := utils.CopyTarIntoPodNew(pod.Name, g.TeamVmConfig.ContainerName, pathInPod, srcFilePath , pod.Namespace); err != nil {
 			log.Println(err)
 			return err
 		}
-
-		
 	}
 	
 	return nil
@@ -75,6 +64,7 @@ func copyChallengeIntoTsuka(tarData io.Reader, challengeName string, challengeTy
 
 
 func copyChallengeIntoTsukaOriginal(dirPath string, challengeName string, challengeType string) error {
+
 	localFilePath := dirPath +"/"+ challengeName + ".tar.gz"
 	pathInPod := "/opt/katana/katana_" + challengeType + "_" + challengeName + ".tar.gz"
 	log.Println("Testing" + localFilePath + "....and..." + pathInPod)
@@ -128,40 +118,6 @@ func copyChallengeIntoTsukaOriginal(dirPath string, challengeName string, challe
 	return nil
 }
 
-func createTarGz(sourceDir, targetDir, targetFileName string) error {
-	// Create the target directory if it doesn't exist
-	if err := os.MkdirAll(targetDir, os.ModePerm); err != nil {
-		return err
-	}
-
-	// Construct the full target file path
-	targetFile := filepath.Join(targetDir, targetFileName)
-
-	// Create the output file
-	outputFile, err := os.Create(targetFile)
-	if err != nil {
-		return err
-	}
-	defer outputFile.Close()
-
-	// Create a gzip writer
-	gzipWriter := gzip.NewWriter(outputFile)
-	defer gzipWriter.Close()
-
-	// Create a tar writer
-	tarWriter := tar.NewWriter(gzipWriter)
-	defer tarWriter.Close()
-
-	// Rest of your existing code for walking through the source directory and adding files
-
-	// (No changes needed here)
-
-	return nil
-}
-
-
-
-
 func createServiceForChallenge(challengeName, teamName string, targetPort int32, teamNumber int) (string, error) {
 	kubeclient, _ := utils.GetKubeClient()
 	serviceName := challengeName + "-svc"
@@ -211,4 +167,41 @@ func createFolder(challengeName string) (message int, challengePath string) {
 	}
 	//Successfully created directory
 	return 0, challengePath
+}
+
+func copyChallengeCheckerIntoKissaki(dirPath string, challengeName string, challengeType string) error {
+	srcFilePath := dirPath +"/"+ challengeName + "/" + challengeName + "_cc" 
+	pathInPod := "/opt/kissaki/challenge-data"
+
+	log.Println("Testing" + srcFilePath + "....and..." + pathInPod)
+		
+		if err := utils.CopyTarIntoPodNew("kissaki-0", "kissaki", pathInPod, srcFilePath, "katana"); err != nil {
+			log.Println(err)
+			return err
+		}
+	return nil
+}
+
+func copyFlagGetterIntoKashira(dirPath string, challengeName string, challengeType string) error {
+	srcFilePath := dirPath +"/"+ challengeName + "/" + challengeName + "_fg" 
+	pathInPod := "/opt/kashira/flag-data"
+	log.Println("Testing" + srcFilePath + "....and..." + pathInPod)
+		
+		if err := utils.CopyTarIntoPodNew("kashira-0", "kashira", pathInPod, srcFilePath, "katana"); err != nil {
+			log.Println(err)
+			return err
+		}
+	return nil
+}
+
+func copyFlagSetterIntoKashira(dirPath string, challengeName string, challengeType string) error {
+	srcFilePath := dirPath +"/"+ challengeName + "/" + challengeName + "_fs" 
+	pathInPod := "/opt/kashira/flag-data"
+	log.Println("Testing" + srcFilePath + "....and..." + pathInPod)
+		
+		if err := utils.CopyTarIntoPodNew("kashira-0", "kashira", pathInPod, srcFilePath, "katana"); err != nil {
+			log.Println(err)
+			return err
+		}
+	return nil
 }
