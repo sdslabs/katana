@@ -25,6 +25,7 @@ type ManifestConfig struct {
 	HarborCrt         string
 	HarborCaCrt       string
 	HarborIP          string
+	WireguardIP       string
 	NodeAffinityValue string
 }
 
