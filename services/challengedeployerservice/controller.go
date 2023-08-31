@@ -21,77 +21,8 @@ import (
 	"github.com/sdslabs/katana/types"
 )
 
-func Deploy(c *fiber.Ctx) error {
-	patch := false
-	replicas := int32(1)
-	challengeType := "web"
-	log.Println("Starting")
-
-	//Read folder challenge by os
-	dir, err := os.Open("./challenges")
-
-	//Loop over all subfolders in the challenge folder
-	if err != nil {
-		log.Println("Error in opening challenges folder")
-		return err
-	}
-	defer dir.Close()
-
-	//Read all challenges in the folder
-	fileInfos, err := dir.Readdir(-1)
-	if err != nil {
-		log.Println("Error in reading challenges folder")
-		return err
-	}
-
-	res := make([][]string, 0)
-
-	//Loop over all folders
-	for _, fileInfo := range fileInfos {
-		//Check if it is a directory
-		if fileInfo.IsDir() {
-			//Get the challenger name
-			folderName := fileInfo.Name()
-			log.Println("Folder name is : " + folderName)
-			//Update challenge path to be absolute path
-			challengePath, _ := os.Getwd()
-			challengePath = challengePath + "/challenges/" + folderName
-			log.Println("Challenge path is : " + challengePath)
-			log.Println(challengePath + "/" + folderName + "/" + folderName)
-
-			//Check if the folder has a Dockerfile
-			if _, err := os.Stat(challengePath + "/" + folderName + "/" + folderName); err != nil {
-				log.Println("Dockerfile not found in the " + folderName + " challenge folder. Please follow proper format.")
-			} else {
-				//Update challenge path to get dockerfile
-				err := utils.BuildDockerImage(folderName, challengePath+"/"+folderName+"/"+folderName)
-				if err != nil {
-					return err
-				}
-				clusterConfig := g.ClusterConfig
-				numberOfTeams := clusterConfig.TeamCount
-				for i := 0; i < int(numberOfTeams); i++ {
-					log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
-					teamName := "katana-team-" + strconv.Itoa(i)
-					deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
-					url, err := CreateServiceForChallenge(folderName, teamName, 3000, i)
-					if err != nil {
-						res = append(res, []string{teamName, err.Error()})
-					} else {
-						res = append(res, []string{teamName, url})
-					}
-				}
-			}
-			CopyChallengeIntoTsuka(challengePath, folderName, challengeType)
-			CopyFlagDataIntoKashira(challengePath, folderName)
-			CopyChallengeCheckerIntoKissaki(challengePath, folderName)
-		}
-	}
-	return c.JSON(res)
-}
-
 func DeployChallenge(c *fiber.Ctx) error {
-	challengeType := "web"
+	//challengeType := "web"
 	folderName := ""
 	patch := false
 	replicas := int32(1)

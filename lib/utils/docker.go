@@ -11,6 +11,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
+
 	"github.com/sdslabs/katana/configs"
 )
 
@@ -39,7 +40,12 @@ func dockerLogin(username string, password string) error {
 	return nil
 }
 
-func BuildDockerImage(_ChallengeName string, _DockerfilePath string) error {
+func CheckDockerfile(_DockerfilePath string) bool {
+	_, err := os.Stat(_DockerfilePath + "/Dockerfile")
+	return !os.IsNotExist(err)
+}
+
+func BuildDockerImage(_ChallengeName string, _DockerfilePath string)error {
 	buf := new(bytes.Buffer)
 	if err := Tar(_DockerfilePath, buf); err != nil {
 		log.Fatal(err, ": error tarring directory")
@@ -50,6 +56,10 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) error {
 		log.Fatal(err)
 		return err
 	}
+
+	log.Println(_ChallengeName)
+	log.Println("dfsdfsdfsdf")
+	log.Println(_DockerfilePath)
 
 	log.Println("Building Docker image, Please wait......")
 
