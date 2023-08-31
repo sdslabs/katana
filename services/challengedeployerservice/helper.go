@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strconv"
 
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
@@ -69,7 +70,7 @@ func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType 
 
 func createServiceForChallenge(challengeName, teamName string, targetPort int32, teamNumber int) (string, error) {
 	kubeclient, _ := utils.GetKubeClient()
-	serviceName := challengeName + "-svc"
+	serviceName := challengeName + "-svc-" + strconv.Itoa(teamNumber)
 	teamNamespace := teamName + "-ns"
 	port := int32(80)
 	selector := map[string]string{

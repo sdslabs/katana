@@ -20,9 +20,68 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+func Deploy(c *fiber.Ctx) error {
+	patch := false
+	replicas := int32(1)
+	log.Println("Starting")
+	//read folder challenge by os
+	dir, err := os.Open("./challenges")
+	//loop over all subfolders in the challenge folder
+	if err != nil {
+		log.Println("Error in opening challenges folder")
+		return err
+	}
+	defer dir.Close()
+	//Read all challenges in the folder
+	fileInfos, err := dir.Readdir(-1)
+	if err != nil {
+		log.Println("Error in reading challenges folder")
+		return err
+	}
+
+	res := make([][]string, 0)
+
+	//Loop over all folders
+	for _, fileInfo := range fileInfos {
+		//check if it is a directory
+		if fileInfo.IsDir() {
+			//Get the challenger name
+			folderName := fileInfo.Name()
+			log.Println("Folder name is : " + folderName)
+			//update challenge path to be absolute path
+			challengePath, _ := os.Getwd()
+			challengePath = challengePath + "/challenges/" + folderName
+			log.Println("Challenge path is : " + challengePath)
+			//check if the folder has a Dockerfile
+			if utils.CheckDockerfile(challengePath + "/" + folderName) {
+
+				//Update challenge path to get dockerfile
+				utils.BuildDockerImage(folderName, challengePath+"/"+folderName)
+
+				clusterConfig := g.ClusterConfig
+				numberOfTeams := clusterConfig.TeamCount
+				for i := 0; i < int(numberOfTeams); i++ {
+					log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
+					teamName := "katana-team-" + strconv.Itoa(i)
+					deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
+					url, err := createServiceForChallenge(folderName, teamName, 3000, i)
+					if err != nil {
+						res = append(res, []string{teamName, err.Error()})
+					} else {
+						res = append(res, []string{teamName, url})
+					}
+				}
+			} else {
+				log.Println("Dockerfile not found in the " + folderName + " challenge folder. Please follow proper format.")
+			}
+		}
+	}
+	return c.JSON(res)
+}
+
 func DeployChallenge(c *fiber.Ctx) error {
 
-	challengeType := "web"
+	//challengeType := "web"
 	folderName := ""
 	patch := false
 	replicas := int32(1)
@@ -88,7 +147,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 			}
 
 			//Copy challenge in pods and etc.
-			copyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			//copyChallengeIntoTsuka(challengePath, folderName, challengeType)
 
 			return c.JSON(res)
 		}
