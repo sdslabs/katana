@@ -90,8 +90,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 			}
 
 			copyChallengeIntoTsuka(challengePath,folderName, challengeType)
-			copyFlagGetterIntoKashira(challengePath,folderName, challengeType)
-			copyFlagSetterIntoKashira(challengePath,folderName, challengeType)
+			copyFlagDataIntoKashira(challengePath,folderName, challengeType)
 			copyChallengeCheckerIntoKissaki(challengePath,folderName, challengeType)
 			
 			

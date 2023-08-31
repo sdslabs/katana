@@ -14,7 +14,7 @@ import (
 
 func copyChallengeIntoTsuka(dirPath, challengeName string, challengeType string) error {
 	srcFilePath := dirPath +"/"+ challengeName + "/" + challengeName
-	pathInPod := "/opt/katana"
+	pathInPod := "/opt/katana/challenge"
 	
 	filename := challengeName
 
@@ -182,20 +182,8 @@ func copyChallengeCheckerIntoKissaki(dirPath string, challengeName string, chall
 	return nil
 }
 
-func copyFlagGetterIntoKashira(dirPath string, challengeName string, challengeType string) error {
-	srcFilePath := dirPath +"/"+ challengeName + "/" + challengeName + "_fg" 
-	pathInPod := "/opt/kashira/flag-data"
-	log.Println("Testing" + srcFilePath + "....and..." + pathInPod)
-		
-		if err := utils.CopyTarIntoPodNew("kashira-0", "kashira", pathInPod, srcFilePath, "katana"); err != nil {
-			log.Println(err)
-			return err
-		}
-	return nil
-}
-
-func copyFlagSetterIntoKashira(dirPath string, challengeName string, challengeType string) error {
-	srcFilePath := dirPath +"/"+ challengeName + "/" + challengeName + "_fs" 
+func copyFlagDataIntoKashira(dirPath string, challengeName string, challengeType string) error {
+	srcFilePath := dirPath +"/"+ challengeName + "/" + "flag_data" 
 	pathInPod := "/opt/kashira/flag-data"
 	log.Println("Testing" + srcFilePath + "....and..." + pathInPod)
 		
