@@ -3,14 +3,20 @@ package wireguard
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"html/template"
 	"log"
+	"os"
 	"path/filepath"
+	"strconv"
+	"time"
 
 	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/utils"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 func SetupWireguard() error {
@@ -37,8 +43,6 @@ func SetupWireguard() error {
 
 	wireguard_lbIP := service.Status.LoadBalancer.Ingress
 
-	//print the wireguard_lbIP
-	log.Println(wireguard_lbIP[0].IP)
 	deploymentConfig.WireguardIP = wireguard_lbIP[0].IP
 
 	if err := tmpl.Execute(manifest, deploymentConfig); err != nil {
@@ -49,5 +53,108 @@ func SetupWireguard() error {
 		return err
 	}
 
+	noOfTeams := int(configs.ClusterConfig.TeamCount)
+
+	configPath, err := os.Getwd()
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	configPath = configPath + "/peer_configs"
+	_, err = os.Stat(configPath)
+	if os.IsNotExist(err) {
+		err = os.MkdirAll(configPath, os.ModePerm)
+		if err != nil {
+			fmt.Printf("Error creating folder: %v\n", err)
+		} else {
+			fmt.Println("peer_configs folder created successfully.")
+		}
+	} else if err != nil {
+		fmt.Printf("Error checking folder existence: %v\n", err)
+	}
+
+	for i := 0; i < noOfTeams; i++ {
+		if err := GetConfigFiles(strconv.Itoa(i + 1)); err != nil {
+			return err
+		}
+	}
+
 	return nil
+}
+
+func GetConfigFiles(team_number string) error {
+
+	client, _ := utils.GetKubeClient()
+
+	deploymentNames := []string{
+		"wireguard-deployment",
+	}
+	namespace := "katana"
+
+	for _, deploymentName := range deploymentNames {
+		if err := utils.WaitForDeploymentReady(client, deploymentName, namespace); err != nil {
+			log.Printf("Error testing deployment '%s': %v\n", deploymentName, err)
+		}
+	}
+
+	//get pod in the wireguard deployment
+	pods, err := client.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: "app=wireguard",
+	})
+	if err != nil {
+		log.Printf("Error getting pod: %s\n", err)
+	}
+
+	wireguardPod := pods.Items[0]
+	wireguardContainer := wireguardPod.Spec.Containers[0]
+
+	pathInPod := "/config/peer" + team_number + "/peer" + team_number + ".conf"
+	localFilePath := "./peer_configs/peer" + team_number + ".conf"
+
+	//wait for container ready
+	time.Sleep(1 * time.Minute)
+	// if err := waitForContainerRunning(client, wireguardPod.Name, wireguardContainer.Name, namespace, 10*time.Minute); err != nil {
+	// 	log.Printf("Error waiting for container to become running: %v\n", err)
+	// }
+
+	if err := utils.CopyFromPod(wireguardPod.Name, wireguardContainer.Name, pathInPod, localFilePath, namespace); err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
+
+}
+
+// [WIP] : Replace time.Sleep with waitForContainerRunning
+func waitForContainerRunning(client *kubernetes.Clientset, podName, containerName, namespace string, timeout time.Duration) error {
+	startTime := time.Now()
+	for {
+		// Get the pod
+		pod, err := client.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
+		if err != nil {
+			return err
+		}
+
+		// Find the container in the pod
+		var containerStatus *corev1.ContainerStatus
+		for _, status := range pod.Status.ContainerStatuses {
+			if status.Name == containerName {
+				containerStatus = &status
+				break
+			}
+		}
+
+		if containerStatus != nil && containerStatus.State.Running != nil {
+			return nil // Container is in the "Running" state
+		}
+
+		// Check if the timeout has been reached
+		if time.Since(startTime) >= timeout {
+			return fmt.Errorf("timed out waiting for container to become running")
+		}
+
+		// Sleep for a while before checking again
+		time.Sleep(1 * time.Second) // Adjust the sleep duration as needed
+	}
 }

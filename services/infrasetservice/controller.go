@@ -43,6 +43,11 @@ func InfraSet(c *fiber.Ctx) error {
 		log.Fatal(err)
 		return err
 	}
+	err = wireguard.ApplyFirewall()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if err = BuildKatanaServices(); err != nil {
 		log.Fatal(err)
 		return err
