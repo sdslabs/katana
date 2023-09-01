@@ -3,15 +3,12 @@ package utils
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
-	"compress/gzip"
-	"archive/tar"
 
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/types"
@@ -97,83 +94,6 @@ func GetMongoIP() string {
 	// Print the IP address of the service
 	log.Println(service.Spec.ClusterIP)
 	return service.Spec.ClusterIP
-}
-
-func CopyIntoPod(podName string, containerName string, pathInPod string, localFilePath string, ns ...string) error {
-	config, err := GetKubeConfig()
-	if err != nil {
-		return err
-	}
-
-	client, err := GetKubeClient()
-	if err != nil {
-		return err
-	}
-
-	localFile, err := os.Open(localFilePath)
-	if err != nil {
-		log.Printf("Error opening local file: %s\n", err)
-	}
-
-	namespace := "katana"
-	if len(ns) > 0 {
-		namespace = ns[0]
-	}
-
-	pod, err := client.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
-	if err != nil {
-		log.Printf("Error getting pod: %s\n", err)
-	}
-
-	// Find the container in the pod
-	var container *corev1.Container
-	for _, c := range pod.Spec.Containers {
-		if c.Name == containerName {
-			container = &c
-			break
-		}
-	}
-
-	if container == nil {
-		log.Printf("Container not found in pod\n")
-	}
-	// Create a stream to the container
-	req := client.CoreV1().RESTClient().Post().
-		Resource("pods").
-		Name(podName).
-		Namespace(namespace).
-		SubResource("exec").
-		Param("container", containerName)
-
-	req.VersionedParams(&corev1.PodExecOptions{
-		Container: containerName,
-		Command:   []string{"bash", "-c", "cat > " + pathInPod},
-		Stdin:     true,
-		Stdout:    true,
-		Stderr:    true,
-		TTY:       false,
-	}, scheme.ParameterCodec)
-
-	exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
-	if err != nil {
-		log.Printf("Error creating executor: %s\n", err)
-		return err
-	}
-
-	// Stream the file
-	err = exec.Stream(remotecommand.StreamOptions{
-		Stdin:  localFile,
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
-		Tty:    false,
-	})
-	if err != nil {
-		log.Printf("Error streaming the file: %s\n", err)
-		return err
-	}
-
-	log.Println("File copied successfully")
-	return nil
 }
 
 func GetKatanaLoadbalancer() string {
@@ -434,8 +354,7 @@ func GetNodes(clientset *kubernetes.Clientset) ([]corev1.Node, error) {
 	return nodes.Items, nil
 }
 
-
-func CopyTarIntoPodNew(podName string, containerName string, destPath string, srcPath string, ns ...string) error {
+func CopyTarIntoPod(podName string, containerName string, destPath string, srcPath string, ns ...string) error {
 	config, err := GetKubeConfig()
 	if err != nil {
 		return err
@@ -454,19 +373,17 @@ func CopyTarIntoPodNew(podName string, containerName string, destPath string, sr
 	reader, writer := io.Pipe()
 
 	var cmdArr []string
-    
-	
-    cmdArr = []string{"tar", "-zxf", "-"}
-    if len(destPath) > 0 {
-        cmdArr = append(cmdArr, "-C", destPath)
-    }
- 
-    go func() {
-        defer writer.Close()
-        err := cpMakeTar(srcPath, writer)
-        cmdutil.CheckErr(err)
-    }()
-  
+
+	cmdArr = []string{"tar", "-zxf", "-"}
+	if len(destPath) > 0 {
+		cmdArr = append(cmdArr, "-C", destPath)
+	}
+
+	go func() {
+		defer writer.Close()
+		err := Tar(srcPath, writer)
+		cmdutil.CheckErr(err)
+	}()
 
 	pod, err := client.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
 	if err != nil {
@@ -522,54 +439,4 @@ func CopyTarIntoPodNew(podName string, containerName string, destPath string, sr
 
 	log.Println("File copied successfully")
 	return nil
-}
-
-
-func cpMakeTar(src string, writers ...io.Writer) error {
-
-	if _, err := os.Stat(src); err != nil {
-		return fmt.Errorf("unable to tar files - %v", err.Error())
-	}
-
-	mw := io.MultiWriter(writers...)
-
-	gzw := gzip.NewWriter(mw)
-	defer gzw.Close()
-
-	tw := tar.NewWriter(gzw)
-	defer tw.Close()
-
-	return filepath.Walk(src, func(file string, fi os.FileInfo, err error) error {
-
-		if err != nil {
-			return err
-		}
-
-		if !fi.Mode().IsRegular() {
-			return nil
-		}
-
-		header, err := tar.FileInfoHeader(fi, fi.Name())
-		if err != nil {
-			return err
-		}
-
-		header.Name = strings.TrimPrefix(file, src+string(filepath.Separator))
-		if err := tw.WriteHeader(header); err != nil {
-			return err
-		}
-
-		f, err := os.Open(file)
-		if err != nil {
-			return err
-		}
-
-		if _, err := io.Copy(tw, f); err != nil {
-			return err
-		}
-
-		f.Close()
-
-		return nil
-	})
 }
