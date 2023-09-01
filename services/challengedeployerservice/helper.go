@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
+	"regexp"
 
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
@@ -13,9 +13,10 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-func copyChallengeIntoTsuka(dirPath, challengeName string) error {
-	srcFilePath := dirPath + "/" + challengeName
-	pathInPod := "/opt/katana/challenge"
+func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType string) error {
+	localFilePath := dirPath + "/" + challengeName + ".tar.gz"
+	pathInPod := "/opt/katana/katana_" + challengeType + "_" + challengeName + ".tar.gz"
+	log.Println("Testing" + localFilePath + "....and..." + pathInPod)
 
 	filename := challengeName
 
@@ -136,5 +137,30 @@ func copyFlagDataIntoKashira(dirPath string, challengeName string) error {
 		log.Println(err)
 		return err
 	}
+	return nil
+}
+
+func copyChallengeCheckerIntoKissaki(dirPath string, challengeName string, challengeType string) error {
+	srcFilePath := dirPath +"/"+ challengeName + "/" + challengeName + "_cc" 
+	pathInPod := "/opt/kissaki/challenge-data"
+
+	log.Println("Testing" + srcFilePath + "....and..." + pathInPod)
+		
+		if err := utils.CopyTarIntoPodNew("kissaki-0", "kissaki", pathInPod, srcFilePath, "katana"); err != nil {
+			log.Println(err)
+			return err
+		}
+	return nil
+}
+
+func copyFlagDataIntoKashira(dirPath string, challengeName string, challengeType string) error {
+	srcFilePath := dirPath +"/"+ challengeName + "/" + "flag_data" 
+	pathInPod := "/opt/kashira/flag-data"
+	log.Println("Testing" + srcFilePath + "....and..." + pathInPod)
+		
+		if err := utils.CopyTarIntoPodNew("kashira-0", "kashira", pathInPod, srcFilePath, "katana"); err != nil {
+			log.Println(err)
+			return err
+		}
 	return nil
 }
