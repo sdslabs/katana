@@ -8,7 +8,7 @@ data:
   PUID: "1000" # User ID, default 1000
   PGID: "1000" # Group ID
   TZ: "Etc/UTC" # Timezone
-  PEERS: "team1,team2" # Comma separated list of peer names
+  PEERS: "2" # Comma separated list of peer names
 
   #OPTIONAL VARIABLES
   SERVERURL: "{{.WireguardIP}}" #if not set, container tries to determine auto and mostly tells wrong, use lb ip here , pass dynamically best
