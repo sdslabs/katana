@@ -15,7 +15,7 @@ import (
 func copyChallengeIntoTsuka(dirPath string, challengeName string) error {
 	srcFilePath := dirPath + "/" + challengeName
 	pathInPod := "/opt/katana/challenge"
-	log.Println("Testing" + srcFilePath + "....and..." + pathInPod)
+	log.Println("Testing... sourceFilePath is " + srcFilePath + "....and... pathInPod is " + pathInPod)
 
 	filename := challengeName
 
@@ -118,7 +118,7 @@ func copyChallengeCheckerIntoKissaki(dirPath string, challengeName string) error
 	srcFilePath := dirPath + "/" + challengeName + "_challenge_checker"
 	pathInPod := "/opt/kissaki/challenge-data"
 
-	log.Println("Testing" + srcFilePath + "....and..." + pathInPod)
+	log.Println("Testing... sourceFilePath is " +  srcFilePath + "....and... pathInPod is " + pathInPod)
 
 	if err := utils.CopyTarIntoPod("kissaki-0", "kissaki", pathInPod, srcFilePath, "katana"); err != nil {
 		log.Println(err)
@@ -130,7 +130,7 @@ func copyChallengeCheckerIntoKissaki(dirPath string, challengeName string) error
 func copyFlagDataIntoKashira(dirPath string, challengeName string) error {
 	srcFilePath := dirPath + "/" + "flag_data"
 	pathInPod := "/opt/kashira/flag-data"
-	log.Println("Testing" + srcFilePath + "....and..." + pathInPod)
+	log.Println("Testing... sourceFilePath is " + srcFilePath + "....and...  pathInPod is" + pathInPod)
 
 	if err := utils.CopyTarIntoPod("kashira-0", "kashira", pathInPod, srcFilePath, "katana"); err != nil {
 		log.Println(err)

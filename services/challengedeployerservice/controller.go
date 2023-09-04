@@ -102,7 +102,6 @@ func DeployChallenge(c *fiber.Ctx) error {
 			regex := regexp.MustCompile(pattern)
 			match := regex.FindStringSubmatch(file.Filename)
 			folderName = match[1]
-			log.Println(folderName)
 
 			response, challengePath := createFolder(folderName)
 			if response == 1 {
@@ -113,8 +112,6 @@ func DeployChallenge(c *fiber.Ctx) error {
 				return c.SendString("Issue with creating chall directory.Check permissions")
 			}
 
-            log.Println(file.Filename)
-			log.Println(challengePath)
 			//save to disk in that directory
 			if err := c.SaveFile(file, fmt.Sprintf("./challenges/%s/%s", folderName, file.Filename)); err != nil {
 				return err
