@@ -115,7 +115,7 @@ func createFolder(challengeName string) (message int, challengePath string) {
 }
 
 func copyChallengeCheckerIntoKissaki(dirPath string, challengeName string) error {
-	srcFilePath := dirPath + "/" + challengeName + "_cc"
+	srcFilePath := dirPath + "/" + challengeName + "_challenge_checker"
 	pathInPod := "/opt/kissaki/challenge-data"
 
 	log.Println("Testing" + srcFilePath + "....and..." + pathInPod)
