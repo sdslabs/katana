@@ -19,7 +19,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
     _ "unsafe"
 )
-
+//for get request
 func Deploy(c *fiber.Ctx) error {
 	patch := false
 	replicas := int32(1)
@@ -82,6 +82,8 @@ func Deploy(c *fiber.Ctx) error {
 	return c.JSON(res)
 }
 
+
+//for post request
 func DeployChallenge(c *fiber.Ctx) error {
 
 	folderName := ""
