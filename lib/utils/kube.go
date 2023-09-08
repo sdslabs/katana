@@ -353,7 +353,7 @@ func GetNodes(clientset *kubernetes.Clientset) ([]corev1.Node, error) {
 	return nodes.Items, nil
 }
 
-func CopyTarIntoPod(podName string, containerName string, destPath string, srcPath string, ns ...string) error {
+func CopyTarIntoPod(podName string, containerName string, pathInPod string, localFilePath string, ns ...string) error {
 	config, err := GetKubeConfig()
 	if err != nil {
 		return err
@@ -370,17 +370,10 @@ func CopyTarIntoPod(podName string, containerName string, destPath string, srcPa
 	}
 
 	reader, writer := io.Pipe()
-
-	var cmdArr []string
-
-	cmdArr = []string{"tar", "-zxf", "-"}
-	if len(destPath) > 0 {
-		cmdArr = append(cmdArr, "-C", destPath)
-	}
-
+	
 	go func() {
 		defer writer.Close()
-		err := Tar(srcPath, writer)
+		err := Tar(localFilePath, writer)
 		cmdutil.CheckErr(err)
 	}()
 
@@ -401,6 +394,7 @@ func CopyTarIntoPod(podName string, containerName string, destPath string, srcPa
 	if container == nil {
 		log.Printf("Container not found in pod\n")
 	}
+	
 	// Create a stream to the container
 	req := client.CoreV1().RESTClient().Post().
 		Resource("pods").
@@ -411,7 +405,7 @@ func CopyTarIntoPod(podName string, containerName string, destPath string, srcPa
 
 	req.VersionedParams(&corev1.PodExecOptions{
 		Container: containerName,
-		Command:   cmdArr,
+		Command:   []string{"bash", "-c", "cat > " + pathInPod},
 		Stdin:     true,
 		Stdout:    true,
 		Stderr:    true,
@@ -439,3 +433,4 @@ func CopyTarIntoPod(podName string, containerName string, destPath string, srcPa
 	log.Println("File copied successfully")
 	return nil
 }
+

@@ -12,11 +12,11 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-func copyChallengeIntoTsuka(dirPath string, challengeName string) error {
-	srcFilePath := dirPath + "/" + challengeName
-	pathInPod := "/opt/katana/challenge"
-	log.Println("Testing... sourceFilePath is " + srcFilePath + "....and... pathInPod is " + pathInPod)
 
+func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType string) error {
+	localFilePath := dirPath + "/" + challengeName
+	pathInPod := "/opt/katana/katana_" + challengeType + "_" + challengeName + ".tar.gz"
+	log.Println("Testing" + localFilePath + "....and..." + pathInPod)
 	filename := challengeName
 
 	// Get pods from different namespaces
@@ -53,13 +53,11 @@ func copyChallengeIntoTsuka(dirPath string, challengeName string) error {
 	// Loop over pods
 	for _, pod := range pods {
 		// Copy file into pod
-
-		if err := utils.CopyTarIntoPod(pod.Name, g.TeamVmConfig.ContainerName, pathInPod, srcFilePath, pod.Namespace); err != nil {
+		if err := utils.CopyTarIntoPod(pod.Name, g.TeamVmConfig.ContainerName, pathInPod, localFilePath, pod.Namespace); err != nil {
 			log.Println(err)
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -115,9 +113,8 @@ func createFolder(challengeName string) (message int, challengePath string) {
 }
 
 func copyChallengeCheckerIntoKissaki(dirPath string, challengeName string) error {
-	srcFilePath := dirPath + "/" + challengeName + "_challenge_checker"
-	pathInPod := "/opt/kissaki/challenge-data"
-
+	srcFilePath := dirPath + "/" + challengeName + "-challenge-checker"
+	pathInPod := "/opt/kissaki/kissaki_" + challengeName + ".tar.gz"
 	log.Println("Testing... sourceFilePath is " +  srcFilePath + "....and... pathInPod is " + pathInPod)
 
 	if err := utils.CopyTarIntoPod("kissaki-0", "kissaki", pathInPod, srcFilePath, "katana"); err != nil {
@@ -128,8 +125,8 @@ func copyChallengeCheckerIntoKissaki(dirPath string, challengeName string) error
 }
 
 func copyFlagDataIntoKashira(dirPath string, challengeName string) error {
-	srcFilePath := dirPath + "/" + "flag_data"
-	pathInPod := "/opt/kashira/flag-data"
+	srcFilePath := dirPath + "/" + "flag-data"
+	pathInPod := "/opt/kashira/kashira_" + challengeName + ".tar.gz"
 	log.Println("Testing... sourceFilePath is " + srcFilePath + "....and...  pathInPod is" + pathInPod)
 
 	if err := utils.CopyTarIntoPod("kashira-0", "kashira", pathInPod, srcFilePath, "katana"); err != nil {
