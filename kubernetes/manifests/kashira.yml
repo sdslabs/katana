@@ -28,20 +28,18 @@ spec:
       serviceAccountName: cluster-admin
       containers:
         - name: kashira
-          image: ashpect/kashira
+          image: harbor.katana.local/katana/kashira
           ports:
             - containerPort: 80
           volumeMounts:
             - name: kashira-data
               mountPath: /opt/kashira/flag-data
-
           env:
             - name: DAEMON_PORT
               valueFrom:
                 configMapKeyRef:
                   name: kashira-config
                   key: daemon_port
-
   volumeClaimTemplates:
     - metadata:
         name: kashira-data

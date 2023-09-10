@@ -28,7 +28,7 @@ spec:
       serviceAccountName: cluster-admin
       containers:
         - name: kissaki
-          image: ashpect/kissaki
+          image: harbor.katana.local/katana/kissaki
           ports:
             - containerPort: 80
           volumeMounts:
@@ -40,7 +40,6 @@ spec:
                 configMapKeyRef:
                   name: kashira-config
                   key: daemon_port
-
   volumeClaimTemplates:
     - metadata:
         name: kissaki-data

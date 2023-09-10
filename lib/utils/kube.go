@@ -3,12 +3,13 @@ package utils
 import (
 	"bytes"
 	"context"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
-    "io"
+
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/types"
 	appsv1 "k8s.io/api/apps/v1"
@@ -353,7 +354,7 @@ func GetNodes(clientset *kubernetes.Clientset) ([]corev1.Node, error) {
 	return nodes.Items, nil
 }
 
-func CopyTarIntoPod(podName string, containerName string, pathInPod string, localFilePath string, ns ...string) error {
+func CopyIntoPod(podName string, containerName string, pathInPod string, localFilePath string, ns ...string) error {
 	config, err := GetKubeConfig()
 	if err != nil {
 		return err
@@ -370,7 +371,7 @@ func CopyTarIntoPod(podName string, containerName string, pathInPod string, loca
 	}
 
 	reader, writer := io.Pipe()
-	
+
 	go func() {
 		defer writer.Close()
 		err := Tar(localFilePath, writer)
@@ -394,7 +395,7 @@ func CopyTarIntoPod(podName string, containerName string, pathInPod string, loca
 	if container == nil {
 		log.Printf("Container not found in pod\n")
 	}
-	
+
 	// Create a stream to the container
 	req := client.CoreV1().RESTClient().Post().
 		Resource("pods").
@@ -433,4 +434,3 @@ func CopyTarIntoPod(podName string, containerName string, pathInPod string, loca
 	log.Println("File copied successfully")
 	return nil
 }
-
