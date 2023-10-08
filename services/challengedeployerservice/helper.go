@@ -115,7 +115,6 @@ func createFolder(challengeName string) (message int, challengePath string) {
 func copyChallengeCheckerIntoKissaki(dirPath string, challengeName string) error {
 	srcFilePath := dirPath + "/" + challengeName + "-challenge-checker"
 	pathInPod := "/opt/kissaki/kissaki_" + challengeName + ".tar.gz"
-	log.Println("Testing... sourceFilePath is " + srcFilePath + "....and... pathInPod is " + pathInPod)
 
 	if err := utils.CopyIntoPod("kissaki-0", "kissaki", pathInPod, srcFilePath, "katana"); err != nil {
 		log.Println(err)
@@ -127,7 +126,6 @@ func copyChallengeCheckerIntoKissaki(dirPath string, challengeName string) error
 func copyFlagDataIntoKashira(dirPath string, challengeName string) error {
 	srcFilePath := dirPath + "/" + "flag-data"
 	pathInPod := "/opt/kashira/kashira_" + challengeName + ".tar.gz"
-	log.Println("Testing... sourceFilePath is " + srcFilePath + "....and...  pathInPod is" + pathInPod)
 
 	if err := utils.CopyIntoPod("kashira-0", "kashira", pathInPod, srcFilePath, "katana"); err != nil {
 		log.Println(err)

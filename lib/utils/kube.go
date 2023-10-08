@@ -431,6 +431,6 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 		return err
 	}
 
-	log.Println("File copied successfully")
+	log.Println("File copied successfully at " + pathInPod)
 	return nil
 }
