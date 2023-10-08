@@ -3,12 +3,6 @@ package challengedeployerservice
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
-	"regexp"
-	"strconv"
-	"strings"
-
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/gofiber/fiber/v2"
@@ -18,10 +12,81 @@ import (
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"log"
+	"os"
+	"regexp"
+	"strconv"
+	"strings"
 )
 
-func DeployChallenge(c *fiber.Ctx) error {
+func Deploy(c *fiber.Ctx) error {
+	patch := false
+	replicas := int32(1)
+	challengeType := "web"
+	log.Println("Starting")
 
+	//Read folder challenge by os
+	dir, err := os.Open("./challenges")
+
+	//Loop over all subfolders in the challenge folder
+	if err != nil {
+		log.Println("Error in opening challenges folder")
+		return err
+	}
+	defer dir.Close()
+
+	//Read all challenges in the folder
+	fileInfos, err := dir.Readdir(-1)
+	if err != nil {
+		log.Println("Error in reading challenges folder")
+		return err
+	}
+
+	res := make([][]string, 0)
+
+	//Loop over all folders
+	for _, fileInfo := range fileInfos {
+		//Check if it is a directory
+		if fileInfo.IsDir() {
+			//Get the challenger name
+			folderName := fileInfo.Name()
+			log.Println("Folder name is : " + folderName)
+			//Update challenge path to be absolute path
+			challengePath, _ := os.Getwd()
+			challengePath = challengePath + "/challenges/" + folderName
+			log.Println("Challenge path is : " + challengePath)
+			log.Println(challengePath + "/" + folderName + "/" + folderName)
+
+			//Check if the folder has a Dockerfile
+			if _, err := os.Stat(challengePath + "/" + folderName + "/" + folderName); err != nil {
+				log.Println("Dockerfile not found in the " + folderName + " challenge folder. Please follow proper format.")
+			} else {
+				//Update challenge path to get dockerfile
+				utils.BuildDockerImage(folderName, challengePath+"/"+folderName + "/" + folderName)
+
+				clusterConfig := g.ClusterConfig
+				numberOfTeams := clusterConfig.TeamCount
+				for i := 0; i < int(numberOfTeams); i++ {
+					log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
+					teamName := "katana-team-" + strconv.Itoa(i)
+					deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
+					url, err := createServiceForChallenge(folderName, teamName, 3000, i)
+					if err != nil {
+						res = append(res, []string{teamName, err.Error()})
+					} else {
+						res = append(res, []string{teamName, url})
+					}
+				}
+			}
+			copyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			copyFlagDataIntoKashira(challengePath, folderName)
+			copyChallengeCheckerIntoKissaki(challengePath, folderName)
+		}
+	}
+	return c.JSON(res)
+}
+
+func DeployChallenge(c *fiber.Ctx) error {
 	challengeType := "web"
 	folderName := ""
 	patch := false
@@ -34,7 +99,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 		// Loops through all challenges, if multiple uploaded :
 		for _, file := range files {
 
-			//creates folders for each challenge
+			//Creates folders for each challenge
 			pattern := `([^/]+)\.tar\.gz$`
 			regex := regexp.MustCompile(pattern)
 			match := regex.FindStringSubmatch(file.Filename)
@@ -49,7 +114,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 				return c.SendString("Issue with creating chall directory.Check permissions")
 			}
 
-			//save to disk in that directory
+			//Save to disk in that directory
 			if err := c.SaveFile(file, fmt.Sprintf("./challenges/%s/%s", folderName, file.Filename)); err != nil {
 				return err
 			}
@@ -60,8 +125,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 				log.Println("Error in creating folder inside challenge folder")
 				return c.SendString("Error in creating folder inside challenge folder")
 			}
-
-			//extract the tar.gz file
+			//Extract the tar.gz file
 			err := archiver.Unarchive("./challenges/"+folderName+"/"+file.Filename, "./challenges/"+folderName)
 			if err != nil {
 				log.Println("Error in unarchiving", err)
@@ -86,15 +150,14 @@ func DeployChallenge(c *fiber.Ctx) error {
 					res = append(res, []string{teamName, url})
 				}
 			}
-
-			//Copy challenge in pods and etc.
 			copyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			copyFlagDataIntoKashira(challengePath, folderName)
+			copyChallengeCheckerIntoKissaki(challengePath, folderName)
 
 			return c.JSON(res)
 		}
 	}
 	log.Println("Ending")
-
 	return c.SendString("Wrong file")
 }
 

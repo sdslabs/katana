@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"context"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -22,6 +23,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/remotecommand"
+	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 )
 
 // GetKubeConfig returns a kubernetes REST config object
@@ -92,83 +94,6 @@ func GetMongoIP() string {
 	// Print the IP address of the service
 	log.Println(service.Spec.ClusterIP)
 	return service.Spec.ClusterIP
-}
-
-func CopyIntoPod(podName string, containerName string, pathInPod string, localFilePath string, ns ...string) error {
-	config, err := GetKubeConfig()
-	if err != nil {
-		return err
-	}
-
-	client, err := GetKubeClient()
-	if err != nil {
-		return err
-	}
-
-	localFile, err := os.Open(localFilePath)
-	if err != nil {
-		log.Printf("Error opening local file: %s\n", err)
-	}
-
-	namespace := "katana"
-	if len(ns) > 0 {
-		namespace = ns[0]
-	}
-
-	pod, err := client.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
-	if err != nil {
-		log.Printf("Error getting pod: %s\n", err)
-	}
-
-	// Find the container in the pod
-	var container *corev1.Container
-	for _, c := range pod.Spec.Containers {
-		if c.Name == containerName {
-			container = &c
-			break
-		}
-	}
-
-	if container == nil {
-		log.Printf("Container not found in pod\n")
-	}
-	// Create a stream to the container
-	req := client.CoreV1().RESTClient().Post().
-		Resource("pods").
-		Name(podName).
-		Namespace(namespace).
-		SubResource("exec").
-		Param("container", containerName)
-
-	req.VersionedParams(&corev1.PodExecOptions{
-		Container: containerName,
-		Command:   []string{"bash", "-c", "cat > " + pathInPod},
-		Stdin:     true,
-		Stdout:    true,
-		Stderr:    true,
-		TTY:       false,
-	}, scheme.ParameterCodec)
-
-	exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
-	if err != nil {
-		log.Printf("Error creating executor: %s\n", err)
-		return err
-	}
-
-	// Stream the file
-	err = exec.Stream(remotecommand.StreamOptions{
-		Stdin:  localFile,
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
-		Tty:    false,
-	})
-	if err != nil {
-		log.Printf("Error streaming the file: %s\n", err)
-		return err
-	}
-
-	log.Println("File copied successfully")
-	return nil
 }
 
 func GetKatanaLoadbalancer() string {
@@ -427,4 +352,85 @@ func GetNodes(clientset *kubernetes.Clientset) ([]corev1.Node, error) {
 	}
 
 	return nodes.Items, nil
+}
+
+func CopyIntoPod(podName string, containerName string, pathInPod string, localFilePath string, ns ...string) error {
+	config, err := GetKubeConfig()
+	if err != nil {
+		return err
+	}
+
+	client, err := GetKubeClient()
+	if err != nil {
+		return err
+	}
+
+	namespace := "katana"
+	if len(ns) > 0 {
+		namespace = ns[0]
+	}
+
+	reader, writer := io.Pipe()
+
+	go func() {
+		defer writer.Close()
+		err := Tar(localFilePath, writer)
+		cmdutil.CheckErr(err)
+	}()
+
+	pod, err := client.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
+	if err != nil {
+		log.Printf("Error getting pod: %s\n", err)
+	}
+
+	// Find the container in the pod
+	var container *corev1.Container
+	for _, c := range pod.Spec.Containers {
+		if c.Name == containerName {
+			container = &c
+			break
+		}
+	}
+
+	if container == nil {
+		log.Printf("Container not found in pod\n")
+	}
+
+	// Create a stream to the container
+	req := client.CoreV1().RESTClient().Post().
+		Resource("pods").
+		Name(podName).
+		Namespace(namespace).
+		SubResource("exec").
+		Param("container", containerName)
+
+	req.VersionedParams(&corev1.PodExecOptions{
+		Container: containerName,
+		Command:   []string{"bash", "-c", "cat > " + pathInPod},
+		Stdin:     true,
+		Stdout:    true,
+		Stderr:    true,
+		TTY:       false,
+	}, scheme.ParameterCodec)
+
+	exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
+	if err != nil {
+		log.Printf("Error creating executor: %s\n", err)
+		return err
+	}
+
+	// Stream the file
+	err = exec.Stream(remotecommand.StreamOptions{
+		Stdin:  reader,
+		Stdout: os.Stdout,
+		Stderr: os.Stderr,
+		Tty:    false,
+	})
+	if err != nil {
+		log.Printf("Error streaming the file: %s\n", err)
+		return err
+	}
+
+	log.Println("File copied successfully at " + pathInPod)
+	return nil
 }

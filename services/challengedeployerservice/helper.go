@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"regexp"
+	"strconv"
 
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
@@ -14,15 +14,10 @@ import (
 )
 
 func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType string) error {
-	localFilePath := dirPath + "/" + challengeName + ".tar.gz"
+	localFilePath := dirPath + "/" + challengeName
 	pathInPod := "/opt/katana/katana_" + challengeType + "_" + challengeName + ".tar.gz"
 	log.Println("Testing" + localFilePath + "....and..." + pathInPod)
-
-	//regex to find challenge name since localFilePath[12:22] is hardcoded
-	regexPattern := `\/([^\/]+)\.tar\.gz$`
-	regex := regexp.MustCompile(regexPattern)
-	matches := regex.FindStringSubmatch(localFilePath)
-	filename := matches[1]
+	filename := challengeName
 
 	// Get pods from different namespaces
 	var pods []v1.Pod
@@ -63,13 +58,12 @@ func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType 
 			return err
 		}
 	}
-
 	return nil
 }
 
 func createServiceForChallenge(challengeName, teamName string, targetPort int32, teamNumber int) (string, error) {
 	kubeclient, _ := utils.GetKubeClient()
-	serviceName := challengeName + "-svc"
+	serviceName := challengeName + "-svc-" + strconv.Itoa(teamNumber)
 	teamNamespace := teamName + "-ns"
 	port := int32(80)
 	selector := map[string]string{
@@ -116,4 +110,26 @@ func createFolder(challengeName string) (message int, challengePath string) {
 	}
 	//Successfully created directory
 	return 0, challengePath
+}
+
+func copyChallengeCheckerIntoKissaki(dirPath string, challengeName string) error {
+	srcFilePath := dirPath + "/" + challengeName + "-challenge-checker"
+	pathInPod := "/opt/kissaki/kissaki_" + challengeName + ".tar.gz"
+
+	if err := utils.CopyIntoPod("kissaki-0", "kissaki", pathInPod, srcFilePath, "katana"); err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
+func copyFlagDataIntoKashira(dirPath string, challengeName string) error {
+	srcFilePath := dirPath + "/" + "flag-data"
+	pathInPod := "/opt/kashira/kashira_" + challengeName + ".tar.gz"
+
+	if err := utils.CopyIntoPod("kashira-0", "kashira", pathInPod, srcFilePath, "katana"); err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
 }

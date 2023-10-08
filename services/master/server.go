@@ -46,6 +46,7 @@ func Server() error {
 	admin.Post("/login", infraSetService.Login)
 	admin.Get("/createTeams", infraSetService.CreateTeams)
 	admin.Post("/challengeUpdate", challengeDeployerService.ChallengeUpdate)
+	admin.Get("/deploy", challengeDeployerService.Deploy)
 	admin.Post("/deployChallenge", challengeDeployerService.DeployChallenge)
 	admin.Get("/gitServer", infraSetService.GitServer)
 	admin.Get("/deleteChallenge/:chall_name", challengeDeployerService.DeleteChallenge)

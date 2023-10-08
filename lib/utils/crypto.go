@@ -23,10 +23,9 @@ func Base64Encode(str string) string {
 	return base64.StdEncoding.EncodeToString([]byte(str))
 }
 
-// Generating certificates from domain name
 func GenerateCerts(domain string, basePath string) error {
 	// Generate ca.key in harbor directory
-	cmd := "openssl genrsa -traditional -out " + basePath + "/ca.key 4096"
+	cmd := "openssl genrsa -out " + basePath + "/ca.key 4096"
 	if err := RunCommand(cmd); err != nil {
 		return err
 	}
@@ -38,7 +37,7 @@ func GenerateCerts(domain string, basePath string) error {
 	}
 
 	// Generate private key
-	cmd = "openssl genrsa -traditional -out " + basePath + "/" + domain + ".key 4096"
+	cmd = "openssl genrsa -out " + basePath + "/" + domain + ".key 4096"
 	if err := RunCommand(cmd); err != nil {
 		return err
 	}
