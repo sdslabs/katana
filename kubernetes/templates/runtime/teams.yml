@@ -53,3 +53,15 @@ spec:
               configMapKeyRef:
                 name: teamvm-config
                 key: ssh_password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tsuka-svc
+spec:
+  selector:
+    app: {{.TeamLabel}}
+  ports:
+    - protocol: TCP
+      port: 22
+  type: ClusterIP
