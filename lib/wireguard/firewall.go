@@ -54,10 +54,17 @@ func ApplyFirewall() error {
 		IpTable = append(IpTable, "iptables -I FORWARD -s "+teamIPs[i]+" -o eth+ -j DROP")
 	}
 
-	//add iptables rules to allow traffic to nginx service
+	//add iptables rules to allow traffic to challenges service
 	for i := 0; i < int(numberOfTeams); i++ {
 		for j := 0; j < len(challengeNames); j++ {
-			IpTable = append(IpTable, "iptables -I FORWARD -s "+teamIPs[i]+" -d "+challengeNames[j]+"-svc-"+strconv.Itoa(i)+".katana.svc.cluster.local -j ACCEPT")
+			IpTable = append(IpTable, "iptables -I FORWARD -s "+teamIPs[i]+" -d "+challengeNames[j]+"-svc-"+strconv.Itoa(i)+"katana-team-"+strconv.Itoa(i)+"-ns.svc.cluster.local -j ACCEPT")
+		}
+	}
+
+	//add iptables rules to allow access to masterpod
+	for i := 0; i < int(numberOfTeams); i++ {
+		for j := 0; j < len(challengeNames); j++ {
+			IpTable = append(IpTable, "iptables -I FORWARD -s "+teamIPs[i]+" -d ctfteam.katana-team-"+strconv.Itoa(i)+"-ns.svc.cluster.local -j ACCEPT")
 		}
 	}
 
