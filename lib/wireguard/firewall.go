@@ -43,9 +43,6 @@ func ApplyFirewall() error {
 		teamIPs = append(teamIPs, baseip+strconv.Itoa(i+2)+"/32")
 	}
 
-	//print the teamIPs
-	log.Println(teamIPs)
-
 	//create a slice of string to store iptables commands
 	IpTable := make([]string, 0)
 
@@ -54,23 +51,18 @@ func ApplyFirewall() error {
 		IpTable = append(IpTable, "iptables -I FORWARD -s "+teamIPs[i]+" -o eth+ -j DROP")
 	}
 
-	//add iptables rules to allow traffic to challenges service
+	//add iptables rules to allow traffic to all challenges service
 	for i := 0; i < int(numberOfTeams); i++ {
 		for j := 0; j < len(challengeNames); j++ {
-			IpTable = append(IpTable, "iptables -I FORWARD -s "+teamIPs[i]+" -d "+challengeNames[j]+"-svc-"+strconv.Itoa(i)+"katana-team-"+strconv.Itoa(i)+"-ns.svc.cluster.local -j ACCEPT")
+			for k := 0; k < int(numberOfTeams); k++ {
+				IpTable = append(IpTable, "iptables -I FORWARD -s "+teamIPs[i]+" -d "+challengeNames[j]+"-svc-"+strconv.Itoa(k)+".katana-team-"+strconv.Itoa(k)+"-ns.svc.cluster.local -j ACCEPT")
+			}
 		}
 	}
 
 	//add iptables rules to allow access to masterpod
 	for i := 0; i < int(numberOfTeams); i++ {
-		for j := 0; j < len(challengeNames); j++ {
-			IpTable = append(IpTable, "iptables -I FORWARD -s "+teamIPs[i]+" -d ctfteam.katana-team-"+strconv.Itoa(i)+"-ns.svc.cluster.local -j ACCEPT")
-		}
-	}
-
-	// Print all iptables rules
-	for i := 0; i < len(IpTable); i++ {
-		log.Println(IpTable[i])
+		IpTable = append(IpTable, "iptables -I FORWARD -s "+teamIPs[i]+" -d tsuka-svc.katana-team-"+strconv.Itoa(i)+"-ns.svc.cluster.local -j ACCEPT")
 	}
 
 	//append all iptables rules to a string
