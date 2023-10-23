@@ -115,8 +115,10 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 
 	clientset, _ := utils.GetKubeClient()
 
-	nodes, _ := utils.GetNodes(clientset)
-
+	nodes, err := utils.GetNodes(clientset)
+	if err != nil {
+		log.Println(err)
+	}
 	deploymentConfig.NodeAffinityValue = nodes[0].Name
 
 	for _, m := range clusterConfig.TemplatedManifests {
