@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
@@ -123,60 +124,76 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	if err := c.BodyParser(&p); err != nil {
 		return err
 	}
+	cmd := "echo \"Reached\" >> example.txt"
 
-	dir := p.Repository.FullName
-	s := strings.Split(dir, "/")
-	challengeName := s[1]
-	teamName := s[0]
-	namespace := teamName + "-ns"
-	log.Println("Challenge update request received for", challengeName, "by", teamName)
-	repo, err := git.PlainOpen("teams/" + dir)
-	if err != nil {
-		log.Println(err)
-	}
+    // Run the command and capture its output
+    exec.Command(cmd).Run()
 
-	auth := &http.BasicAuth{
-		Username: g.AdminConfig.Username,
-		Password: g.AdminConfig.Password,
-	}
+	if p.Ref == "refs/heads/master" {
+	    cmd := "echo \"Reached master\" >> example.txt"
 
-	worktree, err := repo.Worktree()
-	worktree.Pull(&git.PullOptions{
-		RemoteName: "origin",
-		Auth:       auth,
-	})
-
-	if err != nil {
-		log.Println("Error pulling changes:", err)
-	}
-
-	imageName := strings.Replace(dir, "/", "-", -1)
-
-	log.Println("Pull successful for", teamName, ". Building image...")
-	firstPatch := !utils.DockerImageExists(imageName)
-	utils.BuildDockerImage(imageName, "./teams/"+dir)
-
-	if firstPatch {
-		log.Println("First Patch for", teamName)
-		deployment.DeployChallengeToCluster(challengeName, teamName, patch, replicas)
-	} else {
-		log.Println("Not the first patch for", teamName, ". Simply deploying the image...")
-		labelSelector := metav1.LabelSelector{
-			MatchLabels: map[string]string{
-				"app": challengeName,
-			},
-		}
-		// Delete the challenge pod
-		err = client.CoreV1().Pods(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{
-			LabelSelector: metav1.FormatLabelSelector(&labelSelector),
-		})
+    // Run the command and capture its output
+    exec.Command(cmd).Run()
+		dir := p.Repository.FullName
+		s := strings.Split(dir, "/")
+		challengeName := s[1]
+		teamName := s[0]
+		namespace := teamName + "-ns"
+		log.Println("Challenge update request received for", challengeName, "by", teamName)
+		repo, err := git.PlainOpen("teams/" + dir)
 		if err != nil {
-			log.Println("Error")
 			log.Println(err)
 		}
+
+		auth := &http.BasicAuth{
+			Username: g.AdminConfig.Username,
+			Password: g.AdminConfig.Password,
+		}
+
+		worktree, err := repo.Worktree()
+		worktree.Pull(&git.PullOptions{
+			RemoteName: "origin",
+			Auth:       auth,
+		})
+
+		if err != nil {
+			log.Println("Error pulling changes:", err)
+		}
+
+		imageName := strings.Replace(dir, "/", "-", -1)
+
+		log.Println("Pull successful for", teamName, ". Building image...")
+		firstPatch := !utils.DockerImageExists(imageName)
+		utils.BuildDockerImage(imageName, "./teams/"+dir)
+
+		if firstPatch {
+			log.Println("First Patch for", teamName)
+			deployment.DeployChallengeToCluster(challengeName, teamName, patch, replicas)
+		} else {
+			log.Println("Not the first patch for", teamName, ". Simply deploying the image...")
+			labelSelector := metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"app": challengeName,
+				},
+			}
+			// Delete the challenge pod
+			err = client.CoreV1().Pods(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{
+				LabelSelector: metav1.FormatLabelSelector(&labelSelector),
+			})
+			if err != nil {
+				log.Println("Error")
+				log.Println(err)
+			}
+		}
+		log.Println("Image built for", teamName)
+		return c.SendString("Challenge updated")
+	} else {
+		cmd := "echo \"Reached not master\" >> example.txt"
+
+		// Run the command and capture its output
+		exec.Command(cmd).Run()
+		return c.SendString("Push not on master branch. Ignoring")
 	}
-	log.Println("Image built for", teamName)
-	return c.SendString("Challenge updated")
 }
 
 func DeleteChallenge(c *fiber.Ctx) error {
