@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
@@ -124,16 +123,11 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	if err := c.BodyParser(&p); err != nil {
 		return err
 	}
-	cmd := "echo \"Reached\" >> example.txt"
 
-    // Run the command and capture its output
-    exec.Command(cmd).Run()
+	if p.Ref != "refs/heads/master" {
+		return c.SendString("Push not on master branch. Ignoring")
+	} else {
 
-	if p.Ref == "refs/heads/master" {
-	    cmd := "echo \"Reached master\" >> example.txt"
-
-    // Run the command and capture its output
-    exec.Command(cmd).Run()
 		dir := p.Repository.FullName
 		s := strings.Split(dir, "/")
 		challengeName := s[1]
@@ -187,12 +181,6 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 		}
 		log.Println("Image built for", teamName)
 		return c.SendString("Challenge updated")
-	} else {
-		cmd := "echo \"Reached not master\" >> example.txt"
-
-		// Run the command and capture its output
-		exec.Command(cmd).Run()
-		return c.SendString("Push not on master branch. Ignoring")
 	}
 }
 
