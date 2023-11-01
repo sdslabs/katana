@@ -19,11 +19,48 @@ import (
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/BurntSushi/toml"
 )
+
+type ChallengeToml struct {
+	Challenge Challenge `toml:"challenge"`
+}
+
+type Challenge struct {
+	Author   Author   `toml:"author"`
+	Metadata Metadata `toml:"metadata"`
+	Env      Env      `toml:"env"`
+}
+
+type Author struct {
+	Name  string `toml:"name"`
+	Email string `toml:"email"`
+}
+
+type Metadata struct {
+	Name        string `toml:"name"`
+	Flag        string `toml:"flag"`
+	Description string `toml:"description"`
+	Type        string `toml:"type"`
+	Points      int    `toml:"points"`
+}
+
+type Env struct {
+	PortMappings []string `toml:"port_mappings"`
+}
+
+func LoadConfiguration(configFile string) ChallengeToml {
+	var config ChallengeToml
+	if _, err := toml.DecodeFile(configFile, &config); err != nil {
+		log.Fatal(err)
+		return ChallengeToml{}
+	}
+	return config
+}
 
 func DeployChallenge(c *fiber.Ctx) error {
 
-	challengeType := "web"
+	challengeType := ""
 	folderName := ""
 	patch := false
 	replicas := int32(1)
@@ -69,6 +106,9 @@ func DeployChallenge(c *fiber.Ctx) error {
 				return c.SendString("Error in unarchiving")
 			}
 
+			data := LoadConfiguration("./challenges/"+folderName+"/config.toml")
+			challengeType = data.Challenge.Metadata.Type
+
 			//Update challenge path to get dockerfile
 			utils.BuildDockerImage(folderName, challengePath+"/"+folderName)
 
@@ -84,8 +124,8 @@ func DeployChallenge(c *fiber.Ctx) error {
 					Uptime:        0,
 					Attacks:       0,
 					Defences:      0,
-					Points:        0,
-					Flag:          "flag{test}",
+					Points:        data.Challenge.Metadata.Points,
+					Flag:          data.Challenge.Metadata.Flag,
 				}
 				err := mongo.AddChallenge(challenge, teamName)
 				if err != nil {
@@ -93,7 +133,11 @@ func DeployChallenge(c *fiber.Ctx) error {
 					log.Println(err)
 				}
 				deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
-				url, err := createServiceForChallenge(folderName, teamName, 3000, i)
+				port, err := strconv.ParseInt(strings.Split(data.Challenge.Env.PortMappings[0], ":")[1], 10, 32)
+				if err != nil {
+					log.Println("Error occured")
+				}
+				url, err := createServiceForChallenge(folderName, teamName, int32(port), i)
 				if err != nil {
 					res = append(res, []string{teamName, err.Error()})
 				} else {
