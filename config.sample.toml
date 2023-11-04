@@ -1,6 +1,6 @@
-kubeconfig = ""
+kubeconfig = "/home/rizul/.kube/config"
 kubehost = "0.0.0.0"
-backendurl = "http://10.25.1.15:15528"
+backendurl = "http://10.25.1.15:15529"
 kubenamespace = "default"
 timeout = 20 # in seconds
 
@@ -19,7 +19,7 @@ templated_manifests = [
 
 [services.api]
 host = "0.0.0.0"
-port = 15528
+port = 15529
 
 [teamvm]
 teampodname = "katana-team-master-pod"

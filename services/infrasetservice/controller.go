@@ -182,6 +182,9 @@ func CreateTeams(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
+
+		pwd, team := createTeamCredentials(i)
+
 		deploymentConfig := utils.DeploymentConfig()
 
 		deploymentConfig.SSHPassword = pwd
