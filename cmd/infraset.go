@@ -26,7 +26,6 @@ var infraCmd = &cobra.Command{
 
 		if err != nil {
 			log.Println("There was error in setting up Kubernentes Config")
-			// return err
 		}
 
 		kubeclient, err := utils.GetKubeClient()
@@ -48,20 +47,20 @@ var infraCmd = &cobra.Command{
 			log.Printf("Applying: %s\n", m)
 			tmpl, err := template.ParseFiles(filepath.Join(clusterConfig.TemplatedManifestDir, m))
 			if err != nil {
-				fmt.Print("err")
+				fmt.Print("err1")
 			}
 
 			if err = tmpl.Execute(manifest, deploymentConfig); err != nil {
-				fmt.Print("err")
+				fmt.Print("err2")
 			}
 
 			if err = deployment.ApplyManifest(config, kubeclient, manifest.Bytes(), g.KatanaConfig.KubeNameSpace); err != nil {
-				fmt.Print("err")
+				fmt.Print("err3")
 			}
 		}
 		err = harbor.SetupHarbor()
 		if err != nil {
-			fmt.Print("err")
+			fmt.Print("err4")
 		}
 		infraSetService.BuildKatanaServices()
 	},
