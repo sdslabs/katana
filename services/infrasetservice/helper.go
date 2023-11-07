@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
+	"strings"
 
 	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/mysql"
@@ -13,30 +15,30 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// func GenerateCertsforHarbor() {
-// 	path, _ := os.Getwd()
-// 	path = path + "/lib/harbor/certs"
+func GenerateCertsforHarbor() {
+	path, _ := os.Getwd()
+	path = path + "/lib/harbor/certs"
 
-// 	// Delete the directory if it already exists
-// 	if _, err := os.Stat(path); os.IsExist(err) {
-// 		errDir := os.RemoveAll(path)
-// 		if errDir != nil {
-// 			log.Fatal(err)
-// 		}
-// 	}
+	// Delete the directory if it already exists
+	if _, err := os.Stat(path); os.IsExist(err) {
+		errDir := os.RemoveAll(path)
+		if errDir != nil {
+			log.Fatal(err)
+		}
+	}
 
-// 	if _, err := os.Stat(path); os.IsNotExist(err) {
-// 		errDir := os.Mkdir(path, 0755)
-// 		if errDir != nil {
-// 			log.Fatal(err)
-// 		}
-// 	}
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		errDir := os.Mkdir(path, 0755)
+		if errDir != nil {
+			log.Fatal(err)
+		}
+	}
 
-// 	// Generate the certificates
-// 	if err := utils.GenerateCerts("harbor.katana.local", path); err != nil {
-// 		log.Fatal(err)
-// 	}
-// }
+	// Generate the certificates
+	if err := utils.GenerateCerts("harbor.katana.local", path); err != nil {
+		log.Fatal(err)
+	}
+}
 
 func createTeamCredentials(teamNumber int) (string, types.CTFTeam) {
 	teamlabels := utils.GetTeamPodLabels()
@@ -91,23 +93,23 @@ func envVariables(gogs string, pwd string, podNamespace string) {
 	}
 }
 
-// func BuildKatanaServices() {
-// 	katanaDir, err := utils.GetKatanaRootPath()
-// 	katanaServicesDir := katanaDir + "/katana-services"
+func BuildKatanaServices() {
+	katanaDir, err := utils.GetKatanaRootPath()
+	katanaServicesDir := katanaDir + "/katana-services"
 
-// 	services, err := os.ReadDir(katanaServicesDir)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
+	services, err := os.ReadDir(katanaServicesDir)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-// 	for _, service := range services {
-// 		if service.Name() == ".github" {
-// 			continue
-// 		}
-// 		if service.IsDir() {
-// 			log.Println("Building " + service.Name())
-// 			imageName := strings.ToLower(service.Name())
-// 			utils.BuildDockerImage(imageName, katanaServicesDir+"/"+service.Name())
-// 		}
-// 	}
-// }
+	for _, service := range services {
+		if service.Name() == ".github" {
+			continue
+		}
+		if service.IsDir() {
+			log.Println("Building " + service.Name())
+			imageName := strings.ToLower(service.Name())
+			utils.BuildDockerImage(imageName, katanaServicesDir+"/"+service.Name())
+		}
+	}
+}

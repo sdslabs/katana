@@ -10,7 +10,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -25,61 +24,6 @@ import (
 	coreV1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
-
-//moved it from helper.go to controller.go bcoz it was
-//giving error after making it's first letter capital
-
-func BuildKatanaServices() {
-	fmt.Print("build")
-	katanaDir, err := utils.GetKatanaRootPath()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	katanaServicesDir := katanaDir + "/katana-services"
-
-	services, err := os.ReadDir(katanaServicesDir)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, service := range services {
-		if service.Name() == ".github" {
-			continue
-		}
-		if service.IsDir() {
-			log.Println("Building " + service.Name())
-			imageName := strings.ToLower(service.Name())
-			utils.BuildDockerImage(imageName, katanaServicesDir+"/"+service.Name())
-		}
-	}
-}
-
-func GenerateCertsforHarbor() {
-	path, _ := os.Getwd()
-	path = path + "/lib/harbor/certs"
-
-	// Delete the directory if it already exists
-	if _, err := os.Stat(path); os.IsExist(err) {
-		errDir := os.RemoveAll(path)
-		if errDir != nil {
-			log.Fatal(err)
-		}
-	}
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		errDir := os.Mkdir(path, 0755)
-		if errDir != nil {
-			log.Fatal(err)
-		}
-	}
-
-	// Generate the certificates
-	if err := utils.GenerateCerts("harbor.katana.local", path); err != nil {
-		log.Fatal(err)
-	}
-
-}
 
 func InfraSet(c *fiber.Ctx) error {
 
