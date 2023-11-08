@@ -22,5 +22,11 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(dbCmd)
 	rootCmd.AddCommand(infraCmd)
+	rootCmd.AddCommand(setUpCmd)
+	rootCmd.AddCommand(gitCmd)
+	setUpCmd.AddCommand(gitCmd)
+	setUpCmd.AddCommand(infraCmd)
+	setUpCmd.AddCommand(dbCmd)
 }

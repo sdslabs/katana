@@ -1,11 +1,7 @@
 package main
 
 import (
-	"bytes"
-	"fmt"
-	"html/template"
 	"log"
-	"path/filepath"
 
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
@@ -17,7 +13,7 @@ import (
 
 var infraCmd = &cobra.Command{
 
-	Use:   "infra",
+	Use:   "infra-setup",
 	Short: "Run the infraset setup command",
 	Long:  `Runs the katana API server on port 3000`,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -25,42 +21,18 @@ var infraCmd = &cobra.Command{
 		config, err := utils.GetKubeConfig()
 
 		if err != nil {
-			log.Println("There was error in setting up Kubernentes Config")
+			log.Println("There was error in setting up Kubernentes Config", err)
 		}
 
 		kubeclient, err := utils.GetKubeClient()
-
 		if err != nil {
-			log.Fatal(err)
+			log.Println("Error in creating Kubernetes client", err)
 		}
 		infraSetService.GenerateCertsforHarbor()
-
-		clusterConfig := g.ClusterConfig
-		deploymentConfig := utils.DeploymentConfig()
-		nodes, _ := utils.GetNodes(kubeclient)
-
-		deploymentConfig.NodeAffinityValue = nodes[0].Name
-
-		for _, m := range clusterConfig.TemplatedManifests {
-
-			manifest := &bytes.Buffer{}
-			log.Printf("Applying: %s\n", m)
-			tmpl, err := template.ParseFiles(filepath.Join(clusterConfig.TemplatedManifestDir, m))
-			if err != nil {
-				fmt.Print("err1")
-			}
-
-			if err = tmpl.Execute(manifest, deploymentConfig); err != nil {
-				fmt.Print("err2")
-			}
-
-			if err = deployment.ApplyManifest(config, kubeclient, manifest.Bytes(), g.KatanaConfig.KubeNameSpace); err != nil {
-				fmt.Print("err3")
-			}
-		}
+		deployment.DeployCluster(config, kubeclient)
 		err = harbor.SetupHarbor()
 		if err != nil {
-			fmt.Print("err4")
+			log.Println("There was error in setting up harbor", err)
 		}
 		infraSetService.BuildKatanaServices()
 	},

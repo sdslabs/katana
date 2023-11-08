@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	g "github.com/sdslabs/katana/configs"
@@ -32,14 +33,12 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 	if err != nil {
 		return err
 	}
-
 	decoder := yamlutil.NewYAMLOrJSONDecoder(bytes.NewReader(manifest), 100)
 	for {
 		var rawObj runtime.RawExtension
 		if err = decoder.Decode(&rawObj); err != nil {
 			break
 		}
-
 		obj, gvk, err := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme).Decode(rawObj.Raw, nil, nil)
 		if err != nil {
 			return err
@@ -79,7 +78,13 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 					continue
 					// TODO: Handle PVCs, currently on deletion of PVCs, the cluster is stuck in a loop
 				}
-				_ = dri.Delete(context.Background(), unstructuredObj.GetName(), metav1.DeleteOptions{})
+				err = dri.Delete(context.Background(), unstructuredObj.GetName(), metav1.DeleteOptions{})
+				if err != nil {
+					if strings.Contains(err.Error(), "not found") {
+						return nil
+					}
+					log.Fatal(err)
+				}
 				watcher, err := dri.Watch(context.Background(), metav1.ListOptions{
 					FieldSelector: fmt.Sprintf("metadata.name=%s", unstructuredObj.GetName()),
 				})
@@ -87,8 +92,10 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 					return err
 				}
 				defer watcher.Stop()
+
 				for event := range watcher.ResultChan() {
 					if event.Type == watch.Deleted {
+
 						_, err = dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{})
 						if err != nil {
 							return err
@@ -99,7 +106,6 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 			}
 		}
 	}
-
 	if err != io.EOF {
 		return err
 	}
@@ -115,7 +121,11 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 
 	clientset, _ := utils.GetKubeClient()
 
-	nodes, _ := utils.GetNodes(clientset)
+	nodes, err := utils.GetNodes(clientset)
+
+	if err != nil {
+		log.Println(err)
+	}
 
 	deploymentConfig.NodeAffinityValue = nodes[0].Name
 
