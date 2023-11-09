@@ -26,7 +26,4 @@ func init() {
 	rootCmd.AddCommand(infraCmd)
 	rootCmd.AddCommand(setUpCmd)
 	rootCmd.AddCommand(gitCmd)
-	setUpCmd.AddCommand(gitCmd)
-	setUpCmd.AddCommand(infraCmd)
-	setUpCmd.AddCommand(dbCmd)
 }
