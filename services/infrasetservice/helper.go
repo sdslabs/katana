@@ -34,6 +34,7 @@ func GenerateCertsforHarbor() error {
 		errDir := os.Mkdir(path, 0755)
 		if errDir != nil {
 			log.Fatal(err)
+			return err
 		}
 	}
 	log.Println("CHECK 3")
@@ -121,6 +122,7 @@ func BuildKatanaServices() error {
 		log.Fatal(errDir)
 		return errDir
 	}
+
 	katanaServicesDir := katanaDir + "/katana-services"
 
 	services, err := os.ReadDir(katanaServicesDir)

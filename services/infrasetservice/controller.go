@@ -183,7 +183,6 @@ func CreateTeams(c *fiber.Ctx) error {
 			return err
 		}
 
-		pwd, team := createTeamCredentials(i)
 
 		deploymentConfig := utils.DeploymentConfig()
 

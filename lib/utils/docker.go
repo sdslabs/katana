@@ -45,7 +45,7 @@ func CheckDockerfile(_DockerfilePath string) bool {
 	return !os.IsNotExist(err)
 }
 
-func BuildDockerImage(_ChallengeName string, _DockerfilePath string)error {
+func BuildDockerImage(_ChallengeName string, _DockerfilePath string) error {
 	buf := new(bytes.Buffer)
 	if err := Tar(_DockerfilePath, buf); err != nil {
 		log.Fatal(err, ": error tarring directory")
