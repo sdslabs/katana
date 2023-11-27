@@ -15,7 +15,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func GenerateCertsforHarbor() {
+func GenerateCertsforHarbor() error {
 	path, _ := os.Getwd()
 	path = path + "/lib/harbor/certs"
 
@@ -24,6 +24,7 @@ func GenerateCertsforHarbor() {
 		errDir := os.RemoveAll(path)
 		if errDir != nil {
 			log.Fatal(err)
+			return err
 		}
 	}
 
@@ -31,19 +32,26 @@ func GenerateCertsforHarbor() {
 		errDir := os.Mkdir(path, 0755)
 		if errDir != nil {
 			log.Fatal(err)
+			return err
 		}
 	}
 
 	// Generate the certificates
 	if err := utils.GenerateCerts("harbor.katana.local", path); err != nil {
 		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
 func createTeamCredentials(teamNumber int) (string, types.CTFTeam) {
 	teamlabels := utils.GetTeamPodLabels()
 	podName := teamlabels + "-team-master-pod-0"
-	gogs := utils.GetKatanaLoadbalancer() + ":3000"
+	gogs, err := utils.GetKatanaLoadbalancer()
+	if err != nil {
+		log.Fatal(err)
+	}
+	gogs = gogs + ":3000"
 	pwd := utils.RandomString(configs.SSHProviderConfig.PasswordLen)
 	hashed, err := utils.HashPassword(pwd)
 	if err != nil {
@@ -93,13 +101,19 @@ func envVariables(gogs string, pwd string, podNamespace string) {
 	}
 }
 
-func BuildKatanaServices() {
-	katanaDir, err := utils.GetKatanaRootPath()
+func BuildKatanaServices() error {
+	katanaDir, errDir := utils.GetKatanaRootPath()
+	if errDir != nil {
+		log.Fatal(errDir)
+		return errDir
+	}
+
 	katanaServicesDir := katanaDir + "/katana-services"
 
 	services, err := os.ReadDir(katanaServicesDir)
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
 
 	for _, service := range services {
@@ -109,7 +123,12 @@ func BuildKatanaServices() {
 		if service.IsDir() {
 			log.Println("Building " + service.Name())
 			imageName := strings.ToLower(service.Name())
-			utils.BuildDockerImage(imageName, katanaServicesDir+"/"+service.Name())
+			err := utils.BuildDockerImage(imageName, katanaServicesDir+"/"+service.Name())
+			if err != nil {
+				return err
+			}
+
 		}
 	}
+	return nil
 }

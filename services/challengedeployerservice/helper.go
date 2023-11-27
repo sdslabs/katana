@@ -33,13 +33,18 @@ func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType 
 		if err != nil {
 			log.Println(err)
 		}
+		katanaLB, err := utils.GetKatanaLoadbalancer()
+		if err != nil {
+			return fmt.Errorf("Error in getting Katana Load Balancer : %s/n", err)
+		}
 		remoteConfig := &config.RemoteConfig{
 			Name: "origin",
-			URLs: []string{"http://sdslabs@" + utils.GetKatanaLoadbalancer() + ":3000" + "/" + path}}
+			URLs: []string{"http://sdslabs@" + katanaLB + ":3000" + "/" + path}}
 		_, err = repo.CreateRemote(remoteConfig)
 
 		if err != nil {
 			log.Println(err)
+			return err
 		}
 		podsInTeam, err := utils.GetPods(map[string]string{
 			"app": g.ClusterConfig.TeamLabel,

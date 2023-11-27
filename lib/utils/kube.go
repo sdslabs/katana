@@ -81,39 +81,44 @@ func GetTeamPodLabels() string {
 	return string(g.ClusterConfig.DeploymentLabel)
 }
 
-func GetMongoIP() string {
+func GetMongoIP() (string, error) {
 	client, err := GetKubeClient()
 	if err != nil {
 		log.Fatal(err)
+		return "", err
 	}
 	service, err := client.CoreV1().Services("katana").Get(context.TODO(), "mongo-nodeport-svc", metav1.GetOptions{})
 	if err != nil {
 		log.Fatal(err)
+		return "", err
 	}
 
 	// Print the IP address of the service
 	log.Println(service.Spec.ClusterIP)
-	return service.Spec.ClusterIP
+	return service.Spec.ClusterIP, nil
 }
 
-func GetKatanaLoadbalancer() string {
+func GetKatanaLoadbalancer() (string, error) {
 	client, err := GetKubeClient()
 	if err != nil {
 		log.Fatal(err)
+		return "", err
 	}
 
 	// Check if the service is ready
 	err = WaitForLoadBalancerExternalIP(client, "katana-lb", "katana")
 	if err != nil {
 		log.Fatal(err)
+		return "", err
 	}
 
 	service, err := client.CoreV1().Services("katana").Get(context.TODO(), "katana-lb", metav1.GetOptions{})
 	if err != nil {
 		log.Fatal(err)
+		return "", err
 	}
 	externalIP := service.Status.LoadBalancer.Ingress[0].IP
-	return externalIP
+	return externalIP, nil
 }
 
 func DeploymentConfig() types.ManifestConfig {
@@ -143,10 +148,12 @@ func DeploymentConfig() types.ManifestConfig {
 	harborKey, err := ioutil.ReadFile(basePath + "/lib/harbor/certs/harbor.katana.local.key")
 	if err != nil {
 		log.Fatal(err)
+
 	}
 	harborCrt, err := ioutil.ReadFile(basePath + "/lib/harbor/certs/harbor.katana.local.crt")
 	if err != nil {
 		log.Fatal(err)
+
 	}
 	harborCaCrt, err := ioutil.ReadFile(basePath + "/lib/harbor/certs/ca.crt")
 	if err != nil {
@@ -160,7 +167,7 @@ func DeploymentConfig() types.ManifestConfig {
 	return config
 }
 
-func Podexecutor(command []string, kubeClientset *kubernetes.Clientset, kubeConfig *rest.Config, podNamespace string) {
+func Podexecutor(command []string, kubeClientset *kubernetes.Clientset, kubeConfig *rest.Config, podNamespace string)error {
 	req := kubeClientset.CoreV1().RESTClient().Post().
 		Resource("pods").
 		Name("katana-team-master-pod-0").
@@ -176,6 +183,7 @@ func Podexecutor(command []string, kubeClientset *kubernetes.Clientset, kubeConf
 	exec, err := remotecommand.NewSPDYExecutor(kubeConfig, "POST", req.URL())
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
 	var stdout, stderr bytes.Buffer
 	err = exec.Stream(remotecommand.StreamOptions{
@@ -185,10 +193,12 @@ func Podexecutor(command []string, kubeClientset *kubernetes.Clientset, kubeConf
 	})
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
-func DeleteDaemonSetAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *rest.Config, daemonSetName string, daemonSetNamespace string) {
+func DeleteDaemonSetAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *rest.Config, daemonSetName string, daemonSetNamespace string) error{
 	listOptions := metav1.ListOptions{
 		FieldSelector:   "metadata.name=" + daemonSetName,
 		Watch:           true,
@@ -198,14 +208,16 @@ func DeleteDaemonSetAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *res
 	watcher, err := kubeClientset.AppsV1().DaemonSets(daemonSetNamespace).Watch(context.Background(), listOptions)
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
 
 	err = kubeClientset.AppsV1().DaemonSets(daemonSetNamespace).Delete(context.TODO(), daemonSetName, metav1.DeleteOptions{})
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
-			return
+			return nil
 		}
 		log.Fatal(err)
+		return err
 	}
 
 	for event := range watcher.ResultChan() {
@@ -220,9 +232,10 @@ func DeleteDaemonSetAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *res
 	}
 
 	watcher.Stop()
+	return nil
 }
 
-func DeleteConfigMapAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *rest.Config, configMapName string, configMapNamespace string) {
+func DeleteConfigMapAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *rest.Config, configMapName string, configMapNamespace string)error {
 	// Wait for the configmap to be deleted
 	listOptions := metav1.ListOptions{
 		FieldSelector:   "metadata.name=" + configMapName,
@@ -233,14 +246,16 @@ func DeleteConfigMapAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *res
 	watcher, err := kubeClientset.CoreV1().ConfigMaps(configMapNamespace).Watch(context.Background(), listOptions)
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
 
 	err = kubeClientset.CoreV1().ConfigMaps(configMapNamespace).Delete(context.TODO(), configMapName, metav1.DeleteOptions{})
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
-			return
+			return nil
 		}
 		log.Fatal(err)
+		return err
 	}
 
 	for event := range watcher.ResultChan() {
@@ -255,6 +270,7 @@ func DeleteConfigMapAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *res
 	}
 
 	watcher.Stop()
+	return nil
 }
 
 func WaitForLoadBalancerExternalIP(clientset *kubernetes.Clientset, serviceName string, namespace string) error {
@@ -381,6 +397,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 	pod, err := client.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
 	if err != nil {
 		log.Printf("Error getting pod: %s\n", err)
+		return err
 	}
 
 	// Find the container in the pod

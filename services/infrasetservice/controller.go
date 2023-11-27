@@ -30,24 +30,33 @@ func InfraSet(c *fiber.Ctx) error {
 	config, err := utils.GetKubeConfig()
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
 
 	kubeclient, err := utils.GetKubeClient()
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
 
-	GenerateCertsforHarbor()
-
+	if err := GenerateCertsforHarbor(); err != nil {
+		log.Println("Error generating certificates :", err)
+		return err
+	}
 	if err = deployment.DeployCluster(config, kubeclient); err != nil {
 		log.Fatal(err)
+		return err
 	}
 
 	err = harbor.SetupHarbor()
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
-	BuildKatanaServices()
+	if err = BuildKatanaServices(); err != nil {
+		log.Fatal(err)
+		return err
+	}
 
 	return c.SendString("Infrastructure setup completed")
 }
@@ -108,20 +117,24 @@ func CreateTeams(c *fiber.Ctx) error {
 	config, err := utils.GetKubeConfig()
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
 	client, err := utils.GetKubeClient()
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
 	noOfTeams := int(configs.ClusterConfig.TeamCount)
 
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
 	if _, err := os.Stat("teams"); os.IsNotExist(err) {
 		errDir := os.Mkdir("teams", 0755)
 		if errDir != nil {
 			log.Fatal(err)
+			return err
 		}
 	}
 
@@ -145,6 +158,7 @@ func CreateTeams(c *fiber.Ctx) error {
 	credsFile, err := os.Create(configs.SSHProviderConfig.CredsFile)
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
 
 	for i := 0; i < noOfTeams; i++ {
@@ -153,6 +167,7 @@ func CreateTeams(c *fiber.Ctx) error {
 			errDir := os.Mkdir("teams/katana-team-"+strconv.Itoa(i), 0755)
 			if errDir != nil {
 				log.Fatal(err)
+				return err
 			}
 		}
 
@@ -167,6 +182,7 @@ func CreateTeams(c *fiber.Ctx) error {
 		_, err = client.CoreV1().Namespaces().Create(c.Context(), nsName, metav1.CreateOptions{})
 		if err != nil {
 			log.Fatal(err)
+			return err
 		}
 
 		manifest := &bytes.Buffer{}
@@ -199,8 +215,10 @@ func GitServer(c *fiber.Ctx) error {
 	var requestBody bytes.Buffer
 	writer := multipart.NewWriter(&requestBody)
 
-	LoadBalancer := utils.GetKatanaLoadbalancer()
-
+	LoadBalancer, err := utils.GetKatanaLoadbalancer()
+	if err != nil {
+		return err
+	}
 	writer.WriteField("db_type", "MySQL")
 	writer.WriteField("db_host", LoadBalancer+":3306")
 	writer.WriteField("db_user", configs.MySQLConfig.Username)

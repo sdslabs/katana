@@ -14,14 +14,14 @@ import (
 	"github.com/sdslabs/katana/configs"
 )
 
-func dockerLogin(username string, password string) {
+func dockerLogin(username string, password string) error {
 
 	log.Println("Logging into Harbor, Please wait...")
 
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		log.Fatal("Error creating Docker client:", err)
-		return
+		return err
 	}
 
 	authConfig := registry.AuthConfig{
@@ -33,21 +33,22 @@ func dockerLogin(username string, password string) {
 	_, err = cli.RegistryLogin(context.Background(), authConfig)
 	if err != nil {
 		log.Printf("Error during login: %s\n", err)
-		return
+		return err
 	}
 	log.Println("Logged into Harbor successfully")
+	return nil
 }
 
-func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
+func BuildDockerImage(_ChallengeName string, _DockerfilePath string) error {
 	buf := new(bytes.Buffer)
 	if err := Tar(_DockerfilePath, buf); err != nil {
 		log.Fatal(err, ": error tarring directory")
-		return
+		return err
 	}
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		log.Fatal(err)
-		return
+		return err
 	}
 
 	log.Println("Building Docker image, Please wait......")
@@ -63,18 +64,20 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 	)
 	if err != nil {
 		log.Fatal(err, " :unable to create image")
-		return
+		return err
 	}
 
 	_, err = io.Copy(os.Stdout, imageBuildResponse.Body)
 	if err != nil {
 		log.Fatal(err, " :unable to read image build response")
-		return
+		return err
 	}
 
 	log.Println("Docker image built successfully")
-
-	dockerLogin(configs.KatanaConfig.Harbor.Username, configs.KatanaConfig.Harbor.Password)
+	err = dockerLogin(configs.KatanaConfig.Harbor.Username, configs.KatanaConfig.Harbor.Password)
+	if err != nil {
+		return err
+	}
 
 	log.Println("Pushing Docker image to Harbor, please wait...")
 
@@ -85,7 +88,7 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 	authJSON, err := json.Marshal(authConfig)
 	if err != nil {
 		log.Fatal(err, ": error encoding credentials")
-		return
+		return err
 	}
 
 	encodedAuth := Base64Encode(string(authJSON))
@@ -97,11 +100,11 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 	_, err = cli.ImagePush(context.Background(), "harbor.katana.local/katana/"+_ChallengeName, pushOptions)
 	if err != nil {
 		log.Fatal(err, " :unable to push docker image")
-		return
+		return err
 	}
 
 	log.Println("Image Pushed to Harbor successfully")
-
+	return nil
 }
 
 func DockerImageExists(imageName string) bool {

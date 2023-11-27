@@ -19,8 +19,10 @@ import (
 func updateOrAddHost() error {
 	filePath := "/etc/hosts"
 	hostname := "harbor.katana.local"
-	ipAddress := utils.GetKatanaLoadbalancer()
-
+	ipAddress, err := utils.GetKatanaLoadbalancer()
+	if err != nil {
+		return err
+	}
 	file, err := os.Open(filePath)
 	if err != nil {
 		return err

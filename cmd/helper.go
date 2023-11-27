@@ -32,27 +32,35 @@ func infraSetup() error {
 
 	if err != nil {
 		log.Println("There was error in setting up Kubernentes Config", err)
+		return err
 	}
 
 	kubeclient, err := utils.GetKubeClient()
 	if err != nil {
 		log.Println("Error in creating Kubernetes client", err)
+		return err
 	}
 	infraSetService.GenerateCertsforHarbor()
 	deployment.DeployCluster(config, kubeclient)
 	err = harbor.SetupHarbor()
 	if err != nil {
 		log.Println("There was error in setting up harbor", err)
+		return err
 	}
-	infraSetService.BuildKatanaServices()
+	err = infraSetService.BuildKatanaServices()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func gitSetup() error {
 	var requestBody bytes.Buffer
 	writer := multipart.NewWriter(&requestBody)
-	LoadBalancer := utils.GetKatanaLoadbalancer()
-
+	LoadBalancer, err := utils.GetKatanaLoadbalancer()
+	if err != nil {
+		return err
+	}
 	writer.WriteField("db_type", "MySQL")
 	writer.WriteField("db_host", LoadBalancer+":3306")
 	writer.WriteField("db_user", g.MySQLConfig.Username)
@@ -78,6 +86,7 @@ func gitSetup() error {
 	req, err := http.NewRequest("POST", "http://"+LoadBalancer+":3000"+"/install", &requestBody)
 	if err != nil {
 		fmt.Println("", err)
+		return err
 	}
 
 	// Set the content type
@@ -88,11 +97,13 @@ func gitSetup() error {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("", err)
+		return err
 	}
 
 	// Check the response
 	if resp.StatusCode != http.StatusOK {
 		fmt.Println("error while setting up Git Server")
+		return err
 	}
 
 	log.Println("Git Server setup completed")

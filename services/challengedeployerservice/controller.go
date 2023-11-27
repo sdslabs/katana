@@ -3,6 +3,12 @@ package challengedeployerservice
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
+	"regexp"
+	"strconv"
+	"strings"
+
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/gofiber/fiber/v2"
@@ -12,11 +18,6 @@ import (
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"log"
-	"os"
-	"regexp"
-	"strconv"
-	"strings"
 )
 
 func Deploy(c *fiber.Ctx) error {
@@ -62,8 +63,10 @@ func Deploy(c *fiber.Ctx) error {
 				log.Println("Dockerfile not found in the " + folderName + " challenge folder. Please follow proper format.")
 			} else {
 				//Update challenge path to get dockerfile
-				utils.BuildDockerImage(folderName, challengePath+"/"+folderName + "/" + folderName)
-
+				err := utils.BuildDockerImage(folderName, challengePath+"/"+folderName+"/"+folderName)
+				if err != nil {
+					return err
+				}
 				clusterConfig := g.ClusterConfig
 				numberOfTeams := clusterConfig.TeamCount
 				for i := 0; i < int(numberOfTeams); i++ {
@@ -133,7 +136,10 @@ func DeployChallenge(c *fiber.Ctx) error {
 			}
 
 			//Update challenge path to get dockerfile
-			utils.BuildDockerImage(folderName, challengePath+"/"+folderName)
+			err = utils.BuildDockerImage(folderName, challengePath+"/"+folderName)
+			if err != nil {
+				return err
+			}
 
 			//Get no.of teams and DEPLOY CHALLENGE to each namespace (assuming they exist and /createTeams has been called)
 			clusterConfig := g.ClusterConfig
@@ -182,6 +188,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	repo, err := git.PlainOpen("teams/" + dir)
 	if err != nil {
 		log.Println(err)
+		return err
 	}
 
 	auth := &http.BasicAuth{
@@ -196,14 +203,18 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	})
 
 	if err != nil {
-		log.Println("Error pulling changes:", err)
+		return fmt.Errorf("Error pulling changes:", err)
+
 	}
 	katanaDir, err := utils.GetKatanaRootPath()
 	imageName := strings.Replace(dir, "/", "-", -1)
 
 	log.Println("Pull successful for", teamName, ". Building image...")
 	firstPatch := !utils.DockerImageExists(imageName)
-	utils.BuildDockerImage(imageName, katanaDir+"/teams/"+dir)
+	err = utils.BuildDockerImage(imageName, katanaDir+"/teams/"+dir)
+	if err != nil {
+		return err
+	}
 
 	if firstPatch {
 		log.Println("First Patch for", teamName)
@@ -222,6 +233,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 		if err != nil {
 			log.Println("Error")
 			log.Println(err)
+			return err
 		}
 	}
 	log.Println("Image built for", teamName)
@@ -264,7 +276,6 @@ func DeleteChallenge(c *fiber.Ctx) error {
 		if err != nil {
 			log.Println(" Error in getting deployments associated with the challenge. ")
 			continue
-			//panic(err)
 		}
 
 		//Delete deployments

@@ -119,12 +119,11 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 
 	deploymentConfig := utils.DeploymentConfig()
 
-	clientset, _ := utils.GetKubeClient()
-
-	nodes, err := utils.GetNodes(clientset)
+	nodes, err := utils.GetNodes(kubeclientset)
 
 	if err != nil {
 		log.Println(err)
+		return err
 	}
 
 	deploymentConfig.NodeAffinityValue = nodes[0].Name
@@ -214,7 +213,6 @@ func DeployChallengeToCluster(challengeName, teamName string, firstPatch bool, r
 	}
 	log.Println("Creating deployment...")
 	result, err := deploymentsClient.Create(context.TODO(), manifest, metav1.CreateOptions{})
-
 	if err != nil {
 		log.Println("Unable to create deployement")
 		panic(err)
