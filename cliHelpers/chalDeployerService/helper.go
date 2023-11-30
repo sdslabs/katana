@@ -72,7 +72,10 @@ func ChallengeUpdate() error {
 
 	if firstPatch {
 		log.Println("First Patch for", teamName)
-		deployment.DeployChallengeToCluster(challengeName, teamName, patch, replicas)
+		err = deployment.DeployChallengeToCluster(challengeName, teamName, patch, replicas)
+		if err != nil {
+			return err
+		}
 	} else {
 		log.Println("Not the first patch for", teamName, ". Simply deploying the image...")
 		labelSelector := metav1.LabelSelector{
@@ -146,7 +149,10 @@ func DeployChallenge() error {
 				for i := 0; i < int(numberOfTeams); i++ {
 					log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
 					teamName := "katana-team-" + strconv.Itoa(i)
-					deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
+					err = deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
+					if err != nil {
+						return err
+					}
 					url, err := challengedeployerservice.CreateServiceForChallenge(folderName, teamName, 3000, i)
 					if err != nil {
 						return err
@@ -155,9 +161,18 @@ func DeployChallenge() error {
 					}
 				}
 			}
-			challengedeployerservice.CopyChallengeIntoTsuka(challengePath, folderName, challengeType)
-			challengedeployerservice.CopyFlagDataIntoKashira(challengePath, folderName)
-			challengedeployerservice.CopyChallengeCheckerIntoKissaki(challengePath, folderName)
+			err = challengedeployerservice.CopyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			if err != nil {
+				return err
+			}
+			err = challengedeployerservice.CopyFlagDataIntoKashira(challengePath, folderName)
+			if err != nil {
+				return err
+			}
+			err = challengedeployerservice.CopyChallengeCheckerIntoKissaki(challengePath, folderName)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -218,8 +233,7 @@ func DeleteChallenge(challengeName string) error {
 		services, err := serviceClient.List(context.TODO(), metav1.ListOptions{})
 		if err != nil {
 			log.Println(" Error in getting services for" + challengeName + "in the namespace " + teamNamespace)
-			continue
-			//panic(err)
+			return err
 		}
 
 		flag := 0
@@ -240,7 +254,6 @@ func DeleteChallenge(challengeName string) error {
 			log.Println("Error in deleting service for "+challengeName+" in namespace "+teamNamespace, err)
 			continue
 		}
-
 	}
 
 	log.Println("Process completed")

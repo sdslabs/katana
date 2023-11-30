@@ -16,8 +16,8 @@ var SetUpCmd = &cobra.Command{
 			return err
 		}
 		log.Println("Infrastructure setup successfully")
-		if err := DBSetup(); err != nil {
-			log.Println("Error setting up the database:", err)
+		if err := mongoDBSetup(); err != nil {
+			log.Println("Error setting up the mongo database:", err)
 			return err
 		}
 		log.Println("Database connected successfully")
@@ -26,8 +26,8 @@ var SetUpCmd = &cobra.Command{
 			return err
 		}
 		log.Println("Git Server connected successfully")
-		if err := DBSetup(); err != nil {
-			log.Println("Error setting up the database:", err)
+		if err := mysqlDBSetup(); err != nil {
+			log.Println("Error setting up the mysql database:", err)
 			return err
 		}
 		log.Println("Database connected successfully")

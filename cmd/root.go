@@ -24,7 +24,8 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(runCmd)
-	rootCmd.AddCommand(infraService.DBCmd)
+	rootCmd.AddCommand(infraService.MongoDBCmd)
+	rootCmd.AddCommand(infraService.MysqlDBCmd)
 	rootCmd.AddCommand(infraService.InfraCmd)
 	rootCmd.AddCommand(infraService.SetUpCmd)
 	rootCmd.AddCommand(infraService.GitCmd)

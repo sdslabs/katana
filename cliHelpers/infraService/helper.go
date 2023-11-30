@@ -16,10 +16,13 @@ import (
 	infraSetService "github.com/sdslabs/katana/services/infrasetservice"
 )
 
-func DBSetup() error {
+func mongoDBSetup() error {
 	if err := mongo.Init(); err != nil {
 		return err
 	}
+	return nil
+}
+func mysqlDBSetup() error {
 	if err := mysql.Init(); err != nil {
 		return err
 	}
