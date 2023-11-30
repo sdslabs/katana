@@ -13,7 +13,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType string) error {
+func CopyChallengeIntoTsuka(dirPath string, challengeName string, challengeType string) error {
 	localFilePath := dirPath + "/" + challengeName
 	pathInPod := "/opt/katana/katana_" + challengeType + "_" + challengeName + ".tar.gz"
 	log.Println("Testing" + localFilePath + "....and..." + pathInPod)
@@ -35,7 +35,7 @@ func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType 
 		}
 		katanaLB, err := utils.GetKatanaLoadbalancer()
 		if err != nil {
-			return fmt.Errorf("Error in getting Katana Load Balancer : %s/n", err)
+			return fmt.Errorf("error in getting Katana Load Balancer : %s/n", err)
 		}
 		remoteConfig := &config.RemoteConfig{
 			Name: "origin",
@@ -66,7 +66,7 @@ func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType 
 	return nil
 }
 
-func createServiceForChallenge(challengeName, teamName string, targetPort int32, teamNumber int) (string, error) {
+func CreateServiceForChallenge(challengeName, teamName string, targetPort int32, teamNumber int) (string, error) {
 	kubeclient, _ := utils.GetKubeClient()
 	serviceName := challengeName + "-svc-" + strconv.Itoa(teamNumber)
 	teamNamespace := teamName + "-ns"
@@ -82,7 +82,7 @@ func createServiceForChallenge(challengeName, teamName string, targetPort int32,
 	return serviceName, nil
 }
 
-func createFolder(challengeName string) (message int, challengePath string) {
+func CreateFolder(challengeName string) (message int, challengePath string) {
 
 	basePath, _ := os.Getwd()
 	dirPath := basePath + "/challenges" //basepath is .../katana
@@ -117,7 +117,7 @@ func createFolder(challengeName string) (message int, challengePath string) {
 	return 0, challengePath
 }
 
-func copyChallengeCheckerIntoKissaki(dirPath string, challengeName string) error {
+func CopyChallengeCheckerIntoKissaki(dirPath string, challengeName string) error {
 	srcFilePath := dirPath + "/" + challengeName + "-challenge-checker"
 	pathInPod := "/opt/kissaki/kissaki_" + challengeName + ".tar.gz"
 
@@ -128,7 +128,7 @@ func copyChallengeCheckerIntoKissaki(dirPath string, challengeName string) error
 	return nil
 }
 
-func copyFlagDataIntoKashira(dirPath string, challengeName string) error {
+func CopyFlagDataIntoKashira(dirPath string, challengeName string) error {
 	srcFilePath := dirPath + "/" + "flag-data"
 	pathInPod := "/opt/kashira/kashira_" + challengeName + ".tar.gz"
 

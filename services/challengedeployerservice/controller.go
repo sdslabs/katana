@@ -73,7 +73,7 @@ func Deploy(c *fiber.Ctx) error {
 					log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
 					teamName := "katana-team-" + strconv.Itoa(i)
 					deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
-					url, err := createServiceForChallenge(folderName, teamName, 3000, i)
+					url, err := CreateServiceForChallenge(folderName, teamName, 3000, i)
 					if err != nil {
 						res = append(res, []string{teamName, err.Error()})
 					} else {
@@ -81,9 +81,9 @@ func Deploy(c *fiber.Ctx) error {
 					}
 				}
 			}
-			copyChallengeIntoTsuka(challengePath, folderName, challengeType)
-			copyFlagDataIntoKashira(challengePath, folderName)
-			copyChallengeCheckerIntoKissaki(challengePath, folderName)
+			CopyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			CopyFlagDataIntoKashira(challengePath, folderName)
+			CopyChallengeCheckerIntoKissaki(challengePath, folderName)
 		}
 	}
 	return c.JSON(res)
@@ -108,7 +108,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 			match := regex.FindStringSubmatch(file.Filename)
 			folderName = match[1]
 
-			response, challengePath := createFolder(folderName)
+			response, challengePath := CreateFolder(folderName)
 			if response == 1 {
 				log.Println("Directory already exists with same name")
 				return c.SendString("Directory already exists with same name")
@@ -149,16 +149,16 @@ func DeployChallenge(c *fiber.Ctx) error {
 				log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
 				teamName := "katana-team-" + strconv.Itoa(i)
 				deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
-				url, err := createServiceForChallenge(folderName, teamName, 3000, i)
+				url, err := CreateServiceForChallenge(folderName, teamName, 3000, i)
 				if err != nil {
 					res = append(res, []string{teamName, err.Error()})
 				} else {
 					res = append(res, []string{teamName, url})
 				}
 			}
-			copyChallengeIntoTsuka(challengePath, folderName, challengeType)
-			copyFlagDataIntoKashira(challengePath, folderName)
-			copyChallengeCheckerIntoKissaki(challengePath, folderName)
+			CopyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			CopyFlagDataIntoKashira(challengePath, folderName)
+			CopyChallengeCheckerIntoKissaki(challengePath, folderName)
 
 			return c.JSON(res)
 		}
@@ -203,10 +203,13 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	})
 
 	if err != nil {
-		return fmt.Errorf("Error pulling changes:", err)
+		return fmt.Errorf("error pulling changes:%s", err)
 
 	}
 	katanaDir, err := utils.GetKatanaRootPath()
+	if err != nil {
+		return err
+	}
 	imageName := strings.Replace(dir, "/", "-", -1)
 
 	log.Println("Pull successful for", teamName, ". Building image...")

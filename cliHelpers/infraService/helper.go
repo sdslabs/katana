@@ -1,4 +1,4 @@
-package main
+package infraService
 
 import (
 	"bytes"
@@ -16,7 +16,7 @@ import (
 	infraSetService "github.com/sdslabs/katana/services/infrasetservice"
 )
 
-func dbSetup() error {
+func DBSetup() error {
 	if err := mongo.Init(); err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func dbSetup() error {
 	return nil
 }
 
-func infraSetup() error {
+func InfraSetup() error {
 	g.LoadConfiguration()
 	config, err := utils.GetKubeConfig()
 
@@ -54,7 +54,7 @@ func infraSetup() error {
 	return nil
 }
 
-func gitSetup() error {
+func GitSetup() error {
 	var requestBody bytes.Buffer
 	writer := multipart.NewWriter(&requestBody)
 	LoadBalancer, err := utils.GetKatanaLoadbalancer()

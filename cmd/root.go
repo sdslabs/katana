@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 
+	"github.com/sdslabs/katana/cliHelpers/chalDeployerService"
+	"github.com/sdslabs/katana/cliHelpers/infraService"
 	"github.com/spf13/cobra"
 )
 
@@ -22,8 +24,11 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(runCmd)
-	rootCmd.AddCommand(dbCmd)
-	rootCmd.AddCommand(infraCmd)
-	rootCmd.AddCommand(setUpCmd)
-	rootCmd.AddCommand(gitCmd)
+	rootCmd.AddCommand(infraService.DBCmd)
+	rootCmd.AddCommand(infraService.InfraCmd)
+	rootCmd.AddCommand(infraService.SetUpCmd)
+	rootCmd.AddCommand(infraService.GitCmd)
+	rootCmd.AddCommand(chalDeployerService.DelChalCmd)
+	rootCmd.AddCommand(chalDeployerService.ChalUpdateCmd)
+	rootCmd.AddCommand(chalDeployerService.DeployChalCmd)
 }

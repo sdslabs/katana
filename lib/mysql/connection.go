@@ -17,7 +17,11 @@ var db *sql.DB
 func setup() error {
 	for i := 0; i < 10; i++ {
 		log.Printf("Trying to connect to MySQL, attempt %d", i+1)
-		database, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp("+utils.GetKatanaLoadbalancer()+":3306)/mysql")
+		katanaLB, err := utils.GetKatanaLoadbalancer()
+		if err != nil {
+			return err
+		}
+		database, err := sql.Open("mysql", g.MySQLConfig.Username+":"+g.MySQLConfig.Password+"@tcp("+katanaLB+":3306)/mysql")
 		if err != nil {
 			return fmt.Errorf("cannot connect to mysql: %w", err)
 		}
@@ -49,9 +53,9 @@ func setupGogs() error {
 	if err := CreateAccessToken(configs.AdminConfig.Username, configs.AdminConfig.Password); err != nil {
 		fmt.Errorf("cannot create access token: %w", err)
 	}
+
 	return nil
 }
-
 func Init() error {
 	if err := setup(); err != nil {
 		return fmt.Errorf("cannot setup: %w", err)
