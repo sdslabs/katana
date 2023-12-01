@@ -19,7 +19,7 @@ var MongoDBCmd = &cobra.Command{
 		return nil
 	},
 }
-var MysqlDBCmd = &cobra.Command{
+var MySqlDBCmd = &cobra.Command{
 	Use:   "mysqldb-setup",
 	Short: "Run the mysql db setup command",
 	Long:  "Runs the mysql database setup",

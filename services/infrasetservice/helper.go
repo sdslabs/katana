@@ -44,7 +44,7 @@ func GenerateCertsforHarbor() error {
 	return nil
 }
 
-func createTeamCredentials(teamNumber int) (string, types.CTFTeam) {
+func CreateTeamCredentials(teamNumber int) (string, types.CTFTeam) {
 	teamlabels := utils.GetTeamPodLabels()
 	podName := teamlabels + "-team-master-pod-0"
 	gogs, err := utils.GetKatanaLoadbalancer()

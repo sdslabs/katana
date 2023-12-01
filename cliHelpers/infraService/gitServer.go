@@ -7,7 +7,6 @@ import (
 )
 
 var GitCmd = &cobra.Command{
-
 	Use:   "git-server",
 	Short: "Run the git-server setup command",
 	Long:  `Runs the katana API server on port 3000`,
