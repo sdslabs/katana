@@ -20,7 +20,7 @@ var SetUpCmd = &cobra.Command{
 			log.Println("Error setting up the mongo database:", err)
 			return err
 		}
-		log.Println("Database connected successfully")
+		log.Println("MongoDB connected successfully")
 		if err := GitSetup(); err != nil {
 			log.Println("Error setting up the git server:", err)
 			return err
@@ -30,7 +30,7 @@ var SetUpCmd = &cobra.Command{
 			log.Println("Error setting up the mysql database:", err)
 			return err
 		}
-		log.Println("Database connected successfully")
+		log.Println("ySQL Database connected successfully")
 		return nil
 	},
 }
