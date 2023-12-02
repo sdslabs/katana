@@ -2,6 +2,7 @@ package infrasetservice
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"html/template"
 	"log"
@@ -178,30 +179,34 @@ func CreateTeams(c *fiber.Ctx) error {
 				Name: namespace,
 			},
 		}
-
-		_, err = client.CoreV1().Namespaces().Create(c.Context(), nsName, metav1.CreateOptions{})
+		var contx context.Context
+		_, err = client.CoreV1().Namespaces().Create(contx, nsName, metav1.CreateOptions{})
 		if err != nil {
+			fmt.Println("Error creating namespace0: ", err)
 			log.Fatal(err)
 			return err
 		}
-
 		manifest := &bytes.Buffer{}
 		tmpl, err := template.ParseFiles(filepath.Join(configs.ClusterConfig.TemplatedManifestDir, "runtime", "teams.yml"))
 		if err != nil {
+			fmt.Println("Error creating namespace1: ", err)
+			log.Fatal(err)
 			return err
 		}
-
-		pwd, team := CreateTeamCredentials(i)
-
+		pwd, team, err := CreateTeamCredentials(i)
+		if err != nil {
+			return err
+		}
 		deploymentConfig := utils.DeploymentConfig()
 
 		deploymentConfig.SSHPassword = pwd
-
 		if err = tmpl.Execute(manifest, deploymentConfig); err != nil {
+			fmt.Println("Error creating namespace2: ", err)
 			return err
 		}
 
 		if err = deployment.ApplyManifest(config, client, manifest.Bytes(), namespace); err != nil {
+			fmt.Println("Error creating namespace3: ", err)
 			return err
 		}
 		teams = append(teams, team)

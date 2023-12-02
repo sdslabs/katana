@@ -44,18 +44,20 @@ func GenerateCertsforHarbor() error {
 	return nil
 }
 
-func CreateTeamCredentials(teamNumber int) (string, types.CTFTeam) {
+func CreateTeamCredentials(teamNumber int) (string, types.CTFTeam, error) {
 	teamlabels := utils.GetTeamPodLabels()
 	podName := teamlabels + "-team-master-pod-0"
 	gogs, err := utils.GetKatanaLoadbalancer()
 	if err != nil {
 		log.Fatal(err)
+		return "", types.CTFTeam{}, err
 	}
 	gogs = gogs + ":3000"
 	pwd := utils.RandomString(configs.SSHProviderConfig.PasswordLen)
 	hashed, err := utils.HashPassword(pwd)
 	if err != nil {
 		log.Fatal(err)
+		return "", types.CTFTeam{}, err
 	}
 	podNamespace := "katana-team-" + fmt.Sprint(teamNumber)
 	// start watching for container events
@@ -66,9 +68,17 @@ func CreateTeamCredentials(teamNumber int) (string, types.CTFTeam) {
 		PodName:  podName,
 		Password: hashed,
 	}
-	mysql.CreateGogsUser(team.Name, pwd)
-	mysql.CreateAccessToken(team.Name, pwd)
-	return pwd, team
+	err = mysql.CreateGogsUser(team.Name, pwd)
+	if err != nil {
+		log.Fatal(err)
+		return "", types.CTFTeam{}, err
+	}
+	err = mysql.CreateAccessToken(team.Name, pwd)
+	if err != nil {
+		log.Fatal(err)
+		return "", types.CTFTeam{}, err
+	}
+	return pwd, team, nil
 }
 
 func envVariables(gogs string, pwd string, podNamespace string) {

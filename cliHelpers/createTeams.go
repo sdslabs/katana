@@ -102,8 +102,10 @@ func CreateTeams(ctx context.Context) error {
 			return err
 		}
 
-		pwd, team := infrasetservice.CreateTeamCredentials(i)
-
+		pwd, team, err := infrasetservice.CreateTeamCredentials(i)
+		if err != nil {
+			return err
+		}
 		deploymentConfig := utils.DeploymentConfig()
 
 		deploymentConfig.SSHPassword = pwd
