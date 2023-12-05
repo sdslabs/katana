@@ -1,18 +1,16 @@
 package infrasetservice
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/mysql"
 	utils "github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
-	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func GenerateCertsforHarbor() error {
@@ -61,7 +59,8 @@ func CreateTeamCredentials(teamNumber int) (string, types.CTFTeam, error) {
 	}
 	podNamespace := "katana-team-" + fmt.Sprint(teamNumber)
 	// start watching for container events
-	go envVariables(gogs, pwd, podNamespace)
+
+	envVariables(gogs, pwd, podNamespace)
 	team := types.CTFTeam{
 		Index:    teamNumber,
 		Name:     podNamespace,
@@ -81,34 +80,29 @@ func CreateTeamCredentials(teamNumber int) (string, types.CTFTeam, error) {
 	return pwd, team, nil
 }
 
-func envVariables(gogs string, pwd string, podNamespace string) {
+func envVariables(gogs string, pwd string, podNamespace string) error {
 	kubeClientset, _ := utils.GetKubeClient()
 	kubeConfig, _ := utils.GetKubeConfig()
-	watch, _ := kubeClientset.CoreV1().Pods(podNamespace+"-ns").Watch(context.Background(), metav1.ListOptions{})
-	for event := range watch.ResultChan() {
-		p, ok := event.Object.(*v1.Pod)
-		if !ok {
-			log.Fatal("unexpected type")
-		}
-		if p.Status.Phase != "Pending" {
-			log.Println("Pod created")
-			command := []string{"bash", "-c", "echo 'export GOGS=" + gogs + "' >> /etc/profile"}
-			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
-			command = []string{"bash", "-c", "echo 'export PASSWORD=" + pwd + "' >> /etc/profile"}
-			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
-			command = []string{"bash", "-c", "echo 'export USERNAME=" + podNamespace + "' >> /etc/profile"}
-			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
-			command = []string{"bash", "-c", "echo 'export BACKEND_URL=" + configs.KatanaConfig.BackendUrl + "/api/v1/admin/challengeUpdate' >> /etc/profile"}
-			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
-			command = []string{"bash", "-c", "echo 'export ADMIN=" + configs.AdminConfig.Username + "' >> /etc/profile"}
-			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
-			command = []string{"bash", "-c", "echo 'cd /opt/katana' >> /etc/profile"}
-			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
-			command = []string{"bash", "-c", "source /etc/profile"}
-			utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
-			break
-		}
-	}
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go utils.WaitForPodReady(kubeClientset, podNamespace, &wg)
+	wg.Wait()
+	command := []string{"bash", "-c", "echo 'export GOGS=" + gogs + "' >> /etc/profile"}
+	utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
+	command = []string{"bash", "-c", "echo 'export PASSWORD=" + pwd + "' >> /etc/profile"}
+	utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
+	command = []string{"bash", "-c", "echo 'export USERNAME=" + podNamespace + "' >> /etc/profile"}
+	utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
+	command = []string{"bash", "-c", "echo 'export BACKEND_URL=" + configs.KatanaConfig.BackendUrl + "/api/v1/admin/challengeUpdate' >> /etc/profile"}
+	utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
+	command = []string{"bash", "-c", "echo 'export ADMIN=" + configs.AdminConfig.Username + "' >> /etc/profile"}
+	utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
+	command = []string{"bash", "-c", "echo 'cd /opt/katana' >> /etc/profile"}
+	utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
+	command = []string{"bash", "-c", "source /etc/profile"}
+	utils.Podexecutor(command, kubeClientset, kubeConfig, podNamespace)
+
+	return nil
 }
 
 func BuildKatanaServices() error {

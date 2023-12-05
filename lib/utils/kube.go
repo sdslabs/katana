@@ -3,17 +3,20 @@ package utils
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/types"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -334,6 +337,21 @@ func WaitForDeploymentReady(clientset *kubernetes.Clientset, deploymentName stri
 		}
 	}
 
+	return nil
+}
+func WaitForPodReady(clientset *kubernetes.Clientset, podNamespace string, wg *sync.WaitGroup) error {
+	watch, _ := clientset.CoreV1().Pods(podNamespace+"-ns").Watch(context.Background(), metav1.ListOptions{})
+	for event := range watch.ResultChan() {
+		p, ok := event.Object.(*v1.Pod)
+		if !ok {
+			return fmt.Errorf("unexpected type")
+		}
+		if p.Status.Phase != "Pending" {
+			log.Println("Pod created")
+			wg.Done()
+			return nil
+		}
+	}
 	return nil
 }
 

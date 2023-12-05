@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// still have to test this [WIP]
+
 var DeployChalCmd = &cobra.Command{
 	Use:   "chal-deploy",
 	Short: "Run the Challenge Deploy command",

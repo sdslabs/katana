@@ -6,7 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// runCmd represents the run command
+// runCmd represents the run command 
+// not tested yet [WIP]
 var SetUpCmd = &cobra.Command{
 	Use:   "setup",
 	Short: "SetUps Katana on your computer",
@@ -30,7 +31,7 @@ var SetUpCmd = &cobra.Command{
 			log.Println("Error setting up the mysql database:", err)
 			return err
 		}
-		log.Println("ySQL Database connected successfully")
+		log.Println("MySQL Database connected successfully")
 		return nil
 	},
 }

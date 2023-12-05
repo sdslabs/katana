@@ -2,7 +2,6 @@ package infrasetservice
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"html/template"
 	"log"
@@ -179,8 +178,8 @@ func CreateTeams(c *fiber.Ctx) error {
 				Name: namespace,
 			},
 		}
-		var contx context.Context
-		_, err = client.CoreV1().Namespaces().Create(contx, nsName, metav1.CreateOptions{})
+		// var contx context.Context
+		_, err = client.CoreV1().Namespaces().Create(c.Context(), nsName, metav1.CreateOptions{})
 		if err != nil {
 			fmt.Println("Error creating namespace0: ", err)
 			log.Fatal(err)
