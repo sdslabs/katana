@@ -1,7 +1,6 @@
 package infrasetservice
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
@@ -64,7 +63,8 @@ func CreateTeamCredentials(teamNumber int) (string, types.CTFTeam, error) {
 	}
 	podNamespace := "katana-team-" + fmt.Sprint(teamNumber)
 	// start watching for container events
-	go envVariables(gogs, pwd, podNamespace)
+
+	envVariables(gogs, pwd, podNamespace)
 	team := types.CTFTeam{
 		Index:    teamNumber,
 		Name:     podNamespace,
