@@ -1,0 +1,13 @@
+[challenge.author]
+name = "paradox"
+email = "paradox@katana.local"
+
+[challenge.metadata]
+name = "vmcalc"
+flag = "dice{y0u_4re_a_tru3_vm2_j4ilbreak3r!!!}"
+description = "A simple and very secure online calculator!"
+type = "web"
+points = 100
+
+[challenge.env]
+port_mappings = ["3000:3000"]

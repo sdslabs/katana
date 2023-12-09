@@ -1,4 +1,4 @@
-kubeconfig = ""
+kubeconfig = "/home/iiteens/.kube/config"
 kubehost = "0.0.0.0"
 backendurl = "http://10.25.1.15:15528"
 kubenamespace = "default"

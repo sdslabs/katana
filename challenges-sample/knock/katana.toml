@@ -1,0 +1,13 @@
+[challenge.author]
+name = "paradox"
+email = "paradox@katana.local"
+
+[challenge.metadata]
+name = "knock"
+flag = "dice{1_d00r_y0u_d00r_w3_a11_d00r_f0r_1_d00r}"
+description = "Knock knock? Who's there? Another pastebin!!"
+type = "web"
+points = 100
+
+[challenge.env]
+port_mappings = ["3000:3000"]
