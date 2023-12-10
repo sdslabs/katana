@@ -29,6 +29,12 @@ func GenerateCerts(domain string, basePath string) error {
 	if err := RunCommand(cmd); err != nil {
 		return err
 	}
+	
+	// using -traditional flag to get PKCS#1 [different header], otherwise 500 Internal Error
+	cmd = "openssl rsa -in "+basePath+"/ca.key -out "+basePath+"/ca.key -traditional"
+	if err := RunCommand(cmd); err != nil {
+		return err
+	}
 
 	// Generate ca.crt
 	cmd = "openssl req -x509 -new -nodes -sha512 -days 3650 -subj '/C=IN/ST=Delhi/L=Delhi/O=Katana/CN=" + domain + "' -key " + basePath + "/ca.key -out " + basePath + "/ca.crt"
@@ -38,6 +44,12 @@ func GenerateCerts(domain string, basePath string) error {
 
 	// Generate private key
 	cmd = "openssl genrsa -out " + basePath + "/" + domain + ".key 4096"
+	if err := RunCommand(cmd); err != nil {
+		return err
+	}
+
+	// using -traditional flag to get PKCS#1 [different header], otherwise 500 Internal Error
+	cmd="openssl rsa -in "+basePath+"/"+domain+".key -out "+basePath+"/"+domain+".key -traditional"
 	if err := RunCommand(cmd); err != nil {
 		return err
 	}
