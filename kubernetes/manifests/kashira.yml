@@ -1,3 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kashira-config
+  namespace: katana
+data:
+  daemon_port: "{{.DaemonPort}}"
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -26,6 +34,12 @@ spec:
           volumeMounts:
             - name: kashira-data
               mountPath: /opt/kashira/flag-data
+          env:
+            - name: DAEMON_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: kashira-config
+                  key: daemon_port
   volumeClaimTemplates:
     - metadata:
         name: kashira-data
@@ -47,3 +61,4 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
+      
