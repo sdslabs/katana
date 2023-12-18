@@ -3,9 +3,10 @@ package main
 import (
 	"log"
 
+	"github.com/spf13/cobra"
+
 	"github.com/sdslabs/katana/cliHelpers/chalDeployerService"
 	"github.com/sdslabs/katana/cliHelpers/infraService"
-	"github.com/spf13/cobra"
 )
 
 // rootCmd represents the run command
@@ -29,6 +30,6 @@ func init() {
 	rootCmd.AddCommand(infraService.InfraCmd)
 	rootCmd.AddCommand(infraService.SetUpCmd)
 	rootCmd.AddCommand(infraService.GitCmd)
+	rootCmd.AddCommand(infraService.CreateTeamCmd)
 	rootCmd.AddCommand(chalDeployerService.DelChalCmd)
-	rootCmd.AddCommand(chalDeployerService.DeployChalCmd)
 }

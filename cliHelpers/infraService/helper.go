@@ -17,14 +17,12 @@ import (
 )
 
 func mongoDBSetup() error {
-	g.LoadConfiguration()
 	if err := mongo.Init(); err != nil {
 		return err
 	}
 	return nil
 }
 func mysqlDBSetup() error {
-	g.LoadConfiguration()
 	if err := mysql.Init(); err != nil {
 		return err
 	}
@@ -32,7 +30,6 @@ func mysqlDBSetup() error {
 }
 
 func InfraSetup() error {
-	g.LoadConfiguration()
 	config, err := utils.GetKubeConfig()
 
 	if err != nil {
@@ -60,7 +57,6 @@ func InfraSetup() error {
 }
 
 func GitSetup() error {
-	g.LoadConfiguration()
 	var requestBody bytes.Buffer
 	writer := multipart.NewWriter(&requestBody)
 	LoadBalancer, err := utils.GetKatanaLoadbalancer()

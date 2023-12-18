@@ -7,6 +7,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
 )
@@ -44,13 +45,13 @@ func setup() error {
 
 func setupGogs() error {
 	if err := CreateDatabase(gogsDatabase); err != nil {
-		fmt.Errorf("cannot create database: %w", err)
+		return fmt.Errorf("cannot create database: %w", err)
 	}
 	if err := CreateGogsAdmin(g.AdminConfig.Username, g.AdminConfig.Password); err != nil {
-		fmt.Errorf("cannot create gogs admin: %w", err)
+		return fmt.Errorf("cannot create gogs admin: %w", err)
 	}
 	if err := CreateAccessToken(g.AdminConfig.Username, g.AdminConfig.Password); err != nil {
-		fmt.Errorf("cannot create access token: %w", err)
+		return fmt.Errorf("cannot create access token: %w", err)
 	}
 	return nil
 }
