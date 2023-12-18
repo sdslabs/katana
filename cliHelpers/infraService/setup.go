@@ -2,6 +2,7 @@ package infraService
 
 import (
 	"log"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -24,6 +25,7 @@ var SetUpCmd = &cobra.Command{
 			return err
 		}
 		log.Println("MongoDB connected successfully")
+		time.Sleep(10 * time.Second)
 		if err := GitSetup(); err != nil {
 			log.Println("Error setting up the git server:", err)
 			return err
@@ -38,6 +40,7 @@ var SetUpCmd = &cobra.Command{
 			return err
 		}
 		log.Println("MySQL Database connected successfully")
+		time.Sleep(10 * time.Second)
 		return nil
 	},
 }

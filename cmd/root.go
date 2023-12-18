@@ -32,5 +32,4 @@ func init() {
 	rootCmd.AddCommand(infraService.GitCmd)
 	rootCmd.AddCommand(infraService.CreateTeamCmd)
 	rootCmd.AddCommand(chalDeployerService.DelChalCmd)
-	rootCmd.AddCommand(chalDeployerService.DeployChalCmd)
 }

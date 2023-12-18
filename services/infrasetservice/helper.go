@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"context"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,7 +34,6 @@ func GenerateCertsforHarbor() error {
 		errDir := os.Mkdir(path, 0755)
 		if errDir != nil {
 			log.Fatal(err)
-			return err
 		}
 	}
 	log.Println("CHECK 3")
@@ -63,8 +63,7 @@ func CreateTeamCredentials(teamNumber int) (string, types.CTFTeam, error) {
 	}
 	podNamespace := "katana-team-" + fmt.Sprint(teamNumber)
 	// start watching for container events
-
-	envVariables(gogs, pwd, podNamespace)
+	go envVariables(gogs, pwd, podNamespace)
 	team := types.CTFTeam{
 		Index:    teamNumber,
 		Name:     podNamespace,

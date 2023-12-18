@@ -17,14 +17,12 @@ import (
 )
 
 func mongoDBSetup() error {
-	g.LoadConfiguration()
 	if err := mongo.Init(); err != nil {
 		return err
 	}
 	return nil
 }
 func mysqlDBSetup() error {
-	g.LoadConfiguration()
 	if err := mysql.Init(); err != nil {
 		return err
 	}
