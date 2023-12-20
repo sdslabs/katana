@@ -26,19 +26,18 @@ var SetUpCmd = &cobra.Command{
 			return err
 		}
 		log.Println("MongoDB connected successfully")
-		time.Sleep(10 * time.Second)
+		time.Sleep(5 * time.Second)
 		if err := GitSetup(); err != nil {
 			log.Println("Error setting up the git server:", err)
 			return err
 		}
 		log.Println("Git Server connected successfully")
-		time.Sleep(10 * time.Second)
+		time.Sleep(5 * time.Second)
 		if err := mysqlDBSetup(); err != nil {
 			log.Println("Error setting up the mysql database:", err)
 			return err
 		}
 		log.Println("MySQL Database connected successfully")
-		time.Sleep(10 * time.Second)
 		return nil
 	},
 }

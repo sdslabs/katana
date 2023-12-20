@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -34,8 +35,19 @@ func setup() error {
 			time.Sleep(time.Duration(g.KatanaConfig.TimeOut) * time.Second)
 		} else {
 			log.Println("MySQL Connection Established")
-			if err := setupGogs(); err != nil {
-				return fmt.Errorf("cannot setup gogs: %w", err)
+
+			if err := CreateDatabase(gogsDatabase); err != nil {
+				if !strings.Contains(err.Error(), "database exists") {
+					return fmt.Errorf("cannot create gogs database: %w", err)
+				} else {
+					if err := setupGogs(); err != nil {
+						return fmt.Errorf("cannot setup gogs: %w", err)
+					}else{
+						log.Println("Gogs MySQL database setup successfully")
+					}
+				}
+			} else {
+				log.Println("Gogs database created successfully in MySQL")
 			}
 			return nil
 		}
@@ -44,9 +56,6 @@ func setup() error {
 }
 
 func setupGogs() error {
-	if err := CreateDatabase(gogsDatabase); err != nil {
-		return fmt.Errorf("cannot create database: %w", err)
-	}
 	if err := CreateGogsAdmin(g.AdminConfig.Username, g.AdminConfig.Password); err != nil {
 		return fmt.Errorf("cannot create gogs admin: %w", err)
 	}
@@ -55,6 +64,7 @@ func setupGogs() error {
 	}
 	return nil
 }
+
 func Init() error {
 	if err := setup(); err != nil {
 		return fmt.Errorf("cannot setup: %w", err)

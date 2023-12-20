@@ -57,6 +57,9 @@ func InfraSetup() error {
 }
 
 func GitSetup() error {
+	if err := mysql.Init(); err != nil {
+		return err
+	}
 	var requestBody bytes.Buffer
 	writer := multipart.NewWriter(&requestBody)
 	LoadBalancer, err := utils.GetKatanaLoadbalancer()
