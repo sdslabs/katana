@@ -9,7 +9,7 @@ import (
 	g "github.com/sdslabs/katana/configs"
 )
 
-// runCmd represents the run command 
+// runCmd represents the run command
 // not tested yet [WIP]
 var SetUpCmd = &cobra.Command{
 	Use:   "setup",
@@ -32,6 +32,11 @@ var SetUpCmd = &cobra.Command{
 			return err
 		}
 		log.Println("Git Server connected successfully")
+		time.Sleep(5 * time.Second)
+		if err := mongoDBSetup(); err != nil {
+			log.Println("Error setting up the mysql database:", err)
+			return err
+		}
 		time.Sleep(5 * time.Second)
 		if err := mysqlDBSetup(); err != nil {
 			log.Println("Error setting up the mysql database:", err)
