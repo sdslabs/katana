@@ -8,6 +8,7 @@ import (
 
 	g "github.com/sdslabs/katana/configs"
 )
+
 // still have to test this [WIP]
 
 var DelChalCmd = &cobra.Command{
