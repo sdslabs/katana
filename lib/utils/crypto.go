@@ -28,19 +28,16 @@ func GenerateCerts(domain string, basePath string) error {
 	//add -traditional flag to make it run on minikube
 	cmd := "openssl genrsa -out " + basePath + "/ca.key 4096"
 	if err := RunCommand(cmd); err != nil {
-		fmt.Println("Error generating ca.key")
 		return err
 	}
 	cmd = "openssl rsa -in " + basePath + "/ca.key -out "+ basePath + "/ca.key -traditional"
 	if err := RunCommand(cmd); err != nil {
-		fmt.Println("Error generating ca.key in 2nd step")
 		return err
 	}
 
 	// Generate ca.crt
 	cmd = "openssl req -x509 -new -nodes -sha512 -days 3650 -subj '/C=IN/ST=Delhi/L=Delhi/O=Katana/CN=" + domain + "' -key " + basePath + "/ca.key -out " + basePath + "/ca.crt"
 	if err := RunCommand(cmd); err != nil {
-		fmt.Println("Error generating ca.crt")
 		return err
 	}
 
@@ -48,13 +45,11 @@ func GenerateCerts(domain string, basePath string) error {
 	//add -traditional flag to make it run on minikube
 	cmd = "openssl genrsa -out " + basePath + "/" + domain + ".key 4096"
 	if err := RunCommand(cmd); err != nil {
-		fmt.Println("Error generating private key")
 		return err
 	}
 
 	cmd = "openssl rsa -in " + basePath+"/"+domain + ".key -out "+ basePath +"/"+domain + ".key -traditional"
 	if err := RunCommand(cmd); err != nil {
-		fmt.Println("Error generating private key in 2nd step")
 		return err
 	}
 
@@ -62,21 +57,18 @@ func GenerateCerts(domain string, basePath string) error {
 	// Generate certificate signing request
 	cmd = "openssl req -sha512 -new -subj '/C=IN/ST=Delhi/L=Delhi/O=Katana/CN=" + domain + "' -key " + basePath + "/" + domain + ".key -out " + basePath + "/" + domain + ".csr"
 	if err := RunCommand(cmd); err != nil {
-		fmt.Println("Error generating certificate signing request")
 		return err
 	}
 
 	// Generate v3.ext file
 	cmd = "echo 'authorityKeyIdentifier=keyid,issuer\nbasicConstraints=CA:FALSE\nkeyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment\nextendedKeyUsage = serverAuth\nsubjectAltName = @alt_names\n[alt_names]\nDNS.1=" + domain + "' > " + basePath + "/v3.ext"
 	if err := RunCommand(cmd); err != nil {
-		fmt.Println("Error generating v3.ext file")
 		return err
 	}
 
 	// Generate certificate
 	cmd = "openssl x509 -req -sha512 -days 3650 -extfile " + basePath + "/v3.ext -CA " + basePath + "/ca.crt -CAkey " + basePath + "/ca.key -CAcreateserial -in " + basePath + "/" + domain + ".csr -out " + basePath + "/" + domain + ".crt"
 	if err := RunCommand(cmd); err != nil {
-		fmt.Println("Error generating certificate")
 		return err
 	}
 
