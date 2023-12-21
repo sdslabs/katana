@@ -30,12 +30,12 @@ func GenerateCerts(domain string, basePath string) error {
 		return err
 	}
 	// Generate ca.key in harbor directory
-	//add -traditional flag to make it run on minikube
 	cmd := "openssl genrsa -out " + basePath + "/ca.key 4096"
 	if err := RunCommand(cmd); err != nil {
 		fmt.Println("Error generating ca.key")
 		return err
 	}
+
 	cmd = "openssl rsa -in " + basePath + "/ca.key -out "+ basePath + "/ca.key -traditional"
 	if err := RunCommand(cmd); err != nil {
 		fmt.Println("Error generating ca.key in 2nd step")
@@ -62,7 +62,6 @@ func GenerateCerts(domain string, basePath string) error {
 	}
 
 	// Generate private key
-	//add -traditional flag to make it run on minikube
 	cmd = "openssl genrsa -out " + basePath + "/" + domain + ".key 4096"
 	if err := RunCommand(cmd); err != nil {
 		fmt.Println("Error generating private key")
@@ -74,7 +73,6 @@ func GenerateCerts(domain string, basePath string) error {
 		fmt.Println("Error generating private key in 2nd step")
 		return err
 	}
-
 
 	// Generate certificate signing request
 	cmd = "openssl req -sha512 -new -subj '/C=IN/ST=Delhi/L=Delhi/O=Katana/CN=" + domain + "' -key " + basePath + "/" + domain + ".key -out " + basePath + "/" + domain + ".csr"
