@@ -158,14 +158,12 @@ func CreateTeams(c *fiber.Ctx) error {
 		// var contx context.Context
 		_, err = client.CoreV1().Namespaces().Create(c.Context(), nsName, metav1.CreateOptions{})
 		if err != nil {
-			fmt.Println("Error creating namespace0: ", err)
 			log.Fatal(err)
 			return err
 		}
 		manifest := &bytes.Buffer{}
 		tmpl, err := template.ParseFiles(filepath.Join(configs.ClusterConfig.TemplatedManifestDir, "runtime", "teams.yml"))
 		if err != nil {
-			fmt.Println("Error creating namespace1: ", err)
 			log.Fatal(err)
 			return err
 		}
@@ -177,12 +175,10 @@ func CreateTeams(c *fiber.Ctx) error {
 
 		deploymentConfig.SSHPassword = pwd
 		if err = tmpl.Execute(manifest, deploymentConfig); err != nil {
-			fmt.Println("Error creating namespace2: ", err)
 			return err
 		}
 
 		if err = deployment.ApplyManifest(config, client, manifest.Bytes(), namespace); err != nil {
-			fmt.Println("Error creating namespace3: ", err)
 			return err
 		}
 		teams = append(teams, team)

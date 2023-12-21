@@ -74,7 +74,7 @@ func GetKatanaRootPath() (string, error) {
 	katanaDir, err := os.Getwd()
 	if err != nil {
 		fmt.Println("Error:", err)
-		return "", nil
+		return "", err
 	}
 	return katanaDir, nil
 }
