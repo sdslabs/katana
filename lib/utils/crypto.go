@@ -38,7 +38,6 @@ func GenerateCerts(domain string, basePath string) error {
 
 	cmd = "openssl rsa -in " + basePath + "/ca.key -out "+ basePath + "/ca.key -traditional"
 	if err := RunCommand(cmd); err != nil {
-		fmt.Println("Error generating ca.key in 2nd step")
 		return err
 	}
 
@@ -68,10 +67,11 @@ func GenerateCerts(domain string, basePath string) error {
 		return err
 	}
 
-	cmd = "openssl rsa -in " + basePath+"/"+domain + ".key -out "+ basePath +"/"+domain + ".key -traditional"
-	if err := RunCommand(cmd); err != nil {
-		fmt.Println("Error generating private key in 2nd step")
-		return err
+	if(openSSLabove3){
+		cmd = "openssl rsa -in " + basePath+"/"+domain + ".key -out "+ basePath +"/"+domain + ".key -traditional"
+		if err := RunCommand(cmd); err != nil {
+			return err
+		}
 	}
 
 	// Generate certificate signing request
