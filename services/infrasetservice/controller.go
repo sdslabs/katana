@@ -155,7 +155,6 @@ func CreateTeams(c *fiber.Ctx) error {
 				Name: namespace,
 			},
 		}
-		// var contx context.Context
 		_, err = client.CoreV1().Namespaces().Create(c.Context(), nsName, metav1.CreateOptions{})
 		if err != nil {
 			log.Fatal(err)

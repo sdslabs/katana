@@ -12,8 +12,6 @@ import (
 	"strings"
 	"sync"
 
-	g "github.com/sdslabs/katana/configs"
-	"github.com/sdslabs/katana/types"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
@@ -27,6 +25,9 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/remotecommand"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
+
+	g "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/types"
 )
 
 // GetKubeConfig returns a kubernetes REST config object
@@ -339,6 +340,7 @@ func WaitForDeploymentReady(clientset *kubernetes.Clientset, deploymentName stri
 
 	return nil
 }
+//Not Tested Yet : was giving error 
 func WaitForPodReady(clientset *kubernetes.Clientset, podNamespace string, wg *sync.WaitGroup) error {
 	watch, _ := clientset.CoreV1().Pods(podNamespace+"-ns").Watch(context.Background(), metav1.ListOptions{})
 	for event := range watch.ResultChan() {

@@ -49,6 +49,7 @@ func setup() error {
 			} else {
 				log.Println("Gogs database created successfully in MySQL")
 			}
+			
 			return nil
 		}
 	}

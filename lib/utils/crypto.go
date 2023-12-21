@@ -25,11 +25,11 @@ func Base64Encode(str string) string {
 
 func GenerateCerts(domain string, basePath string) error {
 	// Generate ca.key in harbor directory
-	//add -traditional flag to make it run on minikube
 	cmd := "openssl genrsa -out " + basePath + "/ca.key 4096"
 	if err := RunCommand(cmd); err != nil {
 		return err
 	}
+
 	cmd = "openssl rsa -in " + basePath + "/ca.key -out "+ basePath + "/ca.key -traditional"
 	if err := RunCommand(cmd); err != nil {
 		return err
@@ -42,7 +42,6 @@ func GenerateCerts(domain string, basePath string) error {
 	}
 
 	// Generate private key
-	//add -traditional flag to make it run on minikube
 	cmd = "openssl genrsa -out " + basePath + "/" + domain + ".key 4096"
 	if err := RunCommand(cmd); err != nil {
 		return err
@@ -52,7 +51,6 @@ func GenerateCerts(domain string, basePath string) error {
 	if err := RunCommand(cmd); err != nil {
 		return err
 	}
-
 
 	// Generate certificate signing request
 	cmd = "openssl req -sha512 -new -subj '/C=IN/ST=Delhi/L=Delhi/O=Katana/CN=" + domain + "' -key " + basePath + "/" + domain + ".key -out " + basePath + "/" + domain + ".csr"

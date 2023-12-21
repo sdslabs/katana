@@ -8,8 +8,6 @@ import (
 	"github.com/sdslabs/katana/configs"
 )
 
-// runCmd represents the run command
-// not tested yet [WIP]
 var SetUpCmd = &cobra.Command{
 	Use:   "setup",
 	Short: "SetUps Katana on your computer",
