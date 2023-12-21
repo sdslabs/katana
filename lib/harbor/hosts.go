@@ -9,11 +9,12 @@ import (
 	"strings"
 	"text/template"
 
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/utils"
-	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func updateOrAddHost() error {
@@ -61,8 +62,8 @@ func updateOrAddHost() error {
 }
 
 func deployHarborClusterDaemonSet() error {
-	kubeConfig, _ := utils.GetKubeConfig()
-	kubeClient, _ := utils.GetKubeClient()
+	kubeConfig:= configs.GlobalKubeConfig
+	kubeClient:= configs.GlobalKubeClient
 
 	namespace := "kube-system"
 

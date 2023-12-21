@@ -6,11 +6,13 @@ import (
 	"os"
 	"strconv"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/sdslabs/katana/configs"
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/services/challengedeployerservice"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func DeployChallenge() error {
@@ -115,7 +117,7 @@ func DeleteChallenge(challengeName string) error {
 		teamName := "team-" + strconv.Itoa(i)
 
 		teamNamespace := "katana-" + teamName + "-ns"
-		kubeclient, err := utils.GetKubeClient()
+		kubeclient := configs.GlobalKubeClient
 		if err != nil {
 			return err
 		}

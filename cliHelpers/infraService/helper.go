@@ -30,21 +30,12 @@ func mysqlDBSetup() error {
 }
 
 func InfraSetup() error {
-	config, err := utils.GetKubeConfig()
+	config:= g.GlobalKubeConfig
+	kubeclient:= g.GlobalKubeClient
 
-	if err != nil {
-		log.Println("There was error in setting up Kubernentes Config", err)
-		return err
-	}
-
-	kubeclient, err := utils.GetKubeClient()
-	if err != nil {
-		log.Println("Error in creating Kubernetes client", err)
-		return err
-	}
 	infraSetService.GenerateCertsforHarbor()
 	deployment.DeployCluster(config, kubeclient)
-	err = harbor.SetupHarbor()
+	err := harbor.SetupHarbor()
 	if err != nil {
 		log.Println("There was error in setting up harbor", err)
 		return err

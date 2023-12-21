@@ -16,6 +16,7 @@ var GitCmd = &cobra.Command{
 	Long:  `Runs the katana API server on port 3000`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		g.LoadConfiguration();
+		g.LoadKubeElements();
 		if err := GitSetup(); err != nil {
 			log.Println("Error setting up the git server:", err)
 			return err
@@ -31,6 +32,7 @@ var CreateTeamCmd= &cobra.Command{
 	Long:  `Create namespaces fot teams`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		g.LoadConfiguration();
+		g.LoadKubeElements();
 		fmt.Println("Creating teams")
 		if err := cliHelpers.CreateTeams(); err != nil {
 			log.Println("Error creating teams:", err)

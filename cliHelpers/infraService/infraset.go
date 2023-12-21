@@ -15,6 +15,7 @@ var InfraCmd = &cobra.Command{
 	Long:  `Runs the katana API server on port 3000`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		g.LoadConfiguration();
+		g.LoadKubeElements();
 		if err := InfraSetup(); err != nil {
 			log.Println("Error setting up the infrastructure:", err)
 			return err

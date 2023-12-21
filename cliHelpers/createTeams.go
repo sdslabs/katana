@@ -10,37 +10,25 @@ import (
 	"path/filepath"
 	"strconv"
 
+	coreV1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/mongo"
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/services/infrasetservice"
-	coreV1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func CreateTeams(ctx context.Context) error {
+func CreateTeams() error {
 
 	// if !utils.VerifyToken(c) {
 	// 	return c.SendString("Unauthorized")
 	// }
-
-	config, err := utils.GetKubeConfig()
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
-	client, err := utils.GetKubeClient()
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
+	config:= configs.GlobalKubeConfig
+	client:= configs.GlobalKubeClient
 	noOfTeams := int(configs.ClusterConfig.TeamCount)
 
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
 	if _, err := os.Stat("teams"); os.IsNotExist(err) {
 		errDir := os.Mkdir("teams", 0755)
 		if errDir != nil {
@@ -89,13 +77,12 @@ func CreateTeams(ctx context.Context) error {
 				Name: namespace,
 			},
 		}
-
-		_, err = client.CoreV1().Namespaces().Create(ctx, nsName, metav1.CreateOptions{})
+		_, err = client.CoreV1().Namespaces().Create(context.TODO(), nsName, metav1.CreateOptions{})
 		if err != nil {
 			log.Fatal(err)
 			return err
 		}
-
+		
 		manifest := &bytes.Buffer{}
 		tmpl, err := template.ParseFiles(filepath.Join(configs.ClusterConfig.TemplatedManifestDir, "runtime", "teams.yml"))
 		if err != nil {

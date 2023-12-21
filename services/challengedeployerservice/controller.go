@@ -13,11 +13,12 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/gofiber/fiber/v2"
 	archiver "github.com/mholt/archiver/v3"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func Deploy(c *fiber.Ctx) error {
@@ -169,7 +170,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 
 func ChallengeUpdate(c *fiber.Ctx) error {
 	replicas := int32(1)
-	client, _ := utils.GetKubeClient()
+	client:=g.GlobalKubeClient
 	patch := true
 
 	//http connection configuration for 30 min
@@ -265,7 +266,7 @@ func DeleteChallenge(c *fiber.Ctx) error {
 		teamName := "team-" + strconv.Itoa(i)
 
 		teamNamespace := "katana-" + teamName + "-ns"
-		kubeclient, err := utils.GetKubeClient()
+		kubeclient:=g.GlobalKubeClient
 		if err != nil {
 			return err
 		}

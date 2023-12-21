@@ -10,8 +10,6 @@ import (
 	"strings"
 	"text/template"
 
-	g "github.com/sdslabs/katana/configs"
-	"github.com/sdslabs/katana/lib/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -25,6 +23,9 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
+
+	g "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/lib/utils"
 )
 
 // ApplyManifest applies a given manifest to the cluster
@@ -149,7 +150,7 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 func DeployChallengeToCluster(challengeName, teamName string, firstPatch bool, replicas int32) error {
 
 	teamNamespace := teamName + "-ns"
-	kubeclient, _ := utils.GetKubeClient()
+	kubeclient:= g.GlobalKubeClient
 
 	deploymentsClient := kubeclient.AppsV1().Deployments(teamNamespace)
 	imageName := "harbor.katana.local/katana/" + challengeName + ":latest"

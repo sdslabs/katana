@@ -8,9 +8,10 @@ import (
 
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
+	v1 "k8s.io/api/core/v1"
+
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
-	v1 "k8s.io/api/core/v1"
 )
 
 func CopyChallengeIntoTsuka(dirPath string, challengeName string, challengeType string) error {
@@ -67,7 +68,7 @@ func CopyChallengeIntoTsuka(dirPath string, challengeName string, challengeType 
 }
 
 func CreateServiceForChallenge(challengeName, teamName string, targetPort int32, teamNumber int) (string, error) {
-	kubeclient, _ := utils.GetKubeClient()
+	kubeclient:=g.GlobalKubeClient
 	serviceName := challengeName + "-svc-" + strconv.Itoa(teamNumber)
 	teamNamespace := teamName + "-ns"
 	port := int32(80)

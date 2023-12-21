@@ -14,6 +14,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
+	coreV1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/harbor"
@@ -21,34 +24,20 @@ import (
 	"github.com/sdslabs/katana/lib/mysql"
 	utils "github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
-	coreV1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func InfraSet(c *fiber.Ctx) error {
-
-	config, err := utils.GetKubeConfig()
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
-
-	kubeclient, err := utils.GetKubeClient()
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
-
+	config:= configs.GlobalKubeConfig
+	kubeclient:= configs.GlobalKubeClient
 	if err := GenerateCertsforHarbor(); err != nil {
 		log.Println("Error generating certificates :", err)
 		return err
 	}
-	if err = deployment.DeployCluster(config, kubeclient); err != nil {
+	if err := deployment.DeployCluster(config, kubeclient); err != nil {
 		log.Fatal(err)
 		return err
 	}
-
-	err = harbor.SetupHarbor()
+	err := harbor.SetupHarbor()
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -113,28 +102,16 @@ func CreateTeams(c *fiber.Ctx) error {
 	// if !utils.VerifyToken(c) {
 	// 	return c.SendString("Unauthorized")
 	// }
+	config:= configs.GlobalKubeConfig
+	client:= configs.GlobalKubeClient
 
-	config, err := utils.GetKubeConfig()
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
-	client, err := utils.GetKubeClient()
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
 	noOfTeams := int(configs.ClusterConfig.TeamCount)
 
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
 	if _, err := os.Stat("teams"); os.IsNotExist(err) {
 		errDir := os.Mkdir("teams", 0755)
 		if errDir != nil {
 			log.Fatal(err)
-			return err
+		return err
 		}
 	}
 

@@ -14,6 +14,7 @@ var MongoDBCmd = &cobra.Command{
 	Long:  "Runs the mongo database setup",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		g.LoadConfiguration();
+		g.LoadKubeElements();
 		if err := mongoDBSetup(); err != nil {
 			log.Println("Error setting up mongo database:", err)
 			return err
@@ -28,6 +29,7 @@ var MySqlDBCmd = &cobra.Command{
 	Long:  "Runs the mysql database setup",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		g.LoadConfiguration();
+		g.LoadKubeElements();
 		if err := mysqlDBSetup(); err != nil {
 			log.Println("Error setting up MySQL database:", err)
 			return err

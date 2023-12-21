@@ -82,8 +82,8 @@ func CreateTeamCredentials(teamNumber int) (string, types.CTFTeam, error) {
 }
 
 func envVariables(gogs string, pwd string, podNamespace string) error {
-	kubeClientset, _ := utils.GetKubeClient()
-	kubeConfig, _ := utils.GetKubeConfig()
+	kubeClientset:= configs.GlobalKubeClient
+	kubeConfig:= configs.GlobalKubeConfig
 	watch, _ := kubeClientset.CoreV1().Pods(podNamespace+"-ns").Watch(context.Background(), metav1.ListOptions{})
 	for event := range watch.ResultChan() {
 		p, ok := event.Object.(*v1.Pod)
