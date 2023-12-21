@@ -24,15 +24,21 @@ func Base64Encode(str string) string {
 }
 
 func GenerateCerts(domain string, basePath string) error {
+	
+	openSSLabove3,err :=CheckOpenSSLVersion()
+	if err != nil {	
+		return err
+	}
 	// Generate ca.key in harbor directory
 	cmd := "openssl genrsa -out " + basePath + "/ca.key 4096"
 	if err := RunCommand(cmd); err != nil {
 		return err
 	}
-
-	cmd = "openssl rsa -in " + basePath + "/ca.key -out "+ basePath + "/ca.key -traditional"
-	if err := RunCommand(cmd); err != nil {
-		return err
+	if(openSSLabove3){
+		cmd = "openssl rsa -in " + basePath + "/ca.key -out "+ basePath + "/ca.key -traditional"
+		if err := RunCommand(cmd); err != nil {
+			return err
+		}
 	}
 
 	// Generate ca.crt
@@ -47,9 +53,11 @@ func GenerateCerts(domain string, basePath string) error {
 		return err
 	}
 
-	cmd = "openssl rsa -in " + basePath+"/"+domain + ".key -out "+ basePath +"/"+domain + ".key -traditional"
-	if err := RunCommand(cmd); err != nil {
-		return err
+	if(openSSLabove3){
+		cmd = "openssl rsa -in " + basePath+"/"+domain + ".key -out "+ basePath +"/"+domain + ".key -traditional"
+		if err := RunCommand(cmd); err != nil {
+			return err
+		}
 	}
 
 	// Generate certificate signing request

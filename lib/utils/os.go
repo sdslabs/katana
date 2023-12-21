@@ -70,6 +70,38 @@ func RunCommand(cmd string) error {
 	return nil
 }
 
+func CheckOpenSSLVersion() (bool, error) {
+	cmd := "openssl version"
+	output, err := exec.Command("bash", "-c", cmd).CombinedOutput()
+	if err != nil {
+		return false, err
+	}
+	opensslVersion:= string(output)
+
+	versionParts := strings.Fields(opensslVersion)
+	if len(versionParts) < 2 {
+		return false,fmt.Errorf("unable to determine OpenSSL version")
+	}
+
+	majorVersionStr := strings.Split(versionParts[1], ".")[0]
+	if majorVersionStr == "" {
+		return false,fmt.Errorf("unable to determine OpenSSL major version")
+	}
+
+	majorVersion := 0
+	_, err = fmt.Sscanf(majorVersionStr, "%d", &majorVersion)
+	if err != nil {
+		return false,fmt.Errorf("error parsing OpenSSL major version: %v", err)
+	}
+
+	if majorVersion >= 3 {
+		return true,nil
+	}else{
+		fmt.Println("OpenSSL version 3 or higher is required")
+		return false,nil
+	}
+}
+
 func GetKatanaRootPath() (string, error) {
 	katanaDir, err := os.Getwd()
 	if err != nil {
