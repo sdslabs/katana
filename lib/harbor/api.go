@@ -56,7 +56,7 @@ func setAdminPassword() error {
 
 	resp, _ = httpClient.Do(req)
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("error changing admin password")
+		return fmt.Errorf("error changing admin password, response code is %d", resp.StatusCode)
 	}
 
 	return nil

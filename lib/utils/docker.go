@@ -56,7 +56,6 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 	}
 
 	log.Println(_ChallengeName)
-	log.Println("dfsdfsdfsdf")
 	log.Println(_DockerfilePath)
 
 	log.Println("Building Docker image, Please wait......")
