@@ -14,9 +14,7 @@ import (
 	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/utils"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 )
 
 func SetupWireguard() error {
@@ -113,6 +111,7 @@ func GetConfigFiles(team_number string) error {
 
 	//wait for container ready
 	time.Sleep(1 * time.Minute)
+	// [TODO] : Replace time.Sleep with waitForContainerRunning
 	// if err := waitForContainerRunning(client, wireguardPod.Name, wireguardContainer.Name, namespace, 10*time.Minute); err != nil {
 	// 	log.Printf("Error waiting for container to become running: %v\n", err)
 	// }
@@ -124,37 +123,4 @@ func GetConfigFiles(team_number string) error {
 
 	return nil
 
-}
-
-// [WIP] : Replace time.Sleep with waitForContainerRunning
-func waitForContainerRunning(client *kubernetes.Clientset, podName, containerName, namespace string, timeout time.Duration) error {
-	startTime := time.Now()
-	for {
-		// Get the pod
-		pod, err := client.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
-		if err != nil {
-			return err
-		}
-
-		// Find the container in the pod
-		var containerStatus *corev1.ContainerStatus
-		for _, status := range pod.Status.ContainerStatuses {
-			if status.Name == containerName {
-				containerStatus = &status
-				break
-			}
-		}
-
-		if containerStatus != nil && containerStatus.State.Running != nil {
-			return nil // Container is in the "Running" state
-		}
-
-		// Check if the timeout has been reached
-		if time.Since(startTime) >= timeout {
-			return fmt.Errorf("timed out waiting for container to become running")
-		}
-
-		// Sleep for a while before checking again
-		time.Sleep(1 * time.Second) // Adjust the sleep duration as needed
-	}
 }

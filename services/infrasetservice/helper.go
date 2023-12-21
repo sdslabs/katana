@@ -121,7 +121,6 @@ func BuildKatanaServices() error {
 		log.Fatal(errDir)
 		return errDir
 	}
-
 	katanaServicesDir := katanaDir + "/katana-services"
 
 	services, err := os.ReadDir(katanaServicesDir)
@@ -131,7 +130,16 @@ func BuildKatanaServices() error {
 	}
 
 	for _, service := range services {
-		if service.Name() == ".github" {
+
+		invalidServiceNames := []string{".github", ".git", ".gitignore"}
+		found := false
+		for _, invalidName := range invalidServiceNames {
+			if service.Name() == invalidName {
+				found = true
+				break
+			}
+		}
+		if found {
 			continue
 		}
 		if service.IsDir() {
