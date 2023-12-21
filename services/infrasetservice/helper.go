@@ -19,6 +19,7 @@ func generateCertsforHarbor() {
 	path, _ := os.Getwd()
 	path = path + "/lib/harbor/certs"
 
+	log.Println("CHECK 1")
 	// Delete the directory if it already exists
 	if _, err := os.Stat(path); os.IsExist(err) {
 		errDir := os.RemoveAll(path)
@@ -26,18 +27,19 @@ func generateCertsforHarbor() {
 			log.Fatal(err)
 		}
 	}
-
+	log.Println("CHECK 2")
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		errDir := os.Mkdir(path, 0755)
 		if errDir != nil {
 			log.Fatal(err)
 		}
 	}
-
+	log.Println("CHECK 3")
 	// Generate the certificates
 	if err := utils.GenerateCerts("harbor.katana.local", path); err != nil {
 		log.Fatal(err)
 	}
+	log.Println("CHECK 4")
 }
 
 func createTeamCredentials(teamNumber int) (string, types.CTFTeam) {
@@ -95,6 +97,9 @@ func envVariables(gogs string, pwd string, podNamespace string) {
 
 func buildKatanaServices() {
 	katanaDir, err := utils.GetKatanaRootPath()
+	if err != nil {
+		log.Fatal(err)
+	}
 	katanaServicesDir := katanaDir + "/katana-services"
 
 	services, err := os.ReadDir(katanaServicesDir)
@@ -103,7 +108,16 @@ func buildKatanaServices() {
 	}
 
 	for _, service := range services {
-		if service.Name() == ".github" {
+
+		invalidServiceNames := []string{".github", ".git", ".gitignore"}
+		found := false
+		for _, invalidName := range invalidServiceNames {
+			if service.Name() == invalidName {
+				found = true
+				break
+			}
+		}
+		if found {
 			continue
 		}
 		if service.IsDir() {

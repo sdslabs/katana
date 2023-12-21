@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -96,6 +97,88 @@ func GetMongoIP() string {
 	return service.Spec.ClusterIP
 }
 
+func CopyFromPod(podName string, containerName string, pathInPod string, localFilePath string, ns ...string) error {
+	config, err := GetKubeConfig()
+	if err != nil {
+		return err
+	}
+
+	client, err := GetKubeClient()
+	if err != nil {
+		return err
+	}
+
+	namespace := "katana"
+	if len(ns) > 0 {
+		namespace = ns[0]
+	}
+
+	pod, err := client.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
+	if err != nil {
+		log.Printf("Error getting pod: %s\n", err)
+	}
+
+	// Find the container in the pod
+	var container *corev1.Container
+	for _, c := range pod.Spec.Containers {
+		if c.Name == containerName {
+			container = &c
+			break
+		}
+	}
+
+	if container == nil {
+		log.Printf("Container not found in pod\n")
+		err = fmt.Errorf("container not found in pod")
+		return err
+	}
+
+	// Create a stream to the container
+	req := client.CoreV1().RESTClient().Post().
+		Resource("pods").
+		Name(podName).
+		Namespace(namespace).
+		SubResource("exec").
+		Param("container", containerName)
+
+	req.VersionedParams(&corev1.PodExecOptions{
+		Container: containerName,
+		Command:   []string{"cat", pathInPod},
+		Stdin:     false,
+		Stdout:    true,
+		Stderr:    true,
+		TTY:       false,
+	}, scheme.ParameterCodec)
+
+	exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
+	if err != nil {
+		log.Printf("Error creating executor: %s\n", err)
+		return err
+	}
+
+	localFile, err := os.Create(localFilePath)
+	if err != nil {
+		log.Printf("Error creating local file: %s\n", err)
+		return err
+	}
+	defer localFile.Close()
+
+	// Stream the file
+	err = exec.Stream(remotecommand.StreamOptions{
+		Stdin:  nil,
+		Stdout: localFile,
+		Stderr: os.Stderr,
+		Tty:    false,
+	})
+	if err != nil {
+		log.Printf("Error streaming the file: %s\n", err)
+		return err
+	}
+
+	log.Println("File copied successfully")
+	return nil
+}
+
 func GetKatanaLoadbalancer() string {
 	client, err := GetKubeClient()
 	if err != nil {
@@ -135,6 +218,7 @@ func DeploymentConfig() types.ManifestConfig {
 		HarborCrt:         "",
 		HarborCaCrt:       "",
 		HarborIP:          "",
+		WireguardIP:       "",
 		NodeAffinityValue: "",
 	}
 

@@ -38,6 +38,11 @@ func dockerLogin(username string, password string) {
 	log.Println("Logged into Harbor successfully")
 }
 
+func CheckDockerfile(_DockerfilePath string) bool {
+	_, err := os.Stat(_DockerfilePath + "/Dockerfile")
+	return !os.IsNotExist(err)
+}
+
 func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 	buf := new(bytes.Buffer)
 	if err := Tar(_DockerfilePath, buf); err != nil {
@@ -49,6 +54,9 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 		log.Fatal(err)
 		return
 	}
+
+	log.Println(_ChallengeName)
+	log.Println(_DockerfilePath)
 
 	log.Println("Building Docker image, Please wait......")
 

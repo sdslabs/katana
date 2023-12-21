@@ -20,6 +20,7 @@ import (
 	"github.com/sdslabs/katana/lib/mongo"
 	"github.com/sdslabs/katana/lib/mysql"
 	utils "github.com/sdslabs/katana/lib/utils"
+	"github.com/sdslabs/katana/lib/wireguard"
 	"github.com/sdslabs/katana/types"
 	coreV1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -37,8 +38,9 @@ func InfraSet(c *fiber.Ctx) error {
 		log.Fatal(err)
 	}
 
+	log.Println("Creating harbor certs ...")
 	generateCertsforHarbor()
-
+	log.Println("Created harbor certs ...")
 	if err = deployment.DeployCluster(config, kubeclient); err != nil {
 		log.Fatal(err)
 	}
@@ -48,7 +50,17 @@ func InfraSet(c *fiber.Ctx) error {
 		log.Fatal(err)
 	}
 
+	err = wireguard.ApplyFirewall()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	buildKatanaServices()
+
+	err = wireguard.SetupWireguard()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return c.SendString("Infrastructure setup completed")
 }

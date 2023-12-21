@@ -3,6 +3,12 @@ package challengedeployerservice
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
+	"regexp"
+	"strconv"
+	"strings"
+
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/gofiber/fiber/v2"
@@ -12,11 +18,6 @@ import (
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"log"
-	"os"
-	"regexp"
-	"strconv"
-	"strings"
 )
 
 func Deploy(c *fiber.Ctx) error {
@@ -62,7 +63,7 @@ func Deploy(c *fiber.Ctx) error {
 				log.Println("Dockerfile not found in the " + folderName + " challenge folder. Please follow proper format.")
 			} else {
 				//Update challenge path to get dockerfile
-				utils.BuildDockerImage(folderName, challengePath+"/"+folderName + "/" + folderName)
+				utils.BuildDockerImage(folderName, challengePath+"/"+folderName+"/"+folderName)
 
 				clusterConfig := g.ClusterConfig
 				numberOfTeams := clusterConfig.TeamCount

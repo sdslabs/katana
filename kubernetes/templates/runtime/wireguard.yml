@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wireguard-configmap
+  namespace: katana
+data:
+  #REQUIRED VARIABLES
+  PUID: "1000" # User ID, default 1000
+  PGID: "1000" # Group ID
+  TZ: "Etc/UTC" # Timezone
+  PEERS: "2" # Comma separated list of peer names
+
+  #OPTIONAL VARIABLES
+  SERVERURL: "{{.WireguardIP}}" #if not set, container tries to determine auto and mostly tells wrong, use lb ip here , pass dynamically best
+  SERVERPORT: "51820"
+  INTERNAL_SUBNET: "10.13.13.0" #Wireguard tunnel's internal addresses
+  PEERDNS: "10.0.0.10" 
+  INTERFACE: "katana_wg"
+  ALLOWEDIPS: "0.0.0.0/0" #This is set for users, they can obv change it, so better to give 0.0.0.0/0 as nahi to append karni padti cheezein
+  #PERSISTENTKEEPALIVE_PEERS: (optional) , it is set to 25 by default (confirm?)
+  LOG_CONFS: "true" #optional , true by default
+  # POSTUP: "echo 1 > /proc/sys/net/ipv4/ip_forward; iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE"
+  POSTUP : "iptables -I OUTPUT -i katana_wg -s 10.13.13.2/32 -j DROP; iptables -I INPUT -i katana_wg -s 10.13.13.2/32 -j DROP"
+  #iptables -I INPUT -i katana_wg -j DROP; 
+  #-d 10.0.1.42
+  #iptables -I OUTPUT -i katana_wg -s 10.13.13.2/32 -j DROP
+  #POSTDOWN: "iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wireguard-deployment
+  namespace: katana
+  labels:
+    app: wireguard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wireguard
+  template:
+    metadata:
+      labels:
+        app: wireguard
+    spec:
+      containers:
+        - name: wireguard
+          image: harbor.katana.local/katana/wireguard
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: wireguard-configmap
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - SYS_MODULE
+            privileged: true
+          volumeMounts:
+            - name: wg-config
+              mountPath: /config
+          ports:
+            - containerPort: 51820
+              protocol: UDP
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+      volumes:
+        - name: wg-config
+          emptyDir: {}

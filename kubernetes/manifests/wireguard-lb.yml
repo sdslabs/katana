@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: wireguard
+  name: wireguard
+  namespace: katana
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 51820
+      protocol: UDP
+      targetPort: 51820
+  selector:
+    app: wireguard
