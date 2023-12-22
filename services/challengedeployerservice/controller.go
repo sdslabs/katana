@@ -27,8 +27,14 @@ func Deploy(c *fiber.Ctx) error {
 	challengeType := "web"
 	log.Println("Starting")
 
+	katanaDir, err := utils.GetKatanaRootPath()
+	if err != nil {
+		return err
+	}
+	challengesDir:=katanaDir+"/challenges"	
+
 	//Read folder challenge by os
-	dir, err := os.Open("./challenges")
+	dir, err := os.Open(challengesDir)
 
 	//Loop over all subfolders in the challenge folder
 	if err != nil {
@@ -80,9 +86,18 @@ func Deploy(c *fiber.Ctx) error {
 					}
 				}
 			}
-			CopyChallengeIntoTsuka(challengePath, folderName, challengeType)
-			CopyFlagDataIntoKashira(challengePath, folderName)
-			CopyChallengeCheckerIntoKissaki(challengePath, folderName)
+			err = CopyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			if err != nil {
+				return err
+			}
+			err = CopyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			if err != nil {
+				return err
+			}
+			err = CopyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return c.JSON(res)

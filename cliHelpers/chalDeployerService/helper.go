@@ -21,8 +21,14 @@ func DeployChallenge() error {
 	challengeType := "web"
 	log.Println("Starting")
 
+	katanaDir, err := utils.GetKatanaRootPath()
+	if err != nil {
+		return err
+	}
+	challengesDir:=katanaDir+"/challenges"	
+
 	//Read folder challenge by os
-	dir, err := os.Open("./challenges")
+	dir, err := os.Open(challengesDir)
 
 	//Loop over all subfolders in the challenge folder
 	if err != nil {

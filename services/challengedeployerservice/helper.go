@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
@@ -28,6 +29,18 @@ func CopyChallengeIntoTsuka(dirPath string, challengeName string, challengeType 
 		err := os.Mkdir("teams/"+path, 0755)
 		if err != nil {
 			log.Println(err)
+			if (strings.Contains(err.Error(), "file exists")) {
+				err = os.RemoveAll("teams/" + path)
+				if err != nil {
+					log.Println(err)
+				}
+				err = os.Mkdir("teams/"+path, 0755)
+				if err != nil {
+					log.Println(err)
+				}
+			}else{
+				return err
+			}
 		}
 		git.PlainInit("teams/"+path, false)
 		repo, err := git.PlainOpen("teams/" + path)
@@ -45,7 +58,9 @@ func CopyChallengeIntoTsuka(dirPath string, challengeName string, challengeType 
 
 		if err != nil {
 			log.Println(err)
-			return err
+			if (!strings.Contains(err.Error(), "remote already exists")) {
+				return err
+			}
 		}
 		podsInTeam, err := utils.GetPods(map[string]string{
 			"app": g.ClusterConfig.TeamLabel,
