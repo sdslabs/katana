@@ -121,7 +121,7 @@ func BuildKatanaServices() error {
 		log.Fatal(errDir)
 		return errDir
 	}
-
+  
 	katanaServicesDir := katanaDir + "/katana-services"
 
 	services, err := os.ReadDir(katanaServicesDir)
