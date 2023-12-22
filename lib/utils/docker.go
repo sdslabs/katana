@@ -45,10 +45,6 @@ func CheckDockerfile(_DockerfilePath string) bool {
 	return !os.IsNotExist(err)
 }
 
-func CheckDockerfile(_DockerfilePath string) bool {
-	_, err := os.Stat(_DockerfilePath + "/Dockerfile")
-	return !os.IsNotExist(err)
-}
 func BuildDockerImage(_ChallengeName string, _DockerfilePath string) error {
 	buf := new(bytes.Buffer)
 	if err := Tar(_DockerfilePath, buf); err != nil {

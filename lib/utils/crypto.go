@@ -36,15 +36,12 @@ func GenerateCerts(domain string, basePath string) error {
 		return err
 	}
 
-	cmd = "openssl rsa -in " + basePath + "/ca.key -out "+ basePath + "/ca.key -traditional"
-	if err := RunCommand(cmd); err != nil {
-		return err
-	}
-
-	// using -traditional flag to get PKCS#1 [different header], otherwise 500 Internal Error
-	cmd = "openssl rsa -in " + basePath + "/ca.key -out " + basePath + "/ca.key -traditional"
-	if err := RunCommand(cmd); err != nil {
-		return err
+	if(openSSLabove3){
+		// using -traditional flag to get PKCS#1 [different header], otherwise 500 Internal Error
+		cmd = "openssl rsa -in " + basePath + "/ca.key -out " + basePath + "/ca.key -traditional"
+		if err := RunCommand(cmd); err != nil {
+			return err
+		}
 	}
 
 	// using -traditional flag to get PKCS#1 [different header], otherwise 500 Internal Error
@@ -60,18 +57,6 @@ func GenerateCerts(domain string, basePath string) error {
 		return err
 	}
 
-	// using -traditional flag to get PKCS#1 [different header], otherwise 500 Internal Error
-	cmd = "openssl rsa -in " + basePath + "/" + domain + ".key -out " + basePath + "/" + domain + ".key -traditional"
-	if err := RunCommand(cmd); err != nil {
-		return err
-	}
-
-	// using -traditional flag to get PKCS#1 [different header], otherwise 500 Internal Error
-	cmd = "openssl rsa -in " + basePath + "/" + domain + ".key -out " + basePath + "/" + domain + ".key -traditional"
-	if err := RunCommand(cmd); err != nil {
-		return err
-	}
-
 	// Generate private key
 	cmd = "openssl genrsa -out " + basePath + "/" + domain + ".key 4096"
 	if err := RunCommand(cmd); err != nil {
@@ -80,6 +65,7 @@ func GenerateCerts(domain string, basePath string) error {
 	}
 
 	if(openSSLabove3){
+		// using -traditional flag to get PKCS#1 [different header], otherwise 500 Internal Error
 		cmd = "openssl rsa -in " + basePath+"/"+domain + ".key -out "+ basePath +"/"+domain + ".key -traditional"
 		if err := RunCommand(cmd); err != nil {
 			return err

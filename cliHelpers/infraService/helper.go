@@ -81,7 +81,7 @@ func GitSetup() error {
 	// Create the request
 	req, err := http.NewRequest("POST", "http://"+LoadBalancer+":3000"+"/install", &requestBody)
 	if err != nil {
-		fmt.Println("", err)
+		fmt.Println(err)
 		return err
 	}
 
@@ -92,7 +92,7 @@ func GitSetup() error {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("", err)
+		fmt.Println(err)
 		return err
 	}
 
