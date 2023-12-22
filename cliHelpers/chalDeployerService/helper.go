@@ -2,6 +2,7 @@ package chalDeployerService
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -162,7 +163,7 @@ func DeleteChallenge(challengeName string) error {
 
 		flag := 0
 		for _, service := range services.Items {
-			if service.Name == challengeName {
+			if service.Name == challengeName+"-svc-"+strconv.Itoa(i) {
 				flag = 1
 			}
 		}
