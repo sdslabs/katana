@@ -1,9 +1,10 @@
 package main
 
 import (
+	"github.com/spf13/cobra"
+
 	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/services/master"
-	"github.com/spf13/cobra"
 )
 
 // runCmd represents the run command
@@ -26,8 +27,9 @@ var runCmd = &cobra.Command{
 		// }
 
 		// apiServer := api.Server()
-		configs.LoadConfiguration()
-		return master.Server()
+		configs.LoadConfiguration();
+		configs.LoadKubeElements();
+		return master.Server();
 
 		// if err := g.Wait(); err != nil {
 		// 	os.Exit(1)

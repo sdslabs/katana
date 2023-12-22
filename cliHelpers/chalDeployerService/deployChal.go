@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-g "github.com/sdslabs/katana/configs"
+	g "github.com/sdslabs/katana/configs"
 )
 
 // still have to test this [WIP]
