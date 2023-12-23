@@ -4,10 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/sdslabs/katana/configs"
+
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
 )
@@ -17,7 +18,11 @@ var db *sql.DB
 func setup() error {
 	for i := 0; i < 10; i++ {
 		log.Printf("Trying to connect to MySQL, attempt %d", i+1)
-		database, err := sql.Open("mysql", configs.MySQLConfig.Username+":"+configs.MySQLConfig.Password+"@tcp("+utils.GetKatanaLoadbalancer()+":3306)/mysql")
+		katanaLB, err := utils.GetKatanaLoadbalancer()
+		if err != nil {
+			return err
+		}
+		database, err := sql.Open("mysql", g.MySQLConfig.Username+":"+g.MySQLConfig.Password+"@tcp("+katanaLB+":3306)/mysql")
 		if err != nil {
 			return fmt.Errorf("cannot connect to mysql: %w", err)
 		}
@@ -30,9 +35,21 @@ func setup() error {
 			time.Sleep(time.Duration(g.KatanaConfig.TimeOut) * time.Second)
 		} else {
 			log.Println("MySQL Connection Established")
-			if err := setupGogs(); err != nil {
-				return fmt.Errorf("cannot setup gogs: %w", err)
+
+			if err := CreateDatabase(gogsDatabase); err != nil {
+				if !strings.Contains(err.Error(), "database exists") {
+					return fmt.Errorf("cannot create gogs database: %w", err)
+				} else {
+					if err := setupGogs(); err != nil {
+						return fmt.Errorf("cannot setup gogs: %w", err)
+					}else{
+						log.Println("Gogs MySQL database setup successfully")
+					}
+				}
+			} else {
+				log.Println("Gogs database created successfully in MySQL")
 			}
+			
 			return nil
 		}
 	}
@@ -40,14 +57,11 @@ func setup() error {
 }
 
 func setupGogs() error {
-	if err := CreateDatabase(gogsDatabase); err != nil {
-		fmt.Errorf("cannot create database: %w", err)
+	if err := CreateGogsAdmin(g.AdminConfig.Username, g.AdminConfig.Password); err != nil {
+		return fmt.Errorf("cannot create gogs admin: %w", err)
 	}
-	if err := CreateGogsAdmin(configs.AdminConfig.Username, configs.AdminConfig.Password); err != nil {
-		fmt.Errorf("cannot create gogs admin: %w", err)
-	}
-	if err := CreateAccessToken(configs.AdminConfig.Username, configs.AdminConfig.Password); err != nil {
-		fmt.Errorf("cannot create access token: %w", err)
+	if err := CreateAccessToken(g.AdminConfig.Username, g.AdminConfig.Password); err != nil {
+		return fmt.Errorf("cannot create access token: %w", err)
 	}
 	return nil
 }

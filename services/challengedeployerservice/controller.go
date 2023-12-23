@@ -13,11 +13,12 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/gofiber/fiber/v2"
 	archiver "github.com/mholt/archiver/v3"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/utils"
 	"github.com/sdslabs/katana/types"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func Deploy(c *fiber.Ctx) error {
@@ -26,8 +27,14 @@ func Deploy(c *fiber.Ctx) error {
 	challengeType := "web"
 	log.Println("Starting")
 
+	katanaDir, err := utils.GetKatanaRootPath()
+	if err != nil {
+		return err
+	}
+	challengesDir:=katanaDir+"/challenges"	
+
 	//Read folder challenge by os
-	dir, err := os.Open("./challenges")
+	dir, err := os.Open(challengesDir)
 
 	//Loop over all subfolders in the challenge folder
 	if err != nil {
@@ -71,7 +78,7 @@ func Deploy(c *fiber.Ctx) error {
 					log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
 					teamName := "katana-team-" + strconv.Itoa(i)
 					deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
-					url, err := createServiceForChallenge(folderName, teamName, 3000, i)
+					url, err := CreateServiceForChallenge(folderName, teamName, 3000, i)
 					if err != nil {
 						res = append(res, []string{teamName, err.Error()})
 					} else {
@@ -79,9 +86,18 @@ func Deploy(c *fiber.Ctx) error {
 					}
 				}
 			}
-			copyChallengeIntoTsuka(challengePath, folderName, challengeType)
-			copyFlagDataIntoKashira(challengePath, folderName)
-			copyChallengeCheckerIntoKissaki(challengePath, folderName)
+			err = CopyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			if err != nil {
+				return err
+			}
+			err = CopyFlagDataIntoKashira(challengePath, folderName)
+			if err != nil {
+				return err
+			}
+			err = CopyChallengeCheckerIntoKissaki(challengePath, folderName)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return c.JSON(res)
@@ -106,7 +122,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 			match := regex.FindStringSubmatch(file.Filename)
 			folderName = match[1]
 
-			response, challengePath := createFolder(folderName)
+			response, challengePath := CreateFolder(folderName)
 			if response == 1 {
 				log.Println("Directory already exists with same name")
 				return c.SendString("Directory already exists with same name")
@@ -134,7 +150,10 @@ func DeployChallenge(c *fiber.Ctx) error {
 			}
 
 			//Update challenge path to get dockerfile
-			utils.BuildDockerImage(folderName, challengePath+"/"+folderName)
+			err = utils.BuildDockerImage(folderName, challengePath+"/"+folderName)
+			if err != nil {
+				return err
+			}
 
 			//Get no.of teams and DEPLOY CHALLENGE to each namespace (assuming they exist and /createTeams has been called)
 			clusterConfig := g.ClusterConfig
@@ -144,16 +163,16 @@ func DeployChallenge(c *fiber.Ctx) error {
 				log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
 				teamName := "katana-team-" + strconv.Itoa(i)
 				deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
-				url, err := createServiceForChallenge(folderName, teamName, 3000, i)
+				url, err := CreateServiceForChallenge(folderName, teamName, 3000, i)
 				if err != nil {
 					res = append(res, []string{teamName, err.Error()})
 				} else {
 					res = append(res, []string{teamName, url})
 				}
 			}
-			copyChallengeIntoTsuka(challengePath, folderName, challengeType)
-			copyFlagDataIntoKashira(challengePath, folderName)
-			copyChallengeCheckerIntoKissaki(challengePath, folderName)
+			CopyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			CopyFlagDataIntoKashira(challengePath, folderName)
+			CopyChallengeCheckerIntoKissaki(challengePath, folderName)
 
 			return c.JSON(res)
 		}
@@ -164,7 +183,7 @@ func DeployChallenge(c *fiber.Ctx) error {
 
 func ChallengeUpdate(c *fiber.Ctx) error {
 	replicas := int32(1)
-	client, _ := utils.GetKubeClient()
+	client:=g.GlobalKubeClient
 	patch := true
 
 	//http connection configuration for 30 min
@@ -183,6 +202,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	repo, err := git.PlainOpen("teams/" + dir)
 	if err != nil {
 		log.Println(err)
+		return err
 	}
 
 	auth := &http.BasicAuth{
@@ -197,14 +217,21 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 	})
 
 	if err != nil {
-		log.Println("Error pulling changes:", err)
+		return fmt.Errorf("Error pulling changes:%w", err)
+
 	}
 	katanaDir, err := utils.GetKatanaRootPath()
+	if err != nil {
+		return err
+	}
 	imageName := strings.Replace(dir, "/", "-", -1)
 
 	log.Println("Pull successful for", teamName, ". Building image...")
 	firstPatch := !utils.DockerImageExists(imageName)
-	utils.BuildDockerImage(imageName, katanaDir+"/teams/"+dir)
+	err = utils.BuildDockerImage(imageName, katanaDir+"/teams/"+dir)
+	if err != nil {
+		return err
+	}
 
 	if firstPatch {
 		log.Println("First Patch for", teamName)
@@ -223,6 +250,7 @@ func ChallengeUpdate(c *fiber.Ctx) error {
 		if err != nil {
 			log.Println("Error")
 			log.Println(err)
+			return err
 		}
 	}
 	log.Println("Image built for", teamName)
@@ -251,7 +279,7 @@ func DeleteChallenge(c *fiber.Ctx) error {
 		teamName := "team-" + strconv.Itoa(i)
 
 		teamNamespace := "katana-" + teamName + "-ns"
-		kubeclient, err := utils.GetKubeClient()
+		kubeclient:=g.GlobalKubeClient
 		if err != nil {
 			return err
 		}
@@ -265,7 +293,6 @@ func DeleteChallenge(c *fiber.Ctx) error {
 		if err != nil {
 			log.Println(" Error in getting deployments associated with the challenge. ")
 			continue
-			//panic(err)
 		}
 
 		//Delete deployments
@@ -292,7 +319,7 @@ func DeleteChallenge(c *fiber.Ctx) error {
 
 		flag := 0
 		for _, service := range services.Items {
-			if service.Name == challengeName {
+			if service.Name == challengeName+"-svc-"+strconv.Itoa(i) {
 				flag = 1
 			}
 		}

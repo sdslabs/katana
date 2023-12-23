@@ -7,12 +7,13 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-func LoadConfiguration() {
+func LoadConfiguration() error {
 	flag.Parse()
 	config := &KatanaCfg{}
 	configFile := flag.String("conf", "config.toml", "location of config file")
 	if _, err := toml.DecodeFile(*configFile, config); err != nil {
 		log.Fatal(err)
+		return err
 	}
 	KatanaConfig = config
 	ServicesConfig = &KatanaConfig.Services
@@ -24,6 +25,7 @@ func LoadConfiguration() {
 	MongoConfig = &KatanaConfig.Mongo
 	MySQLConfig = &KatanaConfig.MySQL
 	HarborConfig = &KatanaConfig.Harbor
+	return nil
 }
 
 var (

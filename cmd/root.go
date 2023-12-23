@@ -4,6 +4,9 @@ import (
 	"log"
 
 	"github.com/spf13/cobra"
+
+	"github.com/sdslabs/katana/cliHelpers/chalDeployerService"
+	"github.com/sdslabs/katana/cliHelpers/infraService"
 )
 
 // rootCmd represents the run command
@@ -22,4 +25,12 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(infraService.MongoDBCmd)
+	rootCmd.AddCommand(infraService.MySqlDBCmd)
+	rootCmd.AddCommand(infraService.InfraCmd)
+	rootCmd.AddCommand(infraService.SetUpCmd)
+	rootCmd.AddCommand(infraService.GitCmd)
+	rootCmd.AddCommand(infraService.CreateTeamCmd)
+	rootCmd.AddCommand(chalDeployerService.DelChalCmd)
+	rootCmd.AddCommand(chalDeployerService.DeployChalCmd)
 }

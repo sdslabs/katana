@@ -9,18 +9,21 @@ import (
 	"strings"
 	"text/template"
 
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/utils"
-	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func updateOrAddHost() error {
 	filePath := "/etc/hosts"
 	hostname := "harbor.katana.local"
-	ipAddress := utils.GetKatanaLoadbalancer()
-
+	ipAddress, err := utils.GetKatanaLoadbalancer()
+	if err != nil {
+		return err
+	}
 	file, err := os.Open(filePath)
 	if err != nil {
 		return err
@@ -59,8 +62,8 @@ func updateOrAddHost() error {
 }
 
 func deployHarborClusterDaemonSet() error {
-	kubeConfig, _ := utils.GetKubeConfig()
-	kubeClient, _ := utils.GetKubeClient()
+	kubeConfig:= configs.GlobalKubeConfig
+	kubeClient:= configs.GlobalKubeClient
 
 	namespace := "kube-system"
 

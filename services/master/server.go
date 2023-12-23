@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+
 	cfg "github.com/sdslabs/katana/configs"
 	challengeDeployerService "github.com/sdslabs/katana/services/challengedeployerservice"
 	infraSetService "github.com/sdslabs/katana/services/infrasetservice"

@@ -43,7 +43,11 @@ func setup() error {
 		log.Printf("Trying to connect to MongoDB, attempt %d", i+1)
 		ctx, _ = context.WithTimeout(context.Background(), time.Duration(configs.KatanaConfig.TimeOut)*time.Second)
 		var err error
-		client, err = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+configs.MongoConfig.Username+":"+configs.MongoConfig.Password+"@"+utils.GetKatanaLoadbalancer()+":27017/?directConnection=true&appName=mongosh+"+configs.MongoConfig.Version))
+		katanaLB, err := utils.GetKatanaLoadbalancer()
+		if err != nil {
+			return err
+		}
+		client, err = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+configs.MongoConfig.Username+":"+configs.MongoConfig.Password+"@"+katanaLB+":27017/?directConnection=true&appName=mongosh+"+configs.MongoConfig.Version))
 		if err != nil {
 			return fmt.Errorf("cannot connect to mongo: %w", err)
 		}

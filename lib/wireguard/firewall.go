@@ -76,7 +76,7 @@ func ApplyFirewall() error {
 	if err != nil {
 		log.Println(err)
 	}
-	filepath = filepath + "/katana-services/Wireguard/root/defaults/firewall.conf"
+	filepath = filepath + "/katana-services/wireguard/root/defaults/firewall.conf"
 	err = os.WriteFile(filepath, []byte(finalIprules), 0644)
 	if err != nil {
 		fmt.Println("Error writing to file:", err)

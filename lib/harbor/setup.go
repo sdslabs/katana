@@ -3,11 +3,12 @@ package harbor
 import (
 	"log"
 
+	"github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
 )
 
 func SetupHarbor() error {
-	client, _ := utils.GetKubeClient()
+	client:= configs.GlobalKubeClient
 
 	deploymentNames := []string{
 		"katana-release-harbor-core",

@@ -45,7 +45,7 @@ spec:
   containers:
   - name: create-data-dirs
     image: busybox
-    command: ["sh", "-c", "mkdir /mnt/gogs /mnt/mysql /mnt/mongo /mnt/kashira /mnt/kissaki && sleep infinity"]
+    command: ["sh", "-c", "rm -rf /mnt/gogs /mnt/mysql /mnt/mongo /mnt/kashira /mnt/kissaki && mkdir /mnt/gogs /mnt/mysql /mnt/mongo /mnt/kashira /mnt/kissaki && sleep infinity"]
     volumeMounts:
     - mountPath: "/mnt"
       name: setup-volume

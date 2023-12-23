@@ -7,10 +7,9 @@ import (
 	"io"
 	"log"
 	"path/filepath"
+	"strings"
 	"text/template"
 
-	g "github.com/sdslabs/katana/configs"
-	"github.com/sdslabs/katana/lib/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -24,6 +23,9 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
+
+	g "github.com/sdslabs/katana/configs"
+	"github.com/sdslabs/katana/lib/utils"
 )
 
 // ApplyManifest applies a given manifest to the cluster
@@ -32,14 +34,12 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 	if err != nil {
 		return err
 	}
-
 	decoder := yamlutil.NewYAMLOrJSONDecoder(bytes.NewReader(manifest), 100)
 	for {
 		var rawObj runtime.RawExtension
 		if err = decoder.Decode(&rawObj); err != nil {
 			break
 		}
-
 		obj, gvk, err := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme).Decode(rawObj.Raw, nil, nil)
 		if err != nil {
 			return err
@@ -79,7 +79,13 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 					continue
 					// TODO: Handle PVCs, currently on deletion of PVCs, the cluster is stuck in a loop
 				}
-				_ = dri.Delete(context.Background(), unstructuredObj.GetName(), metav1.DeleteOptions{})
+				err = dri.Delete(context.Background(), unstructuredObj.GetName(), metav1.DeleteOptions{})
+				if err != nil {
+					if strings.Contains(err.Error(), "not found") {
+						return nil
+					}
+					log.Fatal(err)
+				}
 				watcher, err := dri.Watch(context.Background(), metav1.ListOptions{
 					FieldSelector: fmt.Sprintf("metadata.name=%s", unstructuredObj.GetName()),
 				})
@@ -87,8 +93,10 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 					return err
 				}
 				defer watcher.Stop()
+
 				for event := range watcher.ResultChan() {
 					if event.Type == watch.Deleted {
+
 						_, err = dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{})
 						if err != nil {
 							return err
@@ -99,7 +107,6 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 			}
 		}
 	}
-
 	if err != io.EOF {
 		return err
 	}
@@ -113,9 +120,12 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 
 	deploymentConfig := utils.DeploymentConfig()
 
-	clientset, _ := utils.GetKubeClient()
+	nodes, err := utils.GetNodes(kubeclientset)
 
-	nodes, _ := utils.GetNodes(clientset)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 
 	deploymentConfig.NodeAffinityValue = nodes[0].Name
 
@@ -140,7 +150,7 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 func DeployChallengeToCluster(challengeName, teamName string, firstPatch bool, replicas int32) error {
 
 	teamNamespace := teamName + "-ns"
-	kubeclient, _ := utils.GetKubeClient()
+	kubeclient:= g.GlobalKubeClient
 
 	deploymentsClient := kubeclient.AppsV1().Deployments(teamNamespace)
 	imageName := "harbor.katana.local/katana/" + challengeName + ":latest"
@@ -204,10 +214,13 @@ func DeployChallengeToCluster(challengeName, teamName string, firstPatch bool, r
 	}
 	log.Println("Creating deployment...")
 	result, err := deploymentsClient.Create(context.TODO(), manifest, metav1.CreateOptions{})
-
 	if err != nil {
-		log.Println("Unable to create deployement")
-		panic(err)
+		if(!strings.Contains(err.Error(), "already exists")){
+			log.Println("Unable to create deployement")
+			panic(err)
+		}else{
+			log.Println("Deployment already existed")
+		}
 	}
 
 	log.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName()+" in namespace "+teamNamespace)
