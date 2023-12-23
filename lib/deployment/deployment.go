@@ -215,8 +215,12 @@ func DeployChallengeToCluster(challengeName, teamName string, firstPatch bool, r
 	log.Println("Creating deployment...")
 	result, err := deploymentsClient.Create(context.TODO(), manifest, metav1.CreateOptions{})
 	if err != nil {
-		log.Println("Unable to create deployement")
-		panic(err)
+		if(!strings.Contains(err.Error(), "already exists")){
+			log.Println("Unable to create deployement")
+			panic(err)
+		}else{
+			log.Println("Deployment already existed")
+		}
 	}
 
 	log.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName()+" in namespace "+teamNamespace)

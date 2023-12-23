@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -75,7 +76,11 @@ func DeployChallenge() error {
 					teamName := "katana-team-" + strconv.Itoa(i)
 					err = deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
 					if err != nil {
-						return err
+						if !(strings.Contains(err.Error(), "already exists")) {
+							return err
+						}else{
+							log.Println("Deployment already existed.")
+						}
 					}
 					url, err := challengedeployerservice.CreateServiceForChallenge(folderName, teamName, 3000, i)
 					if err != nil {
@@ -173,7 +178,7 @@ func DeleteChallenge(challengeName string) error {
 
 		//Delete service
 		log.Println("Deleting services associated with this challenge...")
-		err = serviceClient.Delete(context.TODO(), challengeName, metav1.DeleteOptions{})
+		err = serviceClient.Delete(context.TODO(), challengeName+"-svc-"+strconv.Itoa(i), metav1.DeleteOptions{})
 		if err != nil {
 			log.Println("Error in deleting service for "+challengeName+" in namespace "+teamNamespace, err)
 			continue

@@ -101,15 +101,8 @@ func GetMongoIP() (string, error) {
 }
 
 func CopyFromPod(podName string, containerName string, pathInPod string, localFilePath string, ns ...string) error {
-	config, err := GetKubeConfig()
-	if err != nil {
-		return err
-	}
-
-	client, err := GetKubeClient()
-	if err != nil {
-		return err
-	}
+	config:=g.GlobalKubeConfig
+	client:=g.GlobalKubeClient
 
 	namespace := "katana"
 	if len(ns) > 0 {
@@ -183,16 +176,8 @@ func CopyFromPod(podName string, containerName string, pathInPod string, localFi
 }
 
 func CopyIntoPod(podName string, containerName string, pathInPod string, localFilePath string, ns ...string) error {
-	config, err := GetKubeConfig()
-	if err != nil {
-		return err
-	}
-
-	client, err := GetKubeClient()
-	if err != nil {
-		return err
-	}
-
+	config:=g.GlobalKubeConfig
+	client:=g.GlobalKubeClient
 	localFile, err := os.Open(localFilePath)
 	if err != nil {
 		log.Printf("Error opening local file: %s\n", err)

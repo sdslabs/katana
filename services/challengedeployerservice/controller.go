@@ -90,11 +90,11 @@ func Deploy(c *fiber.Ctx) error {
 			if err != nil {
 				return err
 			}
-			err = CopyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			err = CopyFlagDataIntoKashira(challengePath, folderName)
 			if err != nil {
 				return err
 			}
-			err = CopyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			err = CopyChallengeCheckerIntoKissaki(challengePath, folderName)
 			if err != nil {
 				return err
 			}
