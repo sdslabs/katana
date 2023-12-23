@@ -123,23 +123,7 @@ func CreateTeams(c *fiber.Ctx) error {
 		errDir := os.Mkdir("teams", 0755)
 		if errDir != nil {
 			log.Fatal(err)
-		return err
-		}
-	}
-
-	// Create a directory named teams in the current directory
-	if _, err := os.Stat("teams"); os.IsNotExist(err) {
-		errDir := os.Mkdir("teams", 0755)
-		if errDir != nil {
-			log.Fatal(err)
-		}
-	}
-
-	// Create a directory named teams in the current directory
-	if _, err := os.Stat("teams"); os.IsNotExist(err) {
-		errDir := os.Mkdir("teams", 0755)
-		if errDir != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
@@ -170,7 +154,9 @@ func CreateTeams(c *fiber.Ctx) error {
 		_, err = client.CoreV1().Namespaces().Create(c.Context(), nsName, metav1.CreateOptions{})
 		if err != nil {
 			log.Fatal(err)
-			return err
+			if(err.Error() != "namespaces \""+namespace+"\" already exists in the cluster"){
+				return err
+			}
 		}
 		manifest := &bytes.Buffer{}
 		tmpl, err := template.ParseFiles(filepath.Join(configs.ClusterConfig.TemplatedManifestDir, "runtime", "teams.yml"))
@@ -182,7 +168,6 @@ func CreateTeams(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-
 
 		deploymentConfig := utils.DeploymentConfig()
 

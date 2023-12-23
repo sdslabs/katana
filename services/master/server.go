@@ -48,7 +48,7 @@ func Server() error {
 	admin.Get("/createTeams", infraSetService.CreateTeams)
 	admin.Post("/challengeUpdate", challengeDeployerService.ChallengeUpdate)
 	admin.Get("/deploy", challengeDeployerService.Deploy)
-	admin.Post("/deployChallenge", challengeDeployerService.Deploy)
+	admin.Post("/deployChallenge", challengeDeployerService.DeployChallenge)
 	admin.Get("/gitServer", infraSetService.GitServer)
 	admin.Get("/deleteChallenge/:chall_name", challengeDeployerService.DeleteChallenge)
 	log.Printf("Listening on %s:%d\n", cfg.APIConfig.Host, cfg.APIConfig.Port)

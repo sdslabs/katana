@@ -2,7 +2,6 @@ package chalDeployerService
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"strconv"
