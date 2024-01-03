@@ -14,7 +14,7 @@ import (
 )
 
 func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType string) error {
-	localFilePath := dirPath + "/" + challengeName
+	localFilePath := dirPath + "/challenge"
 	pathInPod := "/opt/katana/katana_" + challengeType + "_" + challengeName + ".tar.gz"
 	log.Println("Testing" + localFilePath + "....and..." + pathInPod)
 	filename := challengeName
@@ -77,6 +77,21 @@ func createServiceForChallenge(challengeName, teamName string, targetPort int32,
 	return serviceName, nil
 }
 
+func createServiceForChallengeChecker(challengeCheckerName, namespace string, targetPort int32) (string, error) {
+	kubeclient, _ := utils.GetKubeClient()
+	serviceName := challengeCheckerName+"-svc"
+	port := int32(80)
+	selector := map[string]string{
+		"app": challengeCheckerName,
+	}
+
+	utils.CreateService(kubeclient, serviceName, namespace, port, targetPort, selector)
+
+	log.Printf("Created service %s for challenge %s in namespace %s", serviceName, challengeCheckerName, namespace)
+
+	return serviceName, nil
+}
+
 func createFolder(challengeName string) (message int, challengePath string) {
 
 	basePath, _ := os.Getwd()
@@ -113,7 +128,7 @@ func createFolder(challengeName string) (message int, challengePath string) {
 }
 
 func copyChallengeCheckerIntoKissaki(dirPath string, challengeName string) error {
-	srcFilePath := dirPath + "/" + challengeName + "-challenge-checker"
+	srcFilePath := dirPath + "/" + "challenge-checker"
 	pathInPod := "/opt/kissaki/kissaki_" + challengeName + ".tar.gz"
 
 	if err := utils.CopyIntoPod("kissaki-0", "kissaki", pathInPod, srcFilePath, "katana"); err != nil {
@@ -124,7 +139,7 @@ func copyChallengeCheckerIntoKissaki(dirPath string, challengeName string) error
 }
 
 func copyFlagDataIntoKashira(dirPath string, challengeName string) error {
-	srcFilePath := dirPath + "/" + "flag-data"
+	srcFilePath := dirPath + "/" + "flag-handler"
 	pathInPod := "/opt/kashira/kashira_" + challengeName + ".tar.gz"
 
 	if err := utils.CopyIntoPod("kashira-0", "kashira", pathInPod, srcFilePath, "katana"); err != nil {

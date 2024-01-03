@@ -142,6 +142,7 @@ func DeployChallengeToCluster(challengeName, teamName string, firstPatch bool, r
 	teamNamespace := teamName + "-ns"
 	kubeclient, _ := utils.GetKubeClient()
 
+	//to-do verify image exist in harbor, wait for sometime if not return error
 	deploymentsClient := kubeclient.AppsV1().Deployments(teamNamespace)
 	imageName := "harbor.katana.local/katana/" + challengeName + ":latest"
 	if firstPatch {
@@ -213,3 +214,62 @@ func DeployChallengeToCluster(challengeName, teamName string, firstPatch bool, r
 	log.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName()+" in namespace "+teamNamespace)
 	return nil
 }
+
+
+func DeployChallengeCheckerToCluster(challengeCheckerName, namespace string, replicas int32) error {
+
+	kubeclient, _ := utils.GetKubeClient()
+
+	deploymentsClient := kubeclient.AppsV1().Deployments(namespace)
+	// imageName := "harbor.katana.local/katana/" + challengeCheckerName
+	imageName := "iiteens/" + challengeCheckerName
+
+	manifest := &appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: namespace,
+			Name:      challengeCheckerName+"-deployment",
+		},
+		Spec: appsv1.DeploymentSpec{
+			Replicas: &replicas,
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"app": challengeCheckerName,
+				},
+			},
+			Template: v1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						"app": challengeCheckerName,
+					},
+				},
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
+						{
+							Name:            challengeCheckerName,
+							Image:           imageName,
+							ImagePullPolicy: v1.PullPolicy("IfNotPresent"),
+							Ports: []v1.ContainerPort{
+								{
+									Name:          "checker-port",
+									ContainerPort: 8080,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	
+	log.Println("Creating deployment...")
+	result, err := deploymentsClient.Create(context.TODO(), manifest, metav1.CreateOptions{})
+
+	if err != nil {
+		log.Println("Unable to create deployment")
+		panic(err)
+	}
+
+	log.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName()+" in namespace "+namespace)
+	return nil
+}
+

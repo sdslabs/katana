@@ -28,7 +28,7 @@ spec:
       serviceAccountName: cluster-admin
       containers:
         - name: kashira
-          image: harbor.katana.local/katana/kashira
+          image: iiteens/kashira
           ports:
             - containerPort: 80
           volumeMounts:

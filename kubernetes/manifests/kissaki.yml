@@ -28,7 +28,7 @@ spec:
       serviceAccountName: cluster-admin
       containers:
         - name: kissaki
-          image: harbor.katana.local/katana/kissaki
+          image: iiteens/kissaki
           ports:
             - containerPort: 80
           volumeMounts:
