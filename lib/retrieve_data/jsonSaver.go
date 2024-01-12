@@ -18,7 +18,7 @@ var tick int
 func saveJSON() {
 	for range ticker.C {
 		data := mongo.FetchDocs(context.Background(), "teams", bson.M{})
-		path := fmt.Sprintf("./json_data/data-tick-%d", tick)
+		path := fmt.Sprintf("./json_data/data-tick-%d.json", tick)
 		jsonData, err := convertBSONArrayToJSONArray(data)
 		if err != nil {
 			fmt.Println(err)
