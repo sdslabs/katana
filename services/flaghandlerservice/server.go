@@ -40,7 +40,6 @@ func Server() {
 				fmt.Println(err)
 				return
 			}
-
 		}
 	}()
 }
