@@ -18,7 +18,7 @@ spec:
       labels:
         app: {{.AppName}}
     spec:
-      serviceAccountName: default
+      serviceAccountName: cluster-admin
       containers:
       - name: {{.AppName}}
         # image: "harbor.katana.local/katana/"{{.Image}}

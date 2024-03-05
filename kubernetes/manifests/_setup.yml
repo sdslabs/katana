@@ -35,7 +35,7 @@ metadata:
   name: cluster-admin-role
   namespace: katana
 rules:
-  - apiGroups: ["apps"]
+  - apiGroups: ["apps",""]
     resources:
       ["pods", "pods/exec", "services", "statefulsets", "statefulsets/scale"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
@@ -59,29 +59,3 @@ kind: ServiceAccount
 metadata:
   name: cluster-admin
   namespace: katana
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  namespace: katana
-  name: service-reader
-rules:
-- apiGroups: [""]
-  resources: ["services"]
-  verbs: ["get", "watch", "list"]
-
----
-
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: read-services
-  namespace: katana
-subjects:
-- kind: ServiceAccount
-  name: default
-  namespace: katana
-roleRef:
-  kind: Role
-  name: service-reader
-  apiGroup: rbac.authorization.k8s.io
