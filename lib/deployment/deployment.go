@@ -243,6 +243,7 @@ func DeployChallengeCheckerToCluster(challengeCheckerName, namespace string, rep
 					},
 				},
 				Spec: v1.PodSpec{
+					ServiceAccountName: "cluster-admin",
 					Containers: []v1.Container{
 						{
 							Name:            challengeCheckerName,

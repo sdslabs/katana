@@ -6,7 +6,7 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.AppName}}--deployment
+  name: {{.AppName}}-deployment
   namespace: {{.Namespace}}
 spec:
   replicas: 1
