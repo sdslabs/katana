@@ -29,6 +29,7 @@ spec:
       containers:
         - name: kissaki
           image: iiteens/kissaki
+          imagePullPolicy: Always   # added for ease may be remove later
           ports:
             - containerPort: 80
           volumeMounts:
@@ -60,4 +61,4 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 80
+      targetPort: 5000

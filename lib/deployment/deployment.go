@@ -247,7 +247,7 @@ func DeployChallengeCheckerToCluster(challengeCheckerName, namespace string, rep
 						{
 							Name:            challengeCheckerName,
 							Image:           imageName,
-							ImagePullPolicy: v1.PullPolicy("IfNotPresent"),
+							ImagePullPolicy: v1.PullPolicy("Always"),
 							Ports: []v1.ContainerPort{
 								{
 									Name:          "checker-port",

@@ -104,6 +104,74 @@ func BuildDockerImage(_ChallengeName string, _DockerfilePath string) {
 
 }
 
+//this func is modified to pass args to dockerfile, so that name of challenge could be identified
+func BuildDockerImageCc(_ChallengeName string, _DockerfilePath string) {
+	buf := new(bytes.Buffer)
+	if err := Tar(_DockerfilePath, buf); err != nil {
+		log.Fatal(err, ": error tarring directory")
+		return
+	}
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	log.Println("Building Docker image, Please wait......")
+
+	imageBuildResponse, err := cli.ImageBuild(
+		context.Background(),
+		buf,
+		types.ImageBuildOptions{
+			Dockerfile: "Dockerfile",
+			Remove:     true,
+			Tags:       []string{"harbor.katana.local/katana/" + _ChallengeName},
+			BuildArgs: map[string]*string{"chall_name":&_ChallengeName},
+		},
+	)
+	if err != nil {
+		log.Fatal(err, " :unable to create image")
+		return
+	}
+
+	_, err = io.Copy(os.Stdout, imageBuildResponse.Body)
+	if err != nil {
+		log.Fatal(err, " :unable to read image build response")
+		return
+	}
+
+	log.Println("Docker image built successfully")
+
+	dockerLogin(configs.KatanaConfig.Harbor.Username, configs.KatanaConfig.Harbor.Password)
+
+	log.Println("Pushing Docker image to Harbor, please wait...")
+
+	authConfig := registry.AuthConfig{
+		Username: configs.KatanaConfig.Harbor.Username,
+		Password: configs.KatanaConfig.Harbor.Password,
+	}
+	authJSON, err := json.Marshal(authConfig)
+	if err != nil {
+		log.Fatal(err, ": error encoding credentials")
+		return
+	}
+
+	encodedAuth := Base64Encode(string(authJSON))
+
+	pushOptions := types.ImagePushOptions{
+		RegistryAuth: encodedAuth,
+	}
+
+	_, err = cli.ImagePush(context.Background(), "harbor.katana.local/katana/"+_ChallengeName, pushOptions)
+	if err != nil {
+		log.Fatal(err, " :unable to push docker image")
+		return
+	}
+
+	log.Println("Image Pushed to Harbor successfully")
+
+}
+
 func DockerImageExists(imageName string) bool {
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {

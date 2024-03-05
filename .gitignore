@@ -13,3 +13,6 @@ vendor/*
 teams/*
 teamcreds.txt
 lib/harbor/certs/*
+sam/
+work.txt
+sam.yml

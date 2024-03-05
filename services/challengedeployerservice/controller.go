@@ -16,147 +16,223 @@ import (
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/deployment"
 	"github.com/sdslabs/katana/lib/utils"
+	"github.com/sdslabs/katana/services/infrasetservice"
 	"github.com/sdslabs/katana/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	// coreV1 "k8s.io/api/core/v1"
-
-	"bytes"
-	"html/template"
-	"path/filepath"
 )
 
-func createNamespace(c *fiber.Ctx ,ccName, namespaceName string) error {
-	config, err := utils.GetKubeConfig()
+func Deploy(c *fiber.Ctx) error {
+	patch := false
+	replicas := int32(1)
+	challengeType := "web" //hardcoded-------------------------------------
+	log.Println("Starting")
+
+	//Read folder challenge by os
+	dir, err := os.Open("./challenges")
+
+	//Loop over all subfolders in the challenge folder
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Error in opening challenges folder")
+		return err
 	}
+	defer dir.Close()
 
-	data:=struct{
-		Namespace string
-		AppName string
-		Image string
-	}{
-		Namespace: namespaceName,
-		AppName:ccName,
-		Image:ccName,
-	}
-
-	client, err := utils.GetKubeClient()
+	//Read all challenges in the folder
+	fileInfos, err := dir.Readdir(-1)
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	// namespace := &coreV1.Namespace{
-    //     ObjectMeta: metav1.ObjectMeta{
-    //         Name: namespaceName,
-    //     },
-    // }
-
-    // _, err = client.CoreV1().Namespaces().Create(c.Context(),namespace,metav1.CreateOptions{})
-    // if err != nil {
-    //     panic(err)
-    // }
-
-	manifest:=&bytes.Buffer{}
-	tmpl,err:=template.ParseFiles(filepath.Join(g.ClusterConfig.TemplatedManifestDir,"runtime","cc.yml"))
-	if err!=nil{
-		return err
-	}
-	// deploymentConfig:=utils.DeploymentConfig()
-	if err = tmpl.Execute(manifest,data);err!=nil{
-		return err
-	}
-	if err=deployment.ApplyManifest(config,client,manifest.Bytes(),namespaceName);err!=nil{
+		log.Println("Error in reading challenges folder")
 		return err
 	}
 
-	return nil
+	res := make([][]string, 0)
+
+	//Loop over all folders
+	for _, fileInfo := range fileInfos {
+		//Check if it is a directory
+		if fileInfo.IsDir() {
+			//Get the challenger name
+			folderName := fileInfo.Name()
+			log.Println("Folder name is : " + folderName)
+			//Update challenge path to be absolute path
+			challengePath, _ := os.Getwd()
+			challengePath = challengePath + "/challenges/" + folderName
+			log.Println("Challenge path is : " + challengePath)
+			log.Println(challengePath + "/challenge/Dockerfile")
+
+			ccName:=folderName+"-cc"
+			ccNamespace:="katana"
+
+			//Check if the folder has a Dockerfile
+			if _, err := os.Stat(challengePath + "/challenge/Dockerfile"); err != nil {
+				log.Println("Dockerfile not found in the " + folderName + " challenge folder. Please follow proper format.")
+			} else if _, err := os.Stat(challengePath + "/challenge-checker/Dockerfile"); err != nil {
+				log.Println("Dockerfile not found in the " + folderName + " challenge-checker folder. Please follow proper format.")
+			} else {
+				//pass path of folder which contains dockerfile
+				//Update challenge path to get dockerfile
+				utils.BuildDockerImage(folderName, challengePath+"/challenge")
+
+				//Update challenge-checker path to get dockerfile
+				infrasetservice.Apply_cc_yml(c,ccName,ccNamespace)
+				utils.BuildDockerImage(ccName, challengePath+"/challenge-checker")
+				deployment.DeployChallengeCheckerToCluster(ccName, ccNamespace, replicas)
+				url, err := createServiceForChallengeChecker(ccName, ccNamespace, 8080)
+				if err != nil {
+					res = append(res, []string{ccName, err.Error()})
+				} else {
+					res = append(res, []string{ccName, url})
+				}
+
+				clusterConfig := g.ClusterConfig
+				numberOfTeams := clusterConfig.TeamCount
+				for i := 0; i < int(numberOfTeams); i++ {
+					log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
+					teamName := "katana-team-" + strconv.Itoa(i)
+					deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
+					url, err := createServiceForChallenge(folderName, teamName, 3000, i)
+					if err != nil {
+						res = append(res, []string{teamName, err.Error()})
+					} else {
+						res = append(res, []string{teamName, url})
+					}
+				}
+			}
+			copyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			copyFlagDataIntoKashira(challengePath, folderName)
+			// copyChallengeCheckerIntoKissaki(challengePath, folderName)
+		}
+	}
+	return c.JSON(res)
 }
 
+func Cc(c *fiber.Ctx) error {
+	replicas := int32(1)
+	log.Println("Starting")
 
-// func Deploy(c *fiber.Ctx) error {
-// 	patch := false
-// 	replicas := int32(1)
-// 	challengeType := "web" //hardcoded-------------------------------------
-// 	log.Println("Starting")
+	//Read folder challenge by os
+	dir, err := os.Open("./challenges")
 
-// 	//Read folder challenge by os
-// 	dir, err := os.Open("./challenges")
+	//Loop over all subfolders in the challenge folder
+	if err != nil {
+		log.Println("Error in opening challenges folder")
+		return err
+	}
+	defer dir.Close()
 
-// 	//Loop over all subfolders in the challenge folder
-// 	if err != nil {
-// 		log.Println("Error in opening challenges folder")
-// 		return err
-// 	}
-// 	defer dir.Close()
+	//Read all challenges in the folder
+	fileInfos, err := dir.Readdir(-1)
+	if err != nil {
+		log.Println("Error in reading challenges folder")
+		return err
+	}
 
-// 	//Read all challenges in the folder
-// 	fileInfos, err := dir.Readdir(-1)
-// 	if err != nil {
-// 		log.Println("Error in reading challenges folder")
-// 		return err
-// 	}
+	res := make([][]string, 0)
 
-// 	res := make([][]string, 0)
+	//Loop over all folders
+	for _, fileInfo := range fileInfos {
+		//Check if it is a directory
+		if fileInfo.IsDir() {
+			//Get the challenger name
+			folderName := fileInfo.Name()
+			log.Println("Folder name is : " + folderName)
+			//Update challenge path to be absolute path
+			challengePath, _ := os.Getwd()
+			challengePath = challengePath + "/challenges/" + folderName
+			log.Println("Challenge path is : " + challengePath)
+			log.Println(challengePath + "/challenge/Dockerfile")
 
-// 	//Loop over all folders
-// 	for _, fileInfo := range fileInfos {
-// 		//Check if it is a directory
-// 		if fileInfo.IsDir() {
-// 			//Get the challenger name
-// 			folderName := fileInfo.Name()
-// 			log.Println("Folder name is : " + folderName)
-// 			//Update challenge path to be absolute path
-// 			challengePath, _ := os.Getwd()
-// 			challengePath = challengePath + "/challenges/" + folderName
-// 			log.Println("Challenge path is : " + challengePath)
-// 			log.Println(challengePath + "/challenge/Dockerfile")
+			// '-cc' at last of ccName is convention which is also followed in kissaki for handling status
+			ccName:=folderName+"-cc"
+			ccNamespace:="katana"
 
-// 			ccName:=folderName+"-challenge-checker"
-// 			ccNamespace:="katana"
+			//Check if the folder has a Dockerfile
+			if _, err := os.Stat(challengePath + "/challenge-checker/Dockerfile"); err != nil {
+				log.Println("Dockerfile not found in the " + folderName + " challenge-checker folder. Please follow proper format.")
+			} else {
 
-// 			//Check if the folder has a Dockerfile
-// 			if _, err := os.Stat(challengePath + "/challenge/Dockerfile"); err != nil {
-// 				log.Println("Dockerfile not found in the " + folderName + " challenge folder. Please follow proper format.")
-// 			} else if _, err := os.Stat(challengePath + "/challenge-checker/Dockerfile"); err != nil {
-// 				log.Println("Dockerfile not found in the " + folderName + " challenge-checker folder. Please follow proper format.")
-// 			} else {
-// 				//pass path of folder which contains dockerfile
-// 				//Update challenge path to get dockerfile
-// 				utils.BuildDockerImage(folderName, challengePath+"/challenge")
+				//Update challenge-checker path to get dockerfile
+				infrasetservice.Apply_cc_yml(c,ccName,ccNamespace)
+				utils.BuildDockerImageCc(ccName, challengePath+"/challenge-checker")
+				deployment.DeployChallengeCheckerToCluster(ccName, ccNamespace, replicas)
+				url, err := createServiceForChallengeChecker(ccName, ccNamespace, 8080)
+				if err != nil {
+					res = append(res, []string{ccName, err.Error()})
+				} else {
+					res = append(res, []string{ccName, url})
+				}
+			}
+		}
+	}
+	return c.JSON(res)
+}
 
-// 				//Update challenge-checker path to get dockerfile
-// 				createNamespace(c,ccName,ccNamespace)
-// 				utils.BuildDockerImage(ccName, challengePath+"/challenge-checker")
-// 				deployment.DeployChallengeCheckerToCluster(ccName, ccNamespace, replicas)
-// 				url, err := createServiceForChallengeChecker(ccName, ccNamespace, 8080)
-// 				if err != nil {
-// 					res = append(res, []string{ccName, err.Error()})
-// 				} else {
-// 					res = append(res, []string{ccName, url})
-// 				}
+func Team(c *fiber.Ctx) error {
+	patch := false
+	replicas := int32(1)
+	challengeType := "web" //hardcoded-------------------------------------
+	log.Println("Starting")
 
-// 				clusterConfig := g.ClusterConfig
-// 				numberOfTeams := clusterConfig.TeamCount
-// 				for i := 0; i < int(numberOfTeams); i++ {
-// 					log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
-// 					teamName := "katana-team-" + strconv.Itoa(i)
-// 					deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
-// 					url, err := createServiceForChallenge(folderName, teamName, 3000, i)
-// 					if err != nil {
-// 						res = append(res, []string{teamName, err.Error()})
-// 					} else {
-// 						res = append(res, []string{teamName, url})
-// 					}
-// 				}
-// 			}
-// 			copyChallengeIntoTsuka(challengePath, folderName, challengeType)
-// 			copyFlagDataIntoKashira(challengePath, folderName)
-// 			// copyChallengeCheckerIntoKissaki(challengePath, folderName)
-// 		}
-// 	}
-// 	return c.JSON(res)
-// }
+	//Read folder challenge by os
+	dir, err := os.Open("./challenges")
+
+	//Loop over all subfolders in the challenge folder
+	if err != nil {
+		log.Println("Error in opening challenges folder")
+		return err
+	}
+	defer dir.Close()
+
+	//Read all challenges in the folder
+	fileInfos, err := dir.Readdir(-1)
+	if err != nil {
+		log.Println("Error in reading challenges folder")
+		return err
+	}
+
+	res := make([][]string, 0)
+
+	//Loop over all folders
+	for _, fileInfo := range fileInfos {
+		//Check if it is a directory
+		if fileInfo.IsDir() {
+			//Get the challenger name
+			folderName := fileInfo.Name()
+			log.Println("Folder name is : " + folderName)
+			//Update challenge path to be absolute path
+			challengePath, _ := os.Getwd()
+			challengePath = challengePath + "/challenges/" + folderName
+			log.Println("Challenge path is : " + challengePath)
+			log.Println(challengePath + "/challenge/Dockerfile")
+
+			//Check if the folder has a Dockerfile
+			if _, err := os.Stat(challengePath + "/challenge/Dockerfile"); err != nil {
+				log.Println("Dockerfile not found in the " + folderName + " challenge folder. Please follow proper format.")
+			}else {
+				//pass path of folder which contains dockerfile
+				//Update challenge path to get dockerfile
+				utils.BuildDockerImage(folderName, challengePath+"/challenge")
+
+				clusterConfig := g.ClusterConfig
+				numberOfTeams := clusterConfig.TeamCount
+				for i := 0; i < int(numberOfTeams); i++ {
+					log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
+					teamName := "katana-team-" + strconv.Itoa(i)
+					deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
+					url, err := createServiceForChallenge(folderName, teamName, 3000, i)
+					if err != nil {
+						res = append(res, []string{teamName, err.Error()})
+					} else {
+						res = append(res, []string{teamName, url})
+					}
+				}
+			}
+			copyChallengeIntoTsuka(challengePath, folderName, challengeType)
+			copyFlagDataIntoKashira(challengePath, folderName)
+			// copyChallengeCheckerIntoKissaki(challengePath, folderName)
+		}
+	}
+	return c.JSON(res)
+}
 
 func DeployChallenge(c *fiber.Ctx) error {
 	challengeType := "web"
@@ -387,23 +463,23 @@ func DeleteChallenge(c *fiber.Ctx) error {
 	return c.SendString("Deleted challenge" + challengeName + "in all namespaces.")
 }
 
-func Deploy(c *fiber.Ctx) error {
+// func Deploy(c *fiber.Ctx) error {
 
-	folderpath:="/home/iiteens/katana/challenges/knock/challenge-checker"
-	replicas:=int32(1)
-	ccName:="challenge-checker"
-	ccNamespace:="katana"
-	res:=make([][]string,0)
+// 	folderpath:="/home/iiteens/katana/challenges/the-varsity/challenge-checker"
+// 	replicas:=int32(1)
+// 	ccName:="the-varsity-cc"
+// 	ccNamespace:="katana"
+// 	res:=make([][]string,0)
 
-	createNamespace(c,ccName,ccNamespace)
-	utils.BuildDockerImage(ccName,folderpath)
-	deployment.DeployChallengeCheckerToCluster(ccName,ccNamespace,replicas)
-	url,err:=createServiceForChallengeChecker(ccName,ccNamespace,8080)
-	if err!=nil{
-		res=append(res, []string{ccName,err.Error()})
-	}else{
-		res=append(res, []string{ccName,url})
-	}
+// 	infrasetservice.Apply_cc_yml(c,ccName,ccNamespace)
+// 	utils.BuildDockerImage(ccName,folderpath)
+// 	deployment.DeployChallengeCheckerToCluster(ccName,ccNamespace,replicas)
+// 	url,err:=createServiceForChallengeChecker(ccName,ccNamespace,8080)
+// 	if err!=nil{
+// 		res=append(res, []string{ccName,err.Error()})
+// 	}else{
+// 		res=append(res, []string{ccName,url})
+// 	}
 
-	return c.JSON(res)
-}
+// 	return c.JSON(res)
+// }

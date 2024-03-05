@@ -29,6 +29,7 @@ spec:
       containers:
         - name: kashira
           image: iiteens/kashira
+          imagePullPolicy: Always   # added for ease may be remove later
           ports:
             - containerPort: 80
           volumeMounts:
