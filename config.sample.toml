@@ -1,6 +1,6 @@
-kubeconfig = ""
+kubeconfig = "/home/ujjwal/.kube/config"
 kubehost = "0.0.0.0"
-backendurl = "http://10.25.1.15:15528"
+backendurl = "http://10.25.1.15:3000"
 kubenamespace = "default"
 timeout = 20 # in seconds
 
@@ -19,7 +19,7 @@ templated_manifests = [
 
 [services.api]
 host = "0.0.0.0"
-port = 15528
+port = 3000
 
 [teamvm]
 teampodname = "katana-team-master-pod"

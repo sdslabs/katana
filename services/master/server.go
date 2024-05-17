@@ -11,6 +11,7 @@ import (
 	"github.com/sdslabs/katana/lib/utils"
 	challengeDeployerService "github.com/sdslabs/katana/services/challengedeployerservice"
 	infraSetService "github.com/sdslabs/katana/services/infrasetservice"
+	"github.com/sdslabs/katana/services/leaderboardservice"
 	c "github.com/sdslabs/katana/services/master/controllers"
 )
 
@@ -55,5 +56,10 @@ func Server() error {
 	admin.Get("/deleteChallenge/:chall_name", challengeDeployerService.DeleteChallenge)
 	log.Printf("Listening on %s:%d\n", cfg.APIConfig.Host, cfg.APIConfig.Port)
 	admin.Get("/startTicker", c.StartTicker)
+	admin.Get("/leaderboard/:x?", func(c *fiber.Ctx) error {
+		x := c.Params("x")
+		leaderboardservice.Leaderboard(c, x)
+		return nil
+	})
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port))
 }

@@ -20,7 +20,7 @@ var link *mongo.Database
 
 func setupAdmin() error {
 	adminUser := configs.AdminConfig
-	pwd:= utils.SHA256(adminUser.Password)
+	pwd := utils.SHA256(adminUser.Password)
 	admin := types.AdminUser{
 		Username: adminUser.Username,
 		Password: pwd,

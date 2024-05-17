@@ -41,7 +41,7 @@ func setup() error {
 
 func setupGogs() error {
 	if err := CreateDatabase(gogsDatabase); err != nil {
-		return fmt.Errorf("cannot create database: %w", err)
+		log.Println("cannot create database: %w", err)
 	}
 	if err := CreateGogsAdmin(configs.AdminConfig.Username, configs.AdminConfig.Password); err != nil {
 		return fmt.Errorf("cannot create gogs admin: %w", err)
