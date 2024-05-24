@@ -72,3 +72,12 @@ type HarborCfg struct {
 	Username string `toml:"username"`
 	Password string `toml:"password"`
 }
+
+type Certificate struct {
+	Organization  string `toml:"organization"`
+	Country       string `toml:"country"`
+	Province      string `toml:"province"`
+	Locality      string `toml:"locality"`
+	StreetAddress string `toml:"street_address"`
+	PostalCode    string `toml:"postal_code"`
+}

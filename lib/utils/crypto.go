@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	"github.com/BurntSushi/toml"
 	"github.com/xdg-go/pbkdf2"
 	"golang.org/x/crypto/bcrypt"
 
@@ -20,6 +21,9 @@ import (
 
 	"strings"
 	"time"
+
+	configs "github.com/sdslabs/katana/configs"
+	types "github.com/sdslabs/katana/types"
 )
 
 // MD5 encodes string to hexadecimal of MD5 checksum.
@@ -34,18 +38,14 @@ func Base64Encode(str string) string {
 	return base64.StdEncoding.EncodeToString([]byte(str))
 }
 
-// V3Ext represents a v3.ext file
-type V3Ext struct {
-	AuthorityKeyIdentifier string
-	BasicConstraintsValid bool
-	IsCA       bool
-	KeyUsage               string
-	ExtKeyUsage            string
-	DNSNames               []string
-}
-
 func GenerateCerts(domain string, basePath string) error {
 	basePath += "/"
+	cert_config := &configs.Certificate{}
+	_, err := toml.DecodeFile("config.toml", &cert_config)
+	if err != nil {
+		return err
+	}
+
 	// Generate a new private key for the CA
 	caPrivateKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
@@ -56,12 +56,12 @@ func GenerateCerts(domain string, basePath string) error {
 	caTemplate := &x509.Certificate{
 		SerialNumber: big.NewInt(1),
 		Subject: pkix.Name{
-			Organization:  []string{"SDSLabs"},
-			Country:       []string{"IN"},
-			Province:      []string{"Delhi"},
-			Locality:      []string{"Delhi"},
-			StreetAddress: []string{"smoking jawahar"},
-			PostalCode:    []string{"110080"},
+			Organization:  []string{cert_config.Organization},
+			Country:       []string{cert_config.Country},
+			Province:      []string{cert_config.Province},
+			Locality:      []string{cert_config.Locality},
+			StreetAddress: []string{cert_config.StreetAddress},
+			PostalCode:    []string{cert_config.PostalCode},
 		},
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().Add(365 * 24 * time.Hour), // 1 year validity
@@ -161,10 +161,10 @@ func GenerateCerts(domain string, basePath string) error {
 	}
 
 	// Define your v3.ext
-	v3ext := V3Ext{
+	v3ext := types.V3Ext{
 		AuthorityKeyIdentifier: "keyid,issuer",
-		BasicConstraintsValid: true,
-		IsCA:       false,
+		BasicConstraintsValid:  true,
+		IsCA:                   false,
 		KeyUsage:               "digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment",
 		ExtKeyUsage:            "serverAuth",
 		DNSNames:               []string{"harbor.katana.local"},
@@ -182,9 +182,9 @@ func GenerateCerts(domain string, basePath string) error {
 		ExtKeyUsage: []x509.ExtKeyUsage{
 			extKeyUsage(v3ext.ExtKeyUsage),
 		},
-		DNSNames: v3ext.DNSNames,
+		DNSNames:              v3ext.DNSNames,
 		BasicConstraintsValid: v3ext.BasicConstraintsValid,
-		IsCA: v3ext.IsCA,
+		IsCA:                  v3ext.IsCA,
 	}
 
 	// Create the server certificate
