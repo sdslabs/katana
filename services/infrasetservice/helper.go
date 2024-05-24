@@ -21,7 +21,7 @@ func generateCertsforHarbor() {
 
 	log.Println("CHECK 1")
 	// Delete the directory if it already exists
-	if _, err := os.Stat(path); os.IsExist(err) {
+	if _, err := os.Stat(path); err==nil {
 		errDir := os.RemoveAll(path)
 		if errDir != nil {
 			log.Fatal(err)

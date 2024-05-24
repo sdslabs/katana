@@ -6,10 +6,20 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"log"
 
 	"github.com/xdg-go/pbkdf2"
 	"golang.org/x/crypto/bcrypt"
+
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
+	"math/big"
+	"os"
+
+	"strings"
+	"time"
 )
 
 // MD5 encodes string to hexadecimal of MD5 checksum.
@@ -24,78 +34,207 @@ func Base64Encode(str string) string {
 	return base64.StdEncoding.EncodeToString([]byte(str))
 }
 
+// V3Ext represents a v3.ext file
+type V3Ext struct {
+	AuthorityKeyIdentifier string
+	BasicConstraintsValid bool
+	IsCA       bool
+	KeyUsage               string
+	ExtKeyUsage            string
+	DNSNames               []string
+}
+
 func GenerateCerts(domain string, basePath string) error {
-	// Generate ca.key in harbor directory
-	log.Println("cert 1")
-	cmd := "openssl genrsa -out " + basePath + "/ca.key 4096"
-	if err := RunCommand(cmd); err != nil {
-		return err
-	}
-	log.Println("cert 2")
-	// using -traditional flag to get PKCS#1 [different header], otherwise 500 Internal Error
-	cmd = "openssl rsa -in "+basePath+"/ca.key -out "+basePath+"/ca.key -traditional"
-	if err := RunCommand(cmd); err != nil {
+	basePath += "/"
+	// Generate a new private key for the CA
+	caPrivateKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	if err != nil {
 		return err
 	}
 
-	log.Println("cert 3")
-	// using -traditional flag to get PKCS#1 [different header], otherwise 500 Internal Error
-	cmd = "openssl rsa -in "+basePath+"/ca.key -out "+basePath+"/ca.key -traditional"
-	if err := RunCommand(cmd); err != nil {
+	// Set up the certificate template for the CA
+	caTemplate := &x509.Certificate{
+		SerialNumber: big.NewInt(1),
+		Subject: pkix.Name{
+			Organization:  []string{"SDSLabs"},
+			Country:       []string{"IN"},
+			Province:      []string{"Delhi"},
+			Locality:      []string{"Delhi"},
+			StreetAddress: []string{"smoking jawahar"},
+			PostalCode:    []string{"110080"},
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().Add(365 * 24 * time.Hour), // 1 year validity
+		IsCA:                  true,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		BasicConstraintsValid: true,
+	}
+
+	// Create the CA certificate
+	caBytes, err := x509.CreateCertificate(rand.Reader, caTemplate, caTemplate, &caPrivateKey.PublicKey, caPrivateKey)
+	if err != nil {
 		return err
 	}
 
-	log.Println("cert 4")
-	// Generate ca.crt
-	cmd = "openssl req -x509 -new -nodes -sha512 -days 3650 -subj '/C=IN/ST=Delhi/L=Delhi/O=Katana/CN=" + domain + "' -key " + basePath + "/ca.key -out " + basePath + "/ca.crt"
-	if err := RunCommand(cmd); err != nil {
+	// Save the CA private key
+	keyFile, err := os.Create(basePath + "ca.key")
+	if err != nil {
+		return err
+	}
+	defer keyFile.Close()
+
+	privBytes := x509.MarshalPKCS1PrivateKey(caPrivateKey)
+	privPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: privBytes})
+	_, err = keyFile.Write(privPEM)
+	if err != nil {
 		return err
 	}
 
-	log.Println("cert 5")
-	// using -traditional flag to get PKCS#1 [different header], otherwise 500 Internal Error
-	// cmd = "openssl rsa -in " + basePath + "/" + domain + ".key -out " + basePath + "/" + domain + ".key -traditional"
-	// if err := RunCommand(cmd); err != nil {
-	// 	return err
-	// }
+	// Save the CA certificate
+	certFile, err := os.Create(basePath + "ca.crt")
+	if err != nil {
+		return err
+	}
+	defer certFile.Close()
 
-	log.Println("cert 6")
-	// Generate private key
-	cmd = "openssl genrsa -out " + basePath + "/" + domain + ".key 4096"
-	if err := RunCommand(cmd); err != nil {
+	certPEM := pem.EncodeToMemory(&pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: caBytes,
+	})
+
+	_, err = certFile.Write(certPEM)
+	if err != nil {
 		return err
 	}
 
-	log.Println("cert 7")
-	// using -traditional flag to get PKCS#1 [different header], otherwise 500 Internal Error
-	cmd="openssl rsa -in "+basePath+"/"+domain+".key -out "+basePath+"/"+domain+".key -traditional"
-	if err := RunCommand(cmd); err != nil {
+	// Generate a new private key for the server
+	serverPrivateKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	if err != nil {
 		return err
 	}
 
-	log.Println("cert 8")
-	// Generate certificate signing request
-	cmd = "openssl req -sha512 -new -subj '/C=IN/ST=Delhi/L=Delhi/O=Katana/CN=" + domain + "' -key " + basePath + "/" + domain + ".key -out " + basePath + "/" + domain + ".csr"
-	if err := RunCommand(cmd); err != nil {
+	// Set up the CSR template for the server
+	csrTemplate := &x509.CertificateRequest{
+		Subject: pkix.Name{
+			CommonName: domain,
+		},
+		SignatureAlgorithm: x509.SHA256WithRSA,
+		DNSNames:           []string{domain},
+	}
+
+	// Create the CSR
+	csrBytes, err := x509.CreateCertificateRequest(rand.Reader, csrTemplate, serverPrivateKey)
+	if err != nil {
 		return err
 	}
 
-	log.Println("cert 9")
-	// Generate v3.ext file
-	cmd = "echo 'authorityKeyIdentifier=keyid,issuer\nbasicConstraints=CA:FALSE\nkeyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment\nextendedKeyUsage = serverAuth\nsubjectAltName = @alt_names\n[alt_names]\nDNS.1=" + domain + "' > " + basePath + "/v3.ext"
-	if err := RunCommand(cmd); err != nil {
+	// Save the CSR
+	csrFile, err := os.Create(basePath + domain + ".csr")
+	if err != nil {
+		return err
+	}
+	defer csrFile.Close()
+
+	csrPEM := pem.EncodeToMemory(&pem.Block{
+		Type:  "CERTIFICATE REQUEST",
+		Bytes: csrBytes,
+	})
+
+	_, err = csrFile.Write(csrPEM)
+	if err != nil {
 		return err
 	}
 
-	log.Println("cert 10")
-	// Generate certificate
-	cmd = "openssl x509 -req -sha512 -days 3650 -extfile " + basePath + "/v3.ext -CA " + basePath + "/ca.crt -CAkey " + basePath + "/ca.key -CAcreateserial -in " + basePath + "/" + domain + ".csr -out " + basePath + "/" + domain + ".crt"
-	if err := RunCommand(cmd); err != nil {
+	// Save the server private key
+	serverKeyFile, err := os.Create(basePath + domain + ".key")
+	if err != nil {
+		return err
+	}
+	defer serverKeyFile.Close()
+
+	serverPrivBytes := x509.MarshalPKCS1PrivateKey(serverPrivateKey)
+	serverPrivPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: serverPrivBytes})
+	_, err = serverKeyFile.Write(serverPrivPEM)
+	if err != nil {
 		return err
 	}
 
-	log.Println("cert 11")
+	// Define your v3.ext
+	v3ext := V3Ext{
+		AuthorityKeyIdentifier: "keyid,issuer",
+		BasicConstraintsValid: true,
+		IsCA:       false,
+		KeyUsage:               "digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment",
+		ExtKeyUsage:            "serverAuth",
+		DNSNames:               []string{"harbor.katana.local"},
+	}
+
+	// Set up the certificate template for the server
+	serverTemplate := &x509.Certificate{
+		SerialNumber: big.NewInt(2),
+		Subject: pkix.Name{
+			CommonName: domain,
+		},
+		NotBefore: time.Now(),
+		NotAfter:  time.Now().Add(365 * 24 * time.Hour), // 1 year validity
+		KeyUsage:  keyUsage(v3ext.KeyUsage),
+		ExtKeyUsage: []x509.ExtKeyUsage{
+			extKeyUsage(v3ext.ExtKeyUsage),
+		},
+		DNSNames: v3ext.DNSNames,
+		BasicConstraintsValid: v3ext.BasicConstraintsValid,
+		IsCA: v3ext.IsCA,
+	}
+
+	// Create the server certificate
+	serverBytes, err := x509.CreateCertificate(rand.Reader, serverTemplate, caTemplate, &serverPrivateKey.PublicKey, caPrivateKey)
+	if err != nil {
+		return err
+	}
+
+	// Save the server certificate
+	serverCertFile, err := os.Create(basePath + domain + ".crt")
+	if err != nil {
+		return err
+	}
+	defer serverCertFile.Close()
+
+	serverCertPEM := pem.EncodeToMemory(&pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: serverBytes,
+	})
+
+	_, err = serverCertFile.Write(serverCertPEM)
+	if err != nil {
+		return err
+	}
 	return nil
+}
+
+func keyUsage(s string) x509.KeyUsage {
+	var ku x509.KeyUsage
+	if strings.Contains(s, "digitalSignature") {
+		ku |= x509.KeyUsageDigitalSignature
+	}
+	if strings.Contains(s, "nonRepudiation") {
+		ku |= x509.KeyUsageContentCommitment
+	}
+	if strings.Contains(s, "keyEncipherment") {
+		ku |= x509.KeyUsageKeyEncipherment
+	}
+	if strings.Contains(s, "dataEncipherment") {
+		ku |= x509.KeyUsageDataEncipherment
+	}
+	return ku
+}
+
+func extKeyUsage(s string) x509.ExtKeyUsage {
+	var eku x509.ExtKeyUsage
+	if strings.Contains(s, "serverAuth") {
+		eku = x509.ExtKeyUsageServerAuth
+	}
+	return eku
 }
 
 func HashPassword(password string) (string, error) {
