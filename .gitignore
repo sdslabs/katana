@@ -17,4 +17,4 @@ teamcreds.txt
 lib/harbor/certs/*
 peer_configs/*
 work.txt
-
+.DS_Store
