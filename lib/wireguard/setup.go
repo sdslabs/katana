@@ -50,7 +50,7 @@ func SetupWireguard() error {
 	if err = deployment.ApplyManifest(kubeConfig, kubeClient, manifest.Bytes(), namespace); err != nil {
 		return err
 	}
-
+	log.Println("Manifest Applied Successfully")
 	noOfTeams := int(configs.ClusterConfig.TeamCount)
 
 	configPath, err := os.Getwd()
@@ -70,13 +70,13 @@ func SetupWireguard() error {
 	} else if err != nil {
 		fmt.Printf("Error checking folder existence: %v\n", err)
 	}
-
+	log.Println("created config folder")
 	for i := 0; i < noOfTeams; i++ {
 		if err := GetConfigFiles(strconv.Itoa(i + 1)); err != nil {
 			return err
 		}
 	}
-
+	log.Println("take me out")
 	return nil
 }
 
@@ -89,12 +89,13 @@ func GetConfigFiles(team_number string) error {
 	}
 	namespace := "katana"
 
+	log.Println("Waiting for deployment to be ready")
 	for _, deploymentName := range deploymentNames {
 		if err := utils.WaitForDeploymentReady(client, deploymentName, namespace); err != nil {
 			log.Printf("Error testing deployment '%s': %v\n", deploymentName, err)
 		}
 	}
-
+	log.Println("Deployment is ready")
 	//get pod in the wireguard deployment
 	pods, err := client.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{
 		LabelSelector: "app=wireguard",

@@ -10,6 +10,8 @@ An advanced yet simple attack/defence CTF infrastructure in Go build upon k8s.
 - Copy config file and make your changes
   - `cp config.sample.toml config.toml`
   - update the kubeconfig path
+- Copy challenges-sample as challenges
+  - `cp -r challenges-sample challenges`
 - Run `make set-env` to setup the environment locally.
 - Run `make set-env-prod` to setup the environment for production.
 - To start katana, run `./bin/katana run`
