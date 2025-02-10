@@ -47,3 +47,13 @@ type GogsRequest struct {
 	Before     string `json:"before"`
 	Repository Repo   `json:"repository"`
 }
+
+// V3Ext represents a v3.ext file
+type V3Ext struct {
+	AuthorityKeyIdentifier string
+	BasicConstraintsValid  bool
+	IsCA                   bool
+	KeyUsage               string
+	ExtKeyUsage            string
+	DNSNames               []string
+}

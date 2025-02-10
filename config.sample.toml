@@ -53,3 +53,11 @@ password = "sdslabs"
 [harbor]
 username = "admin" # cannot be changed
 password = "Password12345" # NOTE: Password should be 8-128 characters long with at least 1 uppercase, 1 lowercase and 1 number
+
+[certificate]
+organization = "SDSLabs"
+country = "IN"
+province = "Delhi"
+locality = "Delhi"
+street_address = "smoking jawahar"
+postal_code = "110080"

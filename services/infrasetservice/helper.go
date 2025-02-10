@@ -2,6 +2,7 @@ package infrasetservice
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -21,19 +22,26 @@ func generateCertsforHarbor() {
 
 	log.Println("CHECK 1")
 	// Delete the directory if it already exists
-	if _, err := os.Stat(path); os.IsExist(err) {
+	_,err:=os.Stat(path)
+	if err==nil{
+		//If it exists, delete it
 		errDir := os.RemoveAll(path)
 		if errDir != nil {
-			log.Fatal(err)
+			log.Fatalf("Failed to remove directory: %v", errDir)
 		}
+	}else if !errors.Is(err, os.ErrNotExist){
+		// If there is an error other than "does not exist", log it and exit
+		log.Fatalf("Failed to access directory: %v", err)
 	}
 	log.Println("CHECK 2")
-	if _, err := os.Stat(path); os.IsNotExist(err) {
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		//creating directory
 		errDir := os.Mkdir(path, 0755)
 		if errDir != nil {
-			log.Fatal(err)
+			log.Fatalf("Failed to create directory: %v",errDir)
 		}
 	}
+
 	log.Println("CHECK 3")
 	// Generate the certificates
 	if err := utils.GenerateCerts("harbor.katana.local", path); err != nil {
