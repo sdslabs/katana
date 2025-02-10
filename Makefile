@@ -83,12 +83,10 @@ set-env: build
 	minikube start --driver=docker && \
 	minikube addons enable ingress  && \
 	kubectl apply -f $(MANIFEST) && \
-	cp config.sample.toml config.toml && \
 	./bin/katana run
 
 set-env-prod: build
 	kubectl apply -f $(MANIFEST) && \
-	cp config.sample.toml config.toml && \
 	sudo ./bin/katana run
 
 build:

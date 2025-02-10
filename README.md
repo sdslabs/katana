@@ -2,10 +2,16 @@
 An advanced yet simple attack/defence CTF infrastructure in Go build upon k8s.
 
 ## Setup
+- Clone the repo with the submodules
+  - `git clone --recurse-submodules <url>`
 - To start, you must have the following installed:
   - Go 1.18+
   - Minikube & kubectl
-- Run `make set-env` to setup the environment
+- Copy config file and make your changes
+  - `cp config.sample.toml config.toml`
+  - update the kubeconfig path
+- Run `make set-env` to setup the environment locally.
+- Run `make set-env-prod` to setup the environment for production.
 - To start katana, run `./bin/katana run`
 
 ## Docs
