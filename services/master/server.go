@@ -66,5 +66,10 @@ func Server() error {
 		leaderboardservice.Leaderboard(c, x)
 		return nil
 	})
+
+	// Mock stuff
+	admin.Get("/mockApplyFirewall", infraSetService.MockInfraSetWireguard)
+	admin.Get("/mockSetupWireguard", infraSetService.SetupWireguard)
+	
 	return app.Listen(fmt.Sprintf("%s:%d", cfg.APIConfig.Host, cfg.APIConfig.Port))
 }

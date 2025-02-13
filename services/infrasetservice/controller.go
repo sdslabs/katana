@@ -65,6 +65,51 @@ func InfraSet(c *fiber.Ctx) error {
 	return c.SendString("Infrastructure setup completed")
 }
 
+func MockInfraSetWireguard(c *fiber.Ctx) error {
+
+	// config, err := utils.GetKubeConfig()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// kubeclient, err := utils.GetKubeClient()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	log.Println("NOT Creating harbor certs ...")
+	// generateCertsforHarbor()
+	log.Println("NOT Created harbor certs ...")
+
+	// Throttling is fixed Yayaya!!
+	// if err = deployment.DeployCluster(config, kubeclient); err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// err = harbor.SetupHarbor()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	err := wireguard.ApplyFirewall()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// buildKatanaServices()
+
+	
+	return c.SendString("Infrastructure setup completed")
+}
+
+func SetupWireguard(c *fiber.Ctx) error {
+	err := wireguard.SetupWireguard()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return c.SendString("Wireguard setup completed")
+}
+
 func DB(c *fiber.Ctx) error {
 	// TODO: run Mongo and MySQL setup in parallel
 	if err := mongo.Init(); err != nil {
