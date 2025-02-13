@@ -8,6 +8,7 @@ import (
 	"log"
 	"path/filepath"
 	"text/template"
+	"time"
 
 	g "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
@@ -106,17 +107,49 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 				// if deleted, continue
 				// else return a good error telling which resource didn't et deleted.
 
+				// HOTFIX: 30 sec timeout
+				timeout := 30 * time.Second
 				
 				defer watcher.Stop()
-				for event := range watcher.ResultChan() {
-					if event.Type == watch.Deleted {
-						_, err = dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{})
-						if err != nil {
-							return err
+
+				done := make(chan bool)
+				go func() {
+					for event := range watcher.ResultChan() {
+						if event.Type == watch.Deleted {
+							log.Printf("Resource %s deleted, re-creating it", unstructuredObj.GetName())
+							done <- true
+							break
 						}
-						break
+					}
+				}()
+
+				// Wait for either the event or timeout
+				select {
+				case <-done:
+					// Resource deleted and we can re-create it
+					_, err = dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{})
+					if err != nil {
+						log.Printf("Failed to re-create resource %s: %v", unstructuredObj.GetName(), err)
+						return err
+					}
+				case <-time.After(timeout):
+					// Timeout reached
+					_, err = dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{})
+					if err != nil {
+						log.Printf("[Timedout] Failed to re-create resource %s: %v", unstructuredObj.GetName(), err)
+						return err
 					}
 				}
+
+				// for event := range watcher.ResultChan() {
+				// 	if event.Type == watch.Deleted {
+				// 		_, err = dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{})
+				// 		if err != nil {
+				// 			return err
+				// 		}
+				// 		break
+				// 	}
+				// }
 			}
 		}
 	}
