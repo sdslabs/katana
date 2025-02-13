@@ -73,19 +73,40 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 		}
 
 		if _, err := dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{}); err != nil {
+			// if creation fails, this is probably becuse it already exists or some other error
 			if _, err := dri.Update(context.Background(), unstructuredObj, metav1.UpdateOptions{}); err != nil {
+				// we try updating it, in case it already existed or it is updatable
+
+				// This sometime does not get updated. eg : In case of PVCs cause node affinity is immmutable (happens when you restart cluster after pause and we had things there)
+
+				// This check shouldn't happen mp if I delete ns, if i dont delete ns and do this then think later, just delete ns while infra set for now.
+				// If not ns delete them -> we generally delete but pvc deleteion has some issues, so let's just not delete it for now and skip
 				if unstructuredObj.GetObjectKind().GroupVersionKind().Kind == "PersistentVolumeClaim" {
 					// Skip PVCs
 					continue
 					// TODO: Handle PVCs, currently on deletion of PVCs, the cluster is stuck in a loop
 				}
+
 				_ = dri.Delete(context.Background(), unstructuredObj.GetName(), metav1.DeleteOptions{})
+
+				// here pv gets deleted but listen doesn't work or we don't get a wather ping, hence stuck in loop
+				// hence reapplying works as 3-4 times, things get deleted and this isn't called.
+
+				// WATCHER CODE DOESN"T WORK RN, DOING A FIX BELOW TO BYPASS
 				watcher, err := dri.Watch(context.Background(), metav1.ListOptions{
 					FieldSelector: fmt.Sprintf("metadata.name=%s", unstructuredObj.GetName()),
 				})
+
 				if err != nil {
 					return err
 				}
+
+				// set timout 30 sec
+				// check if deployment is there, it should be deleted by then
+				// if deleted, continue
+				// else return a good error telling which resource didn't et deleted.
+
+				
 				defer watcher.Stop()
 				for event := range watcher.ResultChan() {
 					if event.Type == watch.Deleted {
@@ -119,6 +140,8 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 	if err != nil {
 		log.Println(err)
 	}
+
+	// TOREAD : read if we need to acually run on one node, like what is this ? 
 	deploymentConfig.NodeAffinityValue = nodes[0].Name
 
 	for _, m := range clusterConfig.TemplatedManifests {
@@ -128,6 +151,7 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 		if err != nil {
 			return err
 		}
+		// dynamic updation in manifest
 		if err = tmpl.Execute(manifest, deploymentConfig); err != nil {
 			return err
 		}
