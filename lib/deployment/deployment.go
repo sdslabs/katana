@@ -14,6 +14,7 @@ import (
 	"github.com/sdslabs/katana/lib/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
+	errors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -97,7 +98,6 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 				watcher, err := dri.Watch(context.Background(), metav1.ListOptions{
 					FieldSelector: fmt.Sprintf("metadata.name=%s", unstructuredObj.GetName()),
 				})
-
 				if err != nil {
 					return err
 				}
@@ -129,27 +129,28 @@ func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset,
 					// Resource deleted and we can re-create it
 					_, err = dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{})
 					if err != nil {
-						log.Printf("Failed to re-create resource %s: %v", unstructuredObj.GetName(), err)
+						log.Printf("[Deletion done] Failed to re-create resource %s: %v", unstructuredObj.GetName(), err)
 						return err
 					}
 				case <-time.After(timeout):
-					// Timeout reached
-					_, err = dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{})
-					if err != nil {
-						log.Printf("[Timedout] Failed to re-create resource %s: %v", unstructuredObj.GetName(), err)
-						return err
+					// Timeout reached, check if resource still exists.
+					existingObj, getErr := dri.Get(context.Background(), unstructuredObj.GetName(), metav1.GetOptions{})
+					if getErr == nil {
+						// Resource still exists, so deletion timed out.
+						return fmt.Errorf("[Timedout] waiting for deletion of resource %s", existingObj.GetName())
+					}
+					// If error confirms resource is not found, proceed to re-create.
+					if errors.IsNotFound(getErr){
+						_, err = dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{})
+						if err != nil {
+							log.Printf("Failed to re-create resource %s: %v", unstructuredObj.GetName(), err)
+							return err
+						}
+					}else{
+						// An unexpected error occurred during GET call
+						return getErr
 					}
 				}
-
-				// for event := range watcher.ResultChan() {
-				// 	if event.Type == watch.Deleted {
-				// 		_, err = dri.Create(context.Background(), unstructuredObj, metav1.CreateOptions{})
-				// 		if err != nil {
-				// 			return err
-				// 		}
-				// 		break
-				// 	}
-				// }
 			}
 		}
 	}
