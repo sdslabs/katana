@@ -16,7 +16,7 @@ import (
 func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType string) error {
 	localFilePath := dirPath + "/challenge"
 	pathInPod := "/opt/katana/katana_" + challengeType + "_" + challengeName + ".tar.gz"
-	log.Println("Testing" + localFilePath + "....and..." + pathInPod)
+	logger.Info().Msgf("Testing" + localFilePath + "....and..." + pathInPod)
 	filename := challengeName
 
 	// Get pods from different namespaces
@@ -26,12 +26,12 @@ func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType 
 		path := "katana-team-" + fmt.Sprint(i) + "/" + filename
 		err := os.Mkdir("teams/"+path, 0755)
 		if err != nil {
-			log.Println(err)
+			logger.Error().Err(err)
 		}
 		git.PlainInit("teams/"+path, false)
 		repo, err := git.PlainOpen("teams/" + path)
 		if err != nil {
-			log.Println(err)
+			logger.Error().Err(err)
 		}
 		remoteConfig := &config.RemoteConfig{
 			Name: "origin",
@@ -39,13 +39,13 @@ func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType 
 		_, err = repo.CreateRemote(remoteConfig)
 
 		if err != nil {
-			log.Println(err)
+			logger.Error().Err(err)
 		}
 		podsInTeam, err := utils.GetPods(map[string]string{
 			"app": g.ClusterConfig.TeamLabel,
 		}, "katana-team-"+fmt.Sprint(i)+"-ns")
 		if err != nil {
-			log.Println(err)
+			logger.Error().Err(err)
 			return err
 		}
 		pods = append(pods, podsInTeam...)
@@ -54,7 +54,7 @@ func copyChallengeIntoTsuka(dirPath string, challengeName string, challengeType 
 	for _, pod := range pods {
 		// Copy file into pod
 		if err := utils.CopyIntoPod(pod.Name, g.TeamVmConfig.ContainerName, pathInPod, localFilePath, pod.Namespace); err != nil {
-			log.Println(err)
+			logger.Error().Err(err)
 			return err
 		}
 	}
@@ -72,14 +72,14 @@ func createServiceForChallenge(challengeName, teamName string, targetPort int32,
 
 	utils.CreateService(kubeclient, serviceName, teamNamespace, port, targetPort, selector)
 
-	log.Printf("Created service %s for challenge %s in namespace %s", serviceName, challengeName, teamNamespace)
+	logger.Info().Msgf("Created service %s for challenge %s in namespace %s", serviceName, challengeName, teamNamespace)
 
 	return serviceName, nil
 }
 
 func createServiceForChallengeChecker(challengeCheckerName, namespace string, targetPort int32) (string, error) {
 	kubeclient, _ := utils.GetKubeClient()
-	serviceName := challengeCheckerName+"-svc"
+	serviceName := challengeCheckerName + "-svc"
 	port := int32(80)
 	selector := map[string]string{
 		"app": challengeCheckerName,
@@ -87,7 +87,7 @@ func createServiceForChallengeChecker(challengeCheckerName, namespace string, ta
 
 	utils.CreateService(kubeclient, serviceName, namespace, port, targetPort, selector)
 
-	log.Printf("Created service %s for challenge %s in namespace %s", serviceName, challengeCheckerName, namespace)
+	logger.Info().Msgf("Created service %s for challenge %s in namespace %s", serviceName, challengeCheckerName, namespace)
 
 	return serviceName, nil
 }
@@ -143,7 +143,7 @@ func copyFlagDataIntoKashira(dirPath string, challengeName string) error {
 	pathInPod := "/opt/kashira/kashira_" + challengeName + ".tar.gz"
 
 	if err := utils.CopyIntoPod("kashira-0", "kashira", pathInPod, srcFilePath, "katana"); err != nil {
-		log.Println(err)
+		logger.Error().Err(err)
 		return err
 	}
 	return nil

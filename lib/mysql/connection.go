@@ -3,6 +3,7 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
+	"github.com/sdslabs/katana/logging"
 	"log"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 )
 
 var db *sql.DB
+var logger = &logging.GlobalLogger
 
 func setup() error {
 	for i := 0; i < 10; i++ {

@@ -20,34 +20,30 @@ func generateCertsforHarbor() {
 	path, _ := os.Getwd()
 	path = path + "/lib/harbor/certs"
 
-	log.Println("CHECK 1")
 	// Delete the directory if it already exists
-	_,err:=os.Stat(path)
-	if err==nil{
+	_, err := os.Stat(path)
+	if err == nil {
 		//If it exists, delete it
 		errDir := os.RemoveAll(path)
 		if errDir != nil {
-			log.Fatalf("Failed to remove directory: %v", errDir)
+			logger.Fatal().Msgf("Failed to remove directory: %v", errDir)
 		}
-	}else if !errors.Is(err, os.ErrNotExist){
+	} else if !errors.Is(err, os.ErrNotExist) {
 		// If there is an error other than "does not exist", log it and exit
-		log.Fatalf("Failed to access directory: %v", err)
+		logger.Fatal().Msgf("Failed to access directory: %v", err)
 	}
-	log.Println("CHECK 2")
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
 		//creating directory
 		errDir := os.Mkdir(path, 0755)
 		if errDir != nil {
-			log.Fatalf("Failed to create directory: %v",errDir)
+			logger.Fatal().Msgf("Failed to create directory: %v", errDir)
 		}
 	}
 
-	log.Println("CHECK 3")
 	// Generate the certificates
 	if err := utils.GenerateCerts("harbor.katana.local", path); err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
-	log.Println("CHECK 4")
 }
 
 func createTeamCredentials(teamNumber int) (string, types.CTFTeam) {
@@ -60,11 +56,11 @@ func createTeamCredentials(teamNumber int) (string, types.CTFTeam) {
 	// start watching for container events
 	go envVariables(gogs, pwd, podNamespace)
 	team := types.CTFTeam{
-		Index:    teamNumber,
-		Name:     podNamespace,
-		PodName:  podName,
-		Password: hashed,
-		Score: 0,
+		Index:      teamNumber,
+		Name:       podNamespace,
+		PodName:    podName,
+		Password:   hashed,
+		Score:      0,
 		Challenges: []types.Challenge{},
 	}
 	mysql.CreateGogsUser(team.Name, pwd)
@@ -79,7 +75,7 @@ func envVariables(gogs string, pwd string, podNamespace string) {
 	for event := range watch.ResultChan() {
 		p, ok := event.Object.(*v1.Pod)
 		if !ok {
-			log.Fatal("unexpected type")
+			logger.Fatal().Msgf("unexpected type")
 		}
 		if p.Status.Phase != "Pending" {
 			log.Println("Pod created")
@@ -105,13 +101,13 @@ func envVariables(gogs string, pwd string, podNamespace string) {
 func buildKatanaServices() {
 	katanaDir, err := utils.GetKatanaRootPath()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 	katanaServicesDir := katanaDir + "/katana-services"
 
 	services, err := os.ReadDir(katanaServicesDir)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 	for _, service := range services {

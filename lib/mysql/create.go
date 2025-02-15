@@ -30,12 +30,12 @@ func CreateGogsUser(username, password string) error {
 	createdTime := time.Now().Unix()
 	rand, err := utils.RandomSalt()
 	if err != nil {
-		log.Println(err)
+		logger.Error().Err(err)
 	}
 
 	salt, err := utils.RandomSalt()
 	if err != nil {
-		log.Println(err)
+		logger.Error().Err(err)
 	}
 
 	password = utils.EncodePassword(password, salt)
@@ -58,7 +58,7 @@ func CreateGogsUser(username, password string) error {
 	query := "INSERT INTO `user` (`id`, `lower_name`, `name`, `full_name`, `email`, `passwd`, `login_source`, `login_name`, `type`, `location`, `website`, `rands`, `salt`, `created_unix`, `updated_unix`, `last_repo_visibility`, `max_repo_creation`, `is_active`, `is_admin`, `allow_git_hook`, `allow_import_local`, `prohibit_login`, `avatar`, `avatar_email`, `use_custom_avatar`, `num_followers`, `num_following`, `num_stars`, `num_repos`, `description`, `num_teams`, `num_members`) VALUES (NULL, '" + user.LowerName + "', '" + user.Name + "', '" + user.FullName + "', '" + user.Email + "', '" + user.Password + "', '0', '', '0', '', '', '" + user.Rands + "', '" + user.Salt + "', '" + strconv.FormatInt(user.CreatedUnix, 10) + "', '" + strconv.FormatInt(user.UpdatedUnix, 10) + "', '0', '-1', '1', '0', '0', '0', '0', '" + user.Avatar + "', '" + user.AvatarEmail + "', '0', '0', '0', '0', '0', '', '0', '0')"
 	_, err = gogs.Exec(query)
 	if err != nil {
-		log.Println(err)
+		logger.Error().Err(err)
 	}
 	return nil
 }

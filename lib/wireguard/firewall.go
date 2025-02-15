@@ -1,7 +1,7 @@
 package wireguard
 
 import (
-	"fmt"
+	"github.com/sdslabs/katana/logging"
 	"log"
 	"os"
 	"strconv"
@@ -9,20 +9,22 @@ import (
 	g "github.com/sdslabs/katana/configs"
 )
 
+var logger = &logging.GlobalLogger
+
 func ApplyFirewall() error {
 
 	//Read challenges folder
 	dir, err := os.Open("./challenges")
 
 	if err != nil {
-		log.Println("Error in opening challenges folder")
+		logger.Error().Msgf("Error in opening challenges folder")
 		return err
 	}
 	defer dir.Close()
 
 	fileInfos, err := dir.Readdir(-1)
 	if err != nil {
-		log.Println("Error in reading challenges folder")
+		logger.Error().Msgf("Error in reading challenges folder")
 		return err
 	}
 
@@ -79,7 +81,7 @@ func ApplyFirewall() error {
 	filepath = filepath + "/katana-services/Wireguard/root/defaults/firewall.conf"
 	err = os.WriteFile(filepath, []byte(finalIprules), 0644)
 	if err != nil {
-		fmt.Println("Error writing to file:", err)
+		logger.Fatal().Err(err)
 		return err
 	}
 

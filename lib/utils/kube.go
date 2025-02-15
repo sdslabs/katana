@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/sdslabs/katana/logging"
 	"io"
 	"io/ioutil"
 	"log"
@@ -27,6 +28,8 @@ import (
 	"k8s.io/client-go/tools/remotecommand"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 )
+
+var logger = &logging.GlobalLogger
 
 // GetKubeConfig returns a kubernetes REST config object
 func GetKubeConfig() (*rest.Config, error) {
@@ -183,18 +186,18 @@ func CopyFromPod(podName string, containerName string, pathInPod string, localFi
 func GetKatanaLoadbalancer() string {
 	client, err := GetKubeClient()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 	// Check if the service is ready
 	err = WaitForLoadBalancerExternalIP(client, "katana-lb", "katana")
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 	service, err := client.CoreV1().Services("katana").Get(context.TODO(), "katana-lb", metav1.GetOptions{})
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 	externalIP := service.Status.LoadBalancer.Ingress[0].IP
 	return externalIP
@@ -227,15 +230,15 @@ func DeploymentConfig() types.ManifestConfig {
 
 	harborKey, err := ioutil.ReadFile(basePath + "/lib/harbor/certs/harbor.katana.local.key")
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 	harborCrt, err := ioutil.ReadFile(basePath + "/lib/harbor/certs/harbor.katana.local.crt")
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 	harborCaCrt, err := ioutil.ReadFile(basePath + "/lib/harbor/certs/ca.crt")
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 	config.HarborKey = Base64Encode(string(harborKey))
@@ -260,7 +263,7 @@ func Podexecutor(command []string, kubeClientset *kubernetes.Clientset, kubeConf
 	}, scheme.ParameterCodec)
 	exec, err := remotecommand.NewSPDYExecutor(kubeConfig, "POST", req.URL())
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 	var stdout, stderr bytes.Buffer
 	err = exec.Stream(remotecommand.StreamOptions{
@@ -269,7 +272,7 @@ func Podexecutor(command []string, kubeClientset *kubernetes.Clientset, kubeConf
 		Tty:    false,
 	})
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 }
 
@@ -282,7 +285,7 @@ func DeleteDaemonSetAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *res
 
 	watcher, err := kubeClientset.AppsV1().DaemonSets(daemonSetNamespace).Watch(context.Background(), listOptions)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 	err = kubeClientset.AppsV1().DaemonSets(daemonSetNamespace).Delete(context.TODO(), daemonSetName, metav1.DeleteOptions{})
@@ -290,7 +293,7 @@ func DeleteDaemonSetAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *res
 		if strings.Contains(err.Error(), "not found") {
 			return
 		}
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 	for event := range watcher.ResultChan() {
@@ -317,7 +320,7 @@ func DeleteConfigMapAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *res
 
 	watcher, err := kubeClientset.CoreV1().ConfigMaps(configMapNamespace).Watch(context.Background(), listOptions)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 	err = kubeClientset.CoreV1().ConfigMaps(configMapNamespace).Delete(context.TODO(), configMapName, metav1.DeleteOptions{})
@@ -325,7 +328,7 @@ func DeleteConfigMapAndWait(kubeClientset *kubernetes.Clientset, kubeConfig *res
 		if strings.Contains(err.Error(), "not found") {
 			return
 		}
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 	for event := range watcher.ResultChan() {
@@ -465,7 +468,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 
 	pod, err := client.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
 	if err != nil {
-		log.Printf("Error getting pod: %s\n", err)
+		logger.Error().Msgf("Error getting pod: %s\n", err)
 	}
 
 	// Find the container in the pod
@@ -478,7 +481,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 	}
 
 	if container == nil {
-		log.Printf("Container not found in pod\n")
+		logger.Error().Msgf("Container not found in pod\n")
 	}
 
 	// Create a stream to the container
@@ -500,7 +503,7 @@ func CopyIntoPod(podName string, containerName string, pathInPod string, localFi
 
 	exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
 	if err != nil {
-		log.Printf("Error creating executor: %s\n", err)
+		logger.Error().Msgf("Error creating executor: %s\n", err)
 		return err
 	}
 

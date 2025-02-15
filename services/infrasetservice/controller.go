@@ -3,6 +3,8 @@ package infrasetservice
 import (
 	"bytes"
 	"fmt"
+	"github.com/sdslabs/katana/logging"
+
 	"html/template"
 	"log"
 	"mime/multipart"
@@ -26,40 +28,41 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func InfraSet(c *fiber.Ctx) error {
+var logger = &logging.GlobalLogger
 
+func InfraSet(c *fiber.Ctx) error {
 	config, err := utils.GetKubeConfig()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 	kubeclient, err := utils.GetKubeClient()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
-	log.Println("Creating harbor certs ...")
+	logger.Info().Msg("Creating harbor certs ...")
 	generateCertsforHarbor()
-	log.Println("Created harbor certs ...")
+	logger.Info().Msg("Created harbor certs ...")
 	if err = deployment.DeployCluster(config, kubeclient); err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 	err = harbor.SetupHarbor()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 	err = wireguard.ApplyFirewall()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 	buildKatanaServices()
 
 	err = wireguard.SetupWireguard()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 	return c.SendString("Infrastructure setup completed")
@@ -68,11 +71,14 @@ func InfraSet(c *fiber.Ctx) error {
 func DB(c *fiber.Ctx) error {
 	// TODO: run Mongo and MySQL setup in parallel
 	if err := mongo.Init(); err != nil {
+		logger.Fatal().Err(err)
 		return err
 	}
 	if err := mysql.Init(); err != nil {
+		logger.Fatal().Err(err)
 		return err
 	}
+	logger.Info().Msg("Database setup completed")
 	return c.SendString("Database setup completed\n")
 }
 
@@ -120,21 +126,21 @@ func CreateTeams(c *fiber.Ctx) error {
 
 	config, err := utils.GetKubeConfig()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 	client, err := utils.GetKubeClient()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 	noOfTeams := int(configs.ClusterConfig.TeamCount)
 
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 	if _, err := os.Stat("teams"); os.IsNotExist(err) {
 		errDir := os.Mkdir("teams", 0755)
 		if errDir != nil {
-			log.Fatal(err)
+			logger.Fatal().Err(err)
 		}
 	}
 
@@ -142,7 +148,7 @@ func CreateTeams(c *fiber.Ctx) error {
 	if _, err := os.Stat("teams"); os.IsNotExist(err) {
 		errDir := os.Mkdir("teams", 0755)
 		if errDir != nil {
-			log.Fatal(err)
+			logger.Fatal().Err(err)
 		}
 	}
 
@@ -150,14 +156,14 @@ func CreateTeams(c *fiber.Ctx) error {
 	if _, err := os.Stat("teams"); os.IsNotExist(err) {
 		errDir := os.Mkdir("teams", 0755)
 		if errDir != nil {
-			log.Fatal(err)
+			logger.Fatal().Err(err)
 		}
 	}
 
 	var teams []interface{}
 	credsFile, err := os.Create(configs.SSHProviderConfig.CredsFile)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 	for i := 0; i < noOfTeams; i++ {
@@ -165,7 +171,7 @@ func CreateTeams(c *fiber.Ctx) error {
 		if _, err := os.Stat("teams/katana-team-" + strconv.Itoa(i)); os.IsNotExist(err) {
 			errDir := os.Mkdir("teams/katana-team-"+strconv.Itoa(i), 0755)
 			if errDir != nil {
-				log.Fatal(err)
+				logger.Fatal().Err(err)
 			}
 		}
 
@@ -179,7 +185,7 @@ func CreateTeams(c *fiber.Ctx) error {
 
 		_, err = client.CoreV1().Namespaces().Create(c.Context(), nsName, metav1.CreateOptions{})
 		if err != nil {
-			log.Fatal(err)
+			logger.Fatal().Err(err)
 		}
 
 		manifest := &bytes.Buffer{}
@@ -208,48 +214,48 @@ func CreateTeams(c *fiber.Ctx) error {
 	return c.SendString("Successfully created teams")
 }
 
-func Apply_cc_yml(c *fiber.Ctx ,ccName, namespaceName string) error {
+func Apply_cc_yml(c *fiber.Ctx, ccName, namespaceName string) error {
 	config, err := utils.GetKubeConfig()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
-	data:=struct{
+	data := struct {
 		Namespace string
-		AppName string
-		Image string
+		AppName   string
+		Image     string
 	}{
 		Namespace: namespaceName,
-		AppName:ccName,
-		Image:ccName,
+		AppName:   ccName,
+		Image:     ccName,
 	}
 
 	client, err := utils.GetKubeClient()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 	}
 
 	// namespace := &coreV1.Namespace{
-    //     ObjectMeta: metav1.ObjectMeta{
-    //         Name: namespaceName,
-    //     },
-    // }
+	//     ObjectMeta: metav1.ObjectMeta{
+	//         Name: namespaceName,
+	//     },
+	// }
 
-    // _, err = client.CoreV1().Namespaces().Create(c.Context(),namespace,metav1.CreateOptions{})
-    // if err != nil {
-    //     panic(err)
-    // }
+	// _, err = client.CoreV1().Namespaces().Create(c.Context(),namespace,metav1.CreateOptions{})
+	// if err != nil {
+	//     panic(err)
+	// }
 
-	manifest:=&bytes.Buffer{}
-	tmpl,err:=template.ParseFiles(filepath.Join(configs.ClusterConfig.TemplatedManifestDir,"runtime","cc.yml"))
-	if err!=nil{
+	manifest := &bytes.Buffer{}
+	tmpl, err := template.ParseFiles(filepath.Join(configs.ClusterConfig.TemplatedManifestDir, "runtime", "cc.yml"))
+	if err != nil {
 		return err
 	}
 	// deploymentConfig:=utils.DeploymentConfig()
-	if err = tmpl.Execute(manifest,data);err!=nil{
+	if err = tmpl.Execute(manifest, data); err != nil {
 		return err
 	}
-	if err=deployment.ApplyManifest(config,client,manifest.Bytes(),namespaceName);err!=nil{
+	if err = deployment.ApplyManifest(config, client, manifest.Bytes(), namespaceName); err != nil {
 		return err
 	}
 
