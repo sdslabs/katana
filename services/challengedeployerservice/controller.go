@@ -3,6 +3,7 @@ package challengedeployerservice
 import (
 	"context"
 	"fmt"
+	"github.com/sdslabs/katana/logging"
 	"log"
 	"os"
 	"regexp"
@@ -22,6 +23,8 @@ import (
 	"github.com/sdslabs/katana/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+var logger = &logging.GlobalLogger
 
 type ChallengeToml struct {
 	Challenge Challenge `toml:"challenge"`
@@ -53,7 +56,7 @@ type Env struct {
 func LoadConfiguration(configFile string) ChallengeToml {
 	var config ChallengeToml
 	if _, err := toml.DecodeFile(configFile, &config); err != nil {
-		log.Fatal(err)
+		logger.Fatal().Err(err)
 		return ChallengeToml{}
 	}
 	return config
@@ -63,14 +66,14 @@ func Deploy(c *fiber.Ctx) error {
 	patch := false
 	replicas := int32(1)
 	challengeType := "web" //hardcoded-------------------------------------
-	log.Println("Starting")
+	logger.Info().Msg("Starting")
 
 	//Read folder challenge by os
 	dir, err := os.Open("./challenges")
 
 	//Loop over all subfolders in the challenge folder
 	if err != nil {
-		log.Println("Error in opening challenges folder")
+		logger.Error().Msg("Error in opening challenges folder")
 		return err
 	}
 	defer dir.Close()
@@ -78,7 +81,7 @@ func Deploy(c *fiber.Ctx) error {
 	//Read all challenges in the folder
 	fileInfos, err := dir.Readdir(-1)
 	if err != nil {
-		log.Println("Error in reading challenges folder")
+		logger.Error().Msg("Error in reading challenges folder")
 		return err
 	}
 
@@ -90,21 +93,21 @@ func Deploy(c *fiber.Ctx) error {
 		if fileInfo.IsDir() {
 			//Get the challenger name
 			folderName := fileInfo.Name()
-			log.Println("Folder name is : " + folderName)
+			logger.Debug().Str("folderName", folderName).Msg("Folder name: ")
 			//Update challenge path to be absolute path
 			challengePath, _ := os.Getwd()
 			challengePath = challengePath + "/challenges/" + folderName
-			log.Println("Challenge path is : " + challengePath)
-			log.Println(challengePath + "/challenge/Dockerfile")
+			logger.Debug().Str("challengePath", challengePath).Msg("Challenge path: ")
+			logger.Debug().Str("filePath", challengePath+"/challenge/Dockerfile")
 
 			ccName := folderName + "-cc"
 			ccNamespace := "katana"
 
 			//Check if the folder has a Dockerfile
 			if _, err := os.Stat(challengePath + "/challenge/Dockerfile"); err != nil {
-				log.Println("Dockerfile not found in the " + folderName + " challenge folder. Please follow proper format.")
+				logger.Error().Msg("Dockerfile not found in the " + folderName + " challenge folder. Please follow proper format.")
 			} else if _, err := os.Stat(challengePath + "/challenge-checker/Dockerfile"); err != nil {
-				log.Println("Dockerfile not found in the " + folderName + " challenge-checker folder. Please follow proper format.")
+				logger.Error().Msg("Dockerfile not found in the " + folderName + " challenge-checker folder. Please follow proper format.")
 			} else {
 				//pass path of folder which contains dockerfile
 				//Update challenge path to get dockerfile
@@ -126,7 +129,7 @@ func Deploy(c *fiber.Ctx) error {
 				data := LoadConfiguration("./challenges/" + folderName + "/katana.toml")
 				challengeType = data.Challenge.Metadata.Type
 				for i := 0; i < int(numberOfTeams); i++ {
-					log.Println("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
+					logger.Info().Msg("-----------Deploying challenge for team: " + strconv.Itoa(i) + " --------")
 					teamName := "katana-team-" + strconv.Itoa(i)
 					deployment.DeployChallengeToCluster(folderName, teamName, patch, replicas)
 					url, err := createServiceForChallenge(folderName, teamName, 3000, i)
@@ -145,8 +148,9 @@ func Deploy(c *fiber.Ctx) error {
 					}
 					err = mongo.AddChallenge(challenge, teamName)
 					if err != nil {
-						fmt.Println("Error in adding challenge to mongo")
-						log.Println(err)
+						//fmt.Println("Error in adding challenge to mongo")
+						//log.Println(err)
+						logger.Fatal().Err(err)
 					}
 				}
 			}

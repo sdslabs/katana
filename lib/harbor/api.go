@@ -5,11 +5,14 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/sdslabs/katana/logging"
 	"net/http"
 
 	config "github.com/sdslabs/katana/configs"
 	"github.com/sdslabs/katana/lib/utils"
 )
+
+var logger = &logging.GlobalLogger
 
 var baseURL string = "https://harbor.katana.local/api/v2.0"
 

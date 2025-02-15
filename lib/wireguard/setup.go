@@ -50,7 +50,7 @@ func SetupWireguard() error {
 	if err = deployment.ApplyManifest(kubeConfig, kubeClient, manifest.Bytes(), namespace); err != nil {
 		return err
 	}
-	log.Println("Manifest Applied Successfully")
+	logger.Info().Msgf("Manifest Applied Successfully")
 	noOfTeams := int(configs.ClusterConfig.TeamCount)
 
 	configPath, err := os.Getwd()
@@ -63,20 +63,20 @@ func SetupWireguard() error {
 	if os.IsNotExist(err) {
 		err = os.MkdirAll(configPath, os.ModePerm)
 		if err != nil {
-			fmt.Printf("Error creating folder: %v\n", err)
+			logger.Error().Msgf("Error creating folder: %v\n", err)
 		} else {
-			fmt.Println("peer_configs folder created successfully.")
+			logger.Info().Msgf("peer_configs folder created successfully.")
 		}
 	} else if err != nil {
 		fmt.Printf("Error checking folder existence: %v\n", err)
 	}
-	log.Println("created config folder")
+	logger.Info().Msgf("created config folder")
 	for i := 0; i < noOfTeams; i++ {
 		if err := GetConfigFiles(strconv.Itoa(i + 1)); err != nil {
 			return err
 		}
 	}
-	log.Println("take me out")
+	logger.Debug().Msgf("take me out")
 	return nil
 }
 
