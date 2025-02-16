@@ -89,6 +89,19 @@ set-env-prod: build
 	kubectl apply -f $(MANIFEST) && \
 	sudo ./bin/katana run
 
+set-clean:
+	sudo rm -rf peer_configs teamcreds.txt teams && \
+	kind delete clusters $$(kind get clusters)
+
+
+set-kind: build
+	kind create cluster --config metallb-kind-config.yaml && \
+	kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.9/config/manifests/metallb-native.yaml && \
+	kubectl wait --for=condition=Available=True --timeout=90s deployment/controller -n metallb-system && \
+	kubectl apply -f metallb-config.yaml && \
+	kubectl apply -f $(MANIFEST) && \
+	sudo ./bin/katana run
+
 build:
 	cd cmd && go build -o ../bin/katana
 

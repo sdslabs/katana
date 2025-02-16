@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/sdslabs/katana/logging"
 	"io"
 	"log"
 	"path/filepath"
@@ -27,6 +28,8 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
 )
+
+var logger = &logging.GlobalLogger
 
 // ApplyManifest applies a given manifest to the cluster
 func ApplyManifest(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset, manifest []byte, namespace string) error {
@@ -180,7 +183,7 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 
 	for _, m := range clusterConfig.TemplatedManifests {
 		manifest := &bytes.Buffer{}
-		log.Printf("Applying: %s\n", m)
+		logger.Info().Msgf("Applying: %s\n", m)
 		tmpl, err := template.ParseFiles(filepath.Join(clusterConfig.TemplatedManifestDir, m))
 		if err != nil {
 			return err
@@ -193,7 +196,7 @@ func DeployCluster(kubeconfig *rest.Config, kubeclientset *kubernetes.Clientset)
 		if err = ApplyManifest(kubeconfig, kubeclientset, manifest.Bytes(), g.KatanaConfig.KubeNameSpace); err != nil {
 			return err
 		}
-		
+
 	}
 
 	return nil
@@ -211,8 +214,8 @@ func DeployChallengeToCluster(challengeName, teamName string, firstPatch bool, r
 		/// Retrieve the existing deployment
 		existingDeployment, err := deploymentsClient.Get(context.TODO(), challengeName, metav1.GetOptions{})
 		if err != nil {
-			log.Println("Error in retrieving existing deployment.")
-			log.Println(err)
+			logger.Error().Msgf("Error in retrieving existing deployment.")
+			logger.Error().Err(err)
 			return err
 		}
 
@@ -220,12 +223,12 @@ func DeployChallengeToCluster(challengeName, teamName string, firstPatch bool, r
 
 		_, err = deploymentsClient.Update(context.TODO(), existingDeployment, metav1.UpdateOptions{})
 		if err != nil {
-			log.Println("Error in updating deployment.")
-			log.Println(err)
+			logger.Error().Msgf("Error in updating deployment.")
+			logger.Error().Err(err)
 			return err
 		}
 
-		log.Println("Updated deployment with new image.")
+		logger.Info().Msgf("Updated deployment with new image.")
 		return nil
 	}
 
@@ -277,7 +280,6 @@ func DeployChallengeToCluster(challengeName, teamName string, firstPatch bool, r
 	return nil
 }
 
-
 func DeployChallengeCheckerToCluster(challengeCheckerName, namespace string, replicas int32) error {
 
 	kubeclient, _ := utils.GetKubeClient()
@@ -288,7 +290,7 @@ func DeployChallengeCheckerToCluster(challengeCheckerName, namespace string, rep
 	manifest := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: namespace,
-			Name:      challengeCheckerName+"-deployment",
+			Name:      challengeCheckerName + "-deployment",
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: &replicas,
@@ -322,16 +324,15 @@ func DeployChallengeCheckerToCluster(challengeCheckerName, namespace string, rep
 			},
 		},
 	}
-	
-	log.Println("Creating deployment...")
+
+	logger.Info().Msgf("Creating deployment...")
 	result, err := deploymentsClient.Create(context.TODO(), manifest, metav1.CreateOptions{})
 
 	if err != nil {
-		log.Println("Unable to create deployment")
+		logger.Error().Msgf("Unable to create deployment")
 		panic(err)
 	}
 
-	log.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName()+" in namespace "+namespace)
+	logger.Info().Msgf("Created deployment %q.\n", result.GetObjectMeta().GetName()+" in namespace "+namespace)
 	return nil
 }
-

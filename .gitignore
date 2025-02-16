@@ -19,3 +19,4 @@ peer_configs/*
 work.txt
 .DS_Store
 katana-services/*
+.idea/

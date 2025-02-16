@@ -1,8 +1,6 @@
 package harbor
 
 import (
-	"log"
-
 	"github.com/sdslabs/katana/lib/utils"
 )
 
@@ -19,7 +17,7 @@ func SetupHarbor() error {
 
 	for _, deploymentName := range deploymentNames {
 		if err := utils.WaitForDeploymentReady(client, deploymentName, namespace); err != nil {
-			log.Printf("Error testing deployment '%s': %v\n", deploymentName, err)
+			logger.Error().Msgf("Error testing deployment '%s': %v\n", deploymentName, err)
 		}
 	}
 
