@@ -1,0 +1,35 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  serviceSubnet: "172.18.0.0/16"  # custom service CIDR
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 443
+        protocol: TCP
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          taints: []
+  - role: worker
+
+
+# kind: Cluster
+# apiVersion: kind.x-k8s.io/v1alpha4
+# networking:
+#   serviceSubnet: "172.18.0.0/16"  # custom service CIDR
+# nodes:
+#   - role: control-plane
+#     extraPortMappings:
+#       - containerPort: 80
+#         hostPort: 80
+#         protocol: TCP
+#       - containerPort: 443
+#         hostPort: 443
+#         protocol: TCP
+#   - role: worker
